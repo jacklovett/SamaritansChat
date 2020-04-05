@@ -1,0 +1,48 @@
+.actions-container {
+  display: flex;
+  align-items: center;
+}
+
+.toggle-conversation-container {
+  margin-left: 8px;
+  cursor: pointer;
+  height: 24px;
+}
+
+.toggle-conversation {
+  display: flex;
+  align-items: center;
+}
+
+mat-form-field {
+  margin-right: 16px;
+  width: 100%;
+}
+
+.chat-users {
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 780px) {
+  .chat-users {
+    flex-direction: column;
+  }
+}
+
+mat-radio-button {
+  margin: 0 8px;
+}
+
+.rating {
+  display: flex;
+  flex-direction: row;
+}
+
+.rating-description {
+  white-space: normal;
+}
+
+.chat-display {
+  padding: 16px;
+}

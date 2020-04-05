@@ -1,0 +1,26 @@
+@import './../../../sass/theme';
+
+.alert-container {
+  margin: 0;
+  width: 100%;
+  display: flex;
+}
+
+.success {
+  color: $alert-icon-success;
+  margin-right: 8px;
+}
+
+.error {
+  color: $alert-icon-error;
+  margin-right: 8px;
+}
+
+.close-btn {
+  margin-left: auto;
+  opacity: 0.25;
+
+  &.close-btn:hover {
+    opacity: 0.75;
+  }
+}

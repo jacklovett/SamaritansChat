@@ -1,0 +1,230 @@
+/* You can add global styles to this file, and also import other style files */
+// @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import './mixins';
+@import './variables';
+@import './materialFonts';
+@import './theme';
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+body {
+  font-size: 14px;
+  font: 100% $font-stack;
+  background: $background-color;
+}
+
+p,
+span {
+  font-size: 14px;
+}
+
+.mat-card {
+  font-size: 14px;
+}
+
+a {
+  color: $accent;
+}
+
+.navbar-expand .navbar-nav .nav-link {
+  padding: 0;
+  height: 36px;
+  line-height: 36px;
+}
+
+.nav-link {
+  margin-left: 8px;
+}
+
+.bg-dark {
+  background-color: $nav-background !important;
+}
+
+table {
+  width: 100%;
+}
+
+th.mat-header-cell,
+td.mat-cell {
+  padding: 0 14px !important;
+}
+
+td.mat-cell {
+  font-size: 14px;
+}
+
+.center-cell {
+  text-align: center;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-top: 8px;
+}
+
+.chat-window {
+  position: relative;
+  height: 250px;
+  overflow-y: scroll;
+}
+
+.chat-border {
+  border: 1px;
+  border-style: double;
+  border-color: $background-color;
+  border-width: 1px;
+}
+
+.password-container {
+  display: flex;
+}
+
+.container-margin {
+  margin: 32px auto;
+  max-width: 800px;
+}
+
+@media (max-width: 864px) {
+  .container-margin {
+    margin: 32px;
+  }
+}
+
+.content {
+  padding: 0 16px;
+}
+
+.title {
+  font-size: 16px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.search-container {
+  display: flex;
+  font-size: 14px;
+}
+
+.search {
+  margin-left: auto;
+  width: 200px;
+}
+
+.search-icon {
+  position: relative;
+  bottom: -1px;
+  margin-right: 3px;
+}
+
+@media (max-width: 430px) {
+  .search {
+    width: 100%;
+  }
+}
+
+.no-data-found {
+  height: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.5;
+}
+
+.center {
+  height: 300px;
+  position: relative;
+
+  &.center {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+  }
+}
+
+mat-toolbar {
+  background: none !important;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-icon {
+  margin: 0 16px;
+  font-size: 32px;
+}
+
+.primary {
+  background: $primary;
+  color: darken($white, 5%);
+}
+
+.btn-seperator {
+  margin: 0 8px;
+}
+
+.primary-btn:hover {
+  background: darken($primary, 5%);
+}
+
+.cancel-btn:hover {
+  background: darken($white, 10%);
+}
+
+.btn-group {
+  margin: 16px;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-form {
+  display: flex;
+  flex-direction: row;
+}
+
+@media (max-width: 700px) {
+  .user-form {
+    flex-direction: column;
+  }
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.checkbox-container {
+  display: block;
+  margin: 8px 0;
+}
+
+.dialog-container {
+  margin: 16px;
+}
+
+.space-buttons {
+  justify-content: space-evenly;
+}

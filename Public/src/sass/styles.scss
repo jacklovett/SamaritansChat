@@ -1,0 +1,84 @@
+/* You can add global styles to this file, and also import other style files */
+@import './mixins';
+@import './variables';
+@import './materialFonts';
+@import './theme';
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+body {
+  font-size: 14px;
+  font: 100% $font-stack;
+  background: $background-color;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: $accent;
+}
+
+a:hover {
+  color: lighten($accent, 5%);
+}
+
+.bg-dark {
+  background-color: $nav-background !important;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 12px;
+}
+
+.form-spinner {
+  margin: auto;
+}
+
+.mat-card {
+  padding: 0 !important;
+}
+
+mat-toolbar {
+  background: none !important;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.primary {
+  background: $primary;
+  color: darken($white, 5%);
+}
+
+.btn-seperator {
+  margin: 0 8px;
+}
+
+.button {
+  width: 100%;
+  margin: 8px 0 !important;
+}
+
+.primary-btn:hover {
+  background: darken($primary, 5%) !important;
+}
+
+.cancel-btn:hover {
+  background: darken($white, 10%);
+}
+
+.faded-text {
+  opacity: 0.5;
+}

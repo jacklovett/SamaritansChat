@@ -1,0 +1,26 @@
+@import './../../../sass/theme';
+
+.login-panel {
+  max-width: 300px;
+  height: 350px;
+  margin: auto;
+  padding: 12px 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.logo {
+  height: 300px;
+  width: 100%;
+}
+
+.availability-msg {
+  text-align: center;
+}
+
+.login-content {
+  margin: 12px;
+}

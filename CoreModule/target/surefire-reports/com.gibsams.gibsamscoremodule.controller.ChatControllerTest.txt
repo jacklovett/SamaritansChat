@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: com.gibsams.gibsamscoremodule.controller.ChatControllerTest
+-------------------------------------------------------------------------------
+Tests run: 12, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 1.307 s <<< FAILURE! - in com.gibsams.gibsamscoremodule.controller.ChatControllerTest
+testGetChatUsersWhenEmpty(com.gibsams.gibsamscoremodule.controller.ChatControllerTest)  Time elapsed: 0.808 s  <<< FAILURE!
+java.lang.AssertionError: expected:<200> but was:<404>
+	at com.gibsams.gibsamscoremodule.controller.ChatControllerTest.testGetChatUsersWhenEmpty(ChatControllerTest.java:159)
+
+testGetChatUsers(com.gibsams.gibsamscoremodule.controller.ChatControllerTest)  Time elapsed: 0.12 s  <<< FAILURE!
+java.lang.AssertionError: expected:<200> but was:<404>
+	at com.gibsams.gibsamscoremodule.controller.ChatControllerTest.testGetChatUsers(ChatControllerTest.java:141)
+

@@ -1,0 +1,137 @@
+<mat-spinner class="center" [hidden]="!loading" [diameter]="32"></mat-spinner>
+<mat-card [hidden]="loading" class="container-margin">
+  <mat-toolbar>{{ title }}</mat-toolbar>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div class="user-form">
+      <div class="form-column">
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="First Name"
+            formControlName="firstName"
+            [ngClass]="{
+              'is-invalid': submitted && controls.firstName.errors
+            }"
+            autocomplete="off"
+            required
+          />
+          <mat-error *ngIf="submitted && controls['firstName'].errors">
+            {{ getErrorMessage(controls['firstName']) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="Last Name"
+            formControlName="lastName"
+            [ngClass]="{
+              'is-invalid': submitted && controls.lastName.errors
+            }"
+            autocomplete="off"
+            required
+          />
+          <mat-error *ngIf="submitted && controls['lastName'].errors">
+            {{ getErrorMessage(controls['lastName']) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="Email"
+            formControlName="email"
+            [ngClass]="{ 'is-invalid': submitted && controls.email.errors }"
+            autocomplete="off"
+            email
+            required
+          />
+          <mat-error *ngIf="submitted && controls['email'].errors">
+            {{ getErrorMessage(controls['email']) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="Contact Number"
+            formControlName="contactNumber"
+            [ngClass]="{
+              'is-invalid': submitted && controls.contactNumber.errors
+            }"
+            autocomplete="off"
+            pattern="[+0-9]+"
+          />
+          <mat-error *ngIf="submitted && controls['contactNumber'].errors">
+            {{ getErrorMessage(controls['contactNumber']) }}
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="form-column">
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="Username"
+            formControlName="username"
+            [ngClass]="{
+              'is-invalid': submitted && controls.username.errors
+            }"
+            autocomplete="off"
+            required
+          />
+          <mat-error *ngIf="submitted && controls['username'].errors">
+            {{ getErrorMessage(controls['username']) }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            placeholder="Password"
+            formControlName="password"
+            [ngClass]="{
+              'is-invalid': submitted && controls.password.errors
+            }"
+            autocomplete="off"
+            required
+          />
+          <mat-error *ngIf="submitted && controls['password'].errors">
+            {{ getErrorMessage(controls['password']) }}
+          </mat-error>
+        </mat-form-field>
+        <div
+          [hidden]="!editUserId"
+          class="change-password"
+          (click)="openPasswordDialog()"
+        >
+          Change Password
+        </div>
+        <mat-checkbox
+          [hidden]="!currentUser.admin"
+          class="checkbox-container"
+          formControlName="admin"
+          color="primary"
+          >Admin User</mat-checkbox
+        >
+      </div>
+    </div>
+    <div class="btn-group">
+      <button
+        [disabled]="loading"
+        mat-raised-button
+        color="primary"
+        class="primary-btn"
+      >
+        Save
+      </button>
+      <span class="btn-seperator"></span>
+      <button
+        [hidden]="!currentUser.admin"
+        class="btn-seperator"
+        mat-button
+        [routerLink]="['/users']"
+        class="cancel-btn"
+        routerLinkActive="router-link-active"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</mat-card>

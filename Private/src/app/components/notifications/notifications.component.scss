@@ -1,0 +1,71 @@
+@import './../../../sass/theme';
+
+.mat-menu-panel.notifications-dropdown {
+  min-width: 200px;
+  max-width: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+mat-list-item.notification {
+  font-size: 14px !important;
+  cursor: pointer;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  height: 36px;
+}
+
+.notification-icon {
+  line-height: 1 !important;
+  height: 18px !important;
+}
+
+.cta {
+  font-size: 11px;
+  text-decoration: underline;
+  color: $primary;
+
+  &.processed-cta {
+    color: $warn;
+    text-decoration: none;
+  }
+}
+
+.no-notifications {
+  width: 100%;
+  cursor: default;
+  outline: 0;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: block;
+  line-height: 48px;
+  height: 48px;
+  margin: 0;
+  padding: 0 16px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.unread {
+  background: $notification-unread;
+}
+
+mat-list-item.notification.processed {
+  opacity: 0.75;
+  cursor: default;
+}
+
+.delete-notification {
+  margin-left: 8px;
+  color: inherit;
+  opacity: 0.75;
+}
+
+.delete-notification:hover {
+  opacity: 0.5;
+}

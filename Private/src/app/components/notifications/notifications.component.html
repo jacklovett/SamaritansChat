@@ -1,0 +1,62 @@
+<div class="notification">
+  <mat-menu
+    #appMenu="matMenu"
+    xPosition="before"
+    class="notifications-dropdown"
+  >
+    <!-- ng-template is here for lazy loading -->
+    <ng-template matMenuContent>
+      <p class="no-notifications" *ngIf="notifications.length === 0">
+        No new notifications
+      </p>
+      <mat-list *ngIf="notifications.length > 0">
+        <mat-list-item
+          class="notification"
+          [ngClass]="{
+            'unread': !notification.read,
+            'processed': notification.processed
+          }"
+          *ngFor="let notification of notifications"
+          (click)="selectNotification(notification)"
+        >
+          <span matLine>{{ notification.content }}</span>
+          <mat-icon
+            (click)="deleteNotification($event, notification.id)"
+            *ngIf="notification.processed"
+            class="delete-notification material-icons material-icons-btn md-18"
+          >
+            close
+          </mat-icon>
+          <div matLine>
+            <span class="cta" *ngIf="!notification.processed">
+              {{ notification.cta }}
+            </span>
+            <span class="cta processed-cta" *ngIf="notification.processed">
+              {{ notification.processedCTA }}
+            </span>
+          </div>
+          <mat-divider></mat-divider>
+        </mat-list-item>
+      </mat-list>
+    </ng-template>
+  </mat-menu>
+  <mat-icon
+    [matMenuTriggerFor]="appMenu"
+    *ngIf="notificationCount > 0"
+    [matBadge]="notificationCount"
+    matBadgeSize="small"
+    matBadgeColor="warn"
+    matBadgeOverlap="true"
+    class="nav-link notification-icon material-icons material-icons-btn md-18"
+  >
+    notifications
+  </mat-icon>
+  <mat-icon
+    [matMenuTriggerFor]="appMenu"
+    *ngIf="notificationCount === 0"
+    matTooltip="Notifications"
+    class="nav-link material-icons material-icons-btn md-18"
+  >
+    notifications
+  </mat-icon>
+</div>

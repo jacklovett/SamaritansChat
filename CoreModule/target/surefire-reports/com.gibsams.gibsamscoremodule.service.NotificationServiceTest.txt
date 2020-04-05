@@ -1,0 +1,25 @@
+-------------------------------------------------------------------------------
+Test set: com.gibsams.gibsamscoremodule.service.NotificationServiceTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 0 s <<< FAILURE! - in com.gibsams.gibsamscoremodule.service.NotificationServiceTest
+testAddNotification(com.gibsams.gibsamscoremodule.service.NotificationServiceTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.NullPointerException
+	at com.gibsams.gibsamscoremodule.service.NotificationServiceTest.testAddNotification(NotificationServiceTest.java:119)
+
+testAddNotificationWhenUserNotFound(com.gibsams.gibsamscoremodule.service.NotificationServiceTest)  Time elapsed: 0 s  <<< FAILURE!
+org.mockito.exceptions.verification.NeverWantedButInvoked: 
+
+notificationDao.save(
+    <any com.gibsams.gibsamscoremodule.model.Notification>
+);
+Never wanted here:
+-> at com.gibsams.gibsamscoremodule.service.NotificationServiceTest.testAddNotificationWhenUserNotFound(NotificationServiceTest.java:160)
+But invoked here:
+-> at com.gibsams.gibsamscoremodule.service.NotificationService.addNotification(NotificationService.java:59)
+
+	at com.gibsams.gibsamscoremodule.service.NotificationServiceTest.testAddNotificationWhenUserNotFound(NotificationServiceTest.java:160)
+
+testAddNotificationWhenRecipientNotSpecified(com.gibsams.gibsamscoremodule.service.NotificationServiceTest)  Time elapsed: 0 s  <<< ERROR!
+java.lang.NullPointerException
+	at com.gibsams.gibsamscoremodule.service.NotificationServiceTest.testAddNotificationWhenRecipientNotSpecified(NotificationServiceTest.java:137)
+

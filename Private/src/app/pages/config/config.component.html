@@ -1,0 +1,58 @@
+<mat-card class="container-margin">
+  <div class="toolbar">
+    <mat-toolbar>Chat Settings</mat-toolbar>
+  </div>
+  <form [formGroup]="configForm" (ngSubmit)="onSubmit()" class="content">
+    <p>
+      Choose what time the chat service will be available to the public
+    </p>
+    <mat-checkbox
+      class="checkbox-container"
+      formControlName="isTimeRestricted"
+      color="primary"
+      (change)="toggleTimeRestrictions()"
+    >
+      Enable Time Restrictions
+    </mat-checkbox>
+    <mat-form-field class="time-selector">
+      <mat-label>Available From</mat-label>
+      <mat-select formControlName="availableFrom">
+        <mat-option
+          *ngFor="let availableFromTime of availableTimes"
+          [value]="availableFromTime.value"
+        >
+          {{ availableFromTime.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="submitted && controls['availableFrom'].errors">
+        {{ getErrorMessage(controls['availableFrom']) }}
+      </mat-error>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Available Until</mat-label>
+      <mat-select formControlName="availableUntil">
+        <mat-option
+          *ngFor="let availableUntilTime of availableTimes"
+          [value]="availableUntilTime.value"
+        >
+          {{ availableUntilTime.viewValue }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="submitted && controls['availableUntil'].errors">
+        {{ getErrorMessage(controls['availableUntil']) }}
+      </mat-error>
+    </mat-form-field>
+    <div class="form-group">
+      <button
+        [disabled]="loading"
+        *ngIf="!loading"
+        mat-raised-button
+        color="primary"
+        class="primary-btn"
+      >
+        Save Changes
+      </button>
+      <mat-spinner [hidden]="!loading" [diameter]="32"></mat-spinner>
+    </div>
+  </form>
+</mat-card>

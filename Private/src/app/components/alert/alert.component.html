@@ -1,0 +1,29 @@
+<div
+  class="alert-container"
+  *ngIf="alert"
+  [ngClass]="{
+    alert: alert,
+    'alert-success': alert.type === 'success',
+    'alert-danger': alert.type === 'error'
+  }"
+>
+  <mat-icon class="material-icons success" *ngIf="alert.type === 'success'"
+    >check_circle_outline</mat-icon
+  >
+  <mat-icon class="material-icons error" *ngIf="alert.type === 'error'"
+    >highlight_off</mat-icon
+  >
+  {{ alert.message }}
+  <mat-icon
+    class="material-icons material-icons-btn close-btn success"
+    *ngIf="alert.type === 'success'"
+    (click)="close()"
+    >close</mat-icon
+  >
+  <mat-icon
+    class="material-icons material-icons-btn close-btn error"
+    *ngIf="alert.type === 'error'"
+    (click)="close()"
+    >close</mat-icon
+  >
+</div>

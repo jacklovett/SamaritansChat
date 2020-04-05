@@ -1,0 +1,101 @@
+<mat-card class="container-margin">
+  <mat-toolbar>Save Chat Log</mat-toolbar>
+  <div class="content">
+    <form
+      [formGroup]="chatLogForm"
+      (ngSubmit)="onSubmit()"
+      class="form-container"
+    >
+      <div class="chat-users">
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="Chat User"
+            formControlName="username"
+            novalidate
+            autocomplete="off"
+          />
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            placeholder="Volunteer"
+            formControlName="volunteer"
+            novalidate
+            autocomplete="off"
+          />
+        </mat-form-field>
+      </div>
+      <div>
+        <p class="title">Contact Scale</p>
+        <mat-radio-group aria-label="Select an option" formControlName="rating">
+          <mat-radio-button
+            class="radio-button"
+            *ngFor="let rating of chatRatings"
+            [(value)]="rating.id"
+          >
+            <div class="rating">
+              <span>
+                <strong>{{ rating.id }}</strong> =&nbsp;
+              </span>
+              <span class="rating-description">{{ rating.message }}</span>
+            </div>
+          </mat-radio-button>
+        </mat-radio-group>
+      </div>
+      <div class="form-group">
+        <div>
+          Please review the conversation, adding here any notes or comments you
+          have.
+        </div>
+        <mat-form-field>
+          <textarea
+            matInput
+            placeholder="Notes"
+            formControlName="notes"
+            novalidate
+            autocomplete="off"
+            maxlength="300"
+          ></textarea>
+          <mat-hint align="end"
+            >{{ controls['notes'].value.length }} / 300</mat-hint
+          >
+        </mat-form-field>
+      </div>
+      <div class="form-group actions-container">
+        <button
+          *ngIf="!loading"
+          mat-raised-button
+          color="primary"
+          class="primary-btn"
+        >
+          Save
+        </button>
+        <mat-spinner *ngIf="loading" [diameter]="32"></mat-spinner>
+        <div
+          class="toggle-conversation-container"
+          (click)="toggleConversation()"
+        >
+          <div class="toggle-conversation" *ngIf="!this.displayChat">
+            <mat-icon>expand_more</mat-icon>
+            <span>Show conversation</span>
+          </div>
+          <div class="toggle-conversation" *ngIf="this.displayChat">
+            <mat-icon>expand_less</mat-icon>
+            <span>Hide conversation</span>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="chat-display" *ngIf="displayChat">
+      <div *ngIf="!chatMessages?.length" class="no-data-found">
+        <p>No messages where sent during this conversation</p>
+      </div>
+      <app-messages
+        [username]="volunteer"
+        [loading]="loading"
+        [messages]="chatMessages"
+      ></app-messages>
+    </div>
+  </div>
+</mat-card>

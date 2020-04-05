@@ -1,0 +1,40 @@
+<mat-card class="container-margin">
+  <div class="toolbar">
+    <mat-toolbar>Transcript</mat-toolbar>
+    <button
+      (click)="returnToChatLogs()"
+      mat-raised-button
+      color="primary"
+      class="return-btn primary-btn"
+    >
+      Go Back
+    </button>
+  </div>
+  <div class="content">
+    <div class="users-container">
+      <div>Chat user: {{ username }}</div>
+      <div>Volunteer: {{ volunteer }}</div>
+    </div>
+    <div>
+      <p class="title">Contact Scale</p>
+      <p>
+        <strong>{{ rating?.id }}</strong> = {{ rating?.message }}
+      </p>
+    </div>
+    <div [hidden]="!notes">
+      <p class="title">Additional Comments</p>
+      <p>{{ notes }}</p>
+    </div>
+    <div class="chat-border">
+      <div [hidden]="chatMessages" class="no-data-found">
+        No messages where sent during this conversation
+      </div>
+      <app-messages
+        [hidden]="!chatMessages"
+        [username]="volunteer"
+        [loading]="loading"
+        [messages]="chatMessages"
+      ></app-messages>
+    </div>
+  </div>
+</mat-card>

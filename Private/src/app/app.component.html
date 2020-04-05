@@ -1,0 +1,35 @@
+<nav
+  class="navbar navbar-expand navbar-dark bg-dark mat-elevation-z6"
+  *ngIf="isAuthenticated"
+>
+  <div class="navbar-nav">
+    <div class="nav-left">
+      <a class="nav-link" routerLink="/chat">CHAT</a>
+      <a class="nav-link" *ngIf="isAdmin" routerLink="/users">USERS</a>
+      <a class="nav-link" *ngIf="isAdmin" routerLink="/chatlogs">LOGS</a>
+      <a class="nav-link" *ngIf="isAdmin" routerLink="/config">SETTINGS</a>
+    </div>
+    <div class="nav-right">
+      <app-notifications></app-notifications>
+      <mat-icon
+        (click)="viewProfile()"
+        matTooltip="Profile"
+        class="nav-link material-icons material-icons-btn md-18"
+      >
+        account_circle
+      </mat-icon>
+      <mat-icon
+        (click)="logout()"
+        matTooltip="Log Out"
+        class="nav-link material-icons material-icons-btn md-18"
+      >
+        exit_to_app
+      </mat-icon>
+    </div>
+  </div>
+</nav>
+<!-- main app container -->
+<div class="routes">
+  <app-alert></app-alert>
+  <router-outlet></router-outlet>
+</div>

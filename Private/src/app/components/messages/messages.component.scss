@@ -1,0 +1,45 @@
+@import './../../../sass/theme';
+
+.chat-window {
+  position: relative;
+  height: 250px;
+  overflow-y: auto;
+}
+
+mat-list-item.msg-container {
+  margin: 8px 0;
+  height: auto;
+  min-height: 48px;
+}
+
+.msg {
+  padding: 8px;
+  border-radius: 8px;
+  word-break: break-all;
+}
+
+.gib-sams-msg {
+  margin-left: auto;
+}
+
+.chat-user-msg {
+  margin-right: auto;
+  background: darken($white, 10%);
+}
+
+.user-disconnected-msg {
+  position: sticky; // test in other browsers
+  top: 0;
+  z-index: 1;
+  background: darken($white, 10%);
+  width: 100%;
+  opacity: 0.5;
+  text-align: center;
+  padding: 16px;
+}
+
+.date-sent {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+}

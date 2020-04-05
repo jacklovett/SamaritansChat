@@ -1,0 +1,12 @@
+@import './../../../sass/theme';
+
+.change-password {
+  text-decoration: underline;
+  color: $primary;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.change-password:hover {
+  color: darken($primary, 5%);
+}

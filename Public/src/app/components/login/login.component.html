@@ -1,0 +1,31 @@
+<div class="login-panel">
+  <img
+    alt="Gib Sams"
+    class="logo"
+    src="../../../assets/img/gibsams_logo-min.png"
+  />
+  <div class="login-content">
+    <div *ngIf="!chatAvailabilityResponse?.available">
+      <p class="faded-text availability-msg">
+        {{ chatAvailabilityResponse?.message }}
+      </p>
+    </div>
+    <div *ngIf="chatAvailabilityResponse?.available">
+      <button
+        [disabled]="loading"
+        *ngIf="!loading"
+        (click)="openDisclaimerDialog()"
+        mat-raised-button
+        color="primary"
+        class="button primary-btn"
+      >
+        JOIN CHAT
+      </button>
+      <mat-spinner
+        *ngIf="loading"
+        [diameter]="32"
+        class="form-spinner"
+      ></mat-spinner>
+    </div>
+  </div>
+</div>

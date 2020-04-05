@@ -1,0 +1,23 @@
+.login-panel {
+  margin: 0;
+  padding: 32px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  max-width: 500px;
+  width: 100%;
+}
+
+@media (max-width: 700px) {
+  .login-panel {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 479px) {
+  .login-panel {
+    max-width: 300px;
+  }
+}

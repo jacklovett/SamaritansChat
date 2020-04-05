@@ -1,0 +1,54 @@
+<div class="conversation-unavailable" *ngIf="!conversationInProgress">
+  <mat-spinner [diameter]="32"></mat-spinner>
+  <p>Waiting for volunteer to be available...</p>
+</div>
+<div *ngIf="displayChat && conversationInProgress" class="chat-container">
+  <div class="primary mat-elevation-z2">
+    <mat-toolbar class="chat-contact">{{ gibSamsUsername }}</mat-toolbar>
+  </div>
+  <div class="chat-window">
+    <div class="user-disconnected-msg" *ngIf="!volunteerConnected">
+      Sam is currently disconnected
+    </div>
+    <mat-list>
+      <mat-list-item
+        class="msg-container"
+        *ngFor="let chatMessage of chatMessages"
+      >
+        <div
+          class="msg"
+          [ngClass]="{
+            primary: chatMessage.sender === username,
+            'chat-user-msg': chatMessage.sender === username,
+            'gib-sams-msg': chatMessage.sender !== username
+          }"
+        >
+          {{ chatMessage.content }}
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div class="chat-form-section">
+    <form [formGroup]="chatForm" (ngSubmit)="onSend()" class="chat-form form">
+      <mat-form-field>
+        <input
+          matInput
+          placeholder="Type a message"
+          formControlName="message"
+          novalidate
+          autocomplete="off"
+        />
+      </mat-form-field>
+      <button
+        *ngIf="!loading"
+        [disabled]="!volunteerConnected"
+        mat-raised-button
+        color="primary"
+        class="primary-btn send"
+      >
+        Send
+      </button>
+      <mat-spinner *ngIf="loading" [diameter]="32"></mat-spinner>
+    </form>
+  </div>
+</div>
