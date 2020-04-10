@@ -5,12 +5,10 @@
     src="../../../assets/img/gibsams_logo-min.png"
   />
   <div class="login-content">
-    <div *ngIf="!chatAvailabilityResponse?.available">
-      <p class="faded-text availability-msg">
-        {{ chatAvailabilityResponse?.message }}
-      </p>
+    <div class="faded-text" [hidden]="chatAvailabilityResponse?.available">
+      {{ chatAvailabilityResponse?.message }}
     </div>
-    <div *ngIf="chatAvailabilityResponse?.available">
+    <div [hidden]="!chatAvailabilityResponse?.available">
       <button
         [disabled]="loading"
         *ngIf="!loading"
@@ -22,7 +20,7 @@
         JOIN CHAT
       </button>
       <mat-spinner
-        *ngIf="loading"
+        [hidden]="!loading"
         [diameter]="32"
         class="form-spinner"
       ></mat-spinner>
