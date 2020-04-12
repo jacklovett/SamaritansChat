@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.gibsams.gibsamscoremodule.dao.UserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
+import com.gibsams.gibsamscoremodule.exception.InvalidReCaptchaException;
 import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.LoginRequest;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
@@ -35,6 +36,7 @@ import com.gibsams.gibsamscoremodule.responses.JwtAuthenticationResponse;
 import com.gibsams.gibsamscoremodule.security.JwtTokenProvider;
 import com.gibsams.gibsamscoremodule.service.AuthenticationService;
 import com.gibsams.gibsamscoremodule.service.ChatUserService;
+import com.gibsams.gibsamscoremodule.service.ReCaptchaService;
 import com.gibsams.gibsamscoremodule.utils.AppConstants;
 import com.google.gson.Gson;
 
@@ -45,6 +47,7 @@ public class AuthControllerTest {
 	private static final String USERNAME = "username";
 	private static final String SECRET = "secret";
 	private static final String TOKEN = "token";
+	private static final String RECAPTCHA_TOKEN = "recaptcha_test_token";
 
 	private User user;
 	private Gson gson;
@@ -64,6 +67,8 @@ public class AuthControllerTest {
 	private UserDao userDao;
 	@Mock
 	private JwtTokenProvider jwtTokenProvider;
+	@Mock
+	private ReCaptchaService reCaptchaService;
 	@Mock
 	private ChatUserService chatUserService;
 	@Mock
@@ -96,7 +101,8 @@ public class AuthControllerTest {
 		authUserRequestBuilder = MockMvcRequestBuilders.post("/api/auth/login").accept(MediaType.APPLICATION_JSON)
 				.content(json).contentType(MediaType.APPLICATION_JSON);
 
-		chatLoginRequestBuilder = MockMvcRequestBuilders.post("/api/auth/chat/login");
+		chatLoginRequestBuilder = MockMvcRequestBuilders.post("/api/auth/chat/login").accept(MediaType.APPLICATION_JSON)
+				.content(RECAPTCHA_TOKEN).contentType(MediaType.APPLICATION_JSON);
 	}
 
 	@Test
@@ -142,6 +148,20 @@ public class AuthControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
+	}
+
+	@Test
+	public void testChatLoginWhenReCaptchaFails() throws Exception {
+
+		doThrow(new InvalidReCaptchaException("Unable to validate response")).when(reCaptchaService)
+				.verifyResponse(RECAPTCHA_TOKEN);
+		MvcResult result = mockMvc.perform(chatLoginRequestBuilder).andReturn();
+
+		MockHttpServletResponse response = result.getResponse();
+
+		assertNotNull(response);
+		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
+
 	}
 
 	@Test
