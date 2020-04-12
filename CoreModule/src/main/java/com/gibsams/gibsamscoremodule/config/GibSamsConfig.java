@@ -2,6 +2,7 @@ package com.gibsams.gibsamscoremodule.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
 
 import com.gibsams.gibsamscoremodule.dao.ChatConfigDao;
 import com.gibsams.gibsamscoremodule.dao.ChatDao;
@@ -20,6 +21,11 @@ import com.gibsams.gibsamscoremodule.dao.UserInfoDao;
  */
 @Configuration
 public class GibSamsConfig {
+
+	@Bean
+	public RestTemplate getRestTemplate() {
+		return new RestTemplate();
+	}
 
 	@Bean
 	public UserDao userDao() {

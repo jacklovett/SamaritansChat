@@ -26,9 +26,9 @@ export class AuthenticationService {
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
-  login() {
-    return this.http.post<any>(`${this.apiUrl}/auth/chat/login`, {}).pipe(
-      map(jwt => {
+  login(token: string) {
+    return this.http.post<any>(`${this.apiUrl}/auth/chat/login`, token).pipe(
+      map((jwt) => {
         if (jwt?.token) {
           // store jwt token in local storage to keep user logged in between page refreshes
           localStorage.setItem('currentUser', JSON.stringify(jwt));

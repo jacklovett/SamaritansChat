@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "google.recaptcha.key",
+      "type": "com.gibsams.gibsamscoremodule.security.ReCaptchaSettings",
+      "sourceType": "com.gibsams.gibsamscoremodule.security.ReCaptchaSettings"
+    }
+  ],
+  "properties": [
+    {
+      "name": "google.recaptcha.key.secret",
+      "type": "java.lang.String",
+      "sourceType": "com.gibsams.gibsamscoremodule.security.ReCaptchaSettings"
+    },
+    {
+      "name": "google.recaptcha.key.site",
+      "type": "java.lang.String",
+      "sourceType": "com.gibsams.gibsamscoremodule.security.ReCaptchaSettings"
+    },
+    {
+      "name": "google.recaptcha.key.threshold",
+      "type": "java.lang.Double",
+      "sourceType": "com.gibsams.gibsamscoremodule.security.ReCaptchaSettings"
+    }
+  ],
+  "hints": []
+}

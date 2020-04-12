@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
-
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { ReCaptchaV3Service } from 'ng-recaptcha';
 
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
@@ -19,14 +19,18 @@ export class LoginComponent implements OnInit, OnDestroy {
   loading = false;
   submitted = false;
   returnUrl = '';
+
   chatAvailabilityResponse: ChatAvailabilityResponse;
+
+  reCaptchaSubscription: Subscription;
   chatAvailabilitySubscription: Subscription;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authenticationService: AuthenticationService,
     private alertService: AlertService,
+    private recaptchaV3Service: ReCaptchaV3Service,
+    private authenticationService: AuthenticationService,
     private chatAvailabilityService: ChatAvailabilityService,
     public dialog: MatDialog,
   ) {
@@ -50,22 +54,36 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  public onSubmit() {
-    this.submitted = true;
+  public executeRecaptcha(): void {
     this.loading = true;
+    this.reCaptchaSubscription = this.recaptchaV3Service
+      .execute('register')
+      .subscribe(
+        (token) => {
+          this.onSubmit(token);
+        },
+        (error) => {
+          this.alertService.error(error);
+          this.loading = false;
+        },
+      );
+  }
 
-    this.authenticationService.login().subscribe(
+  public onSubmit(token: string) {
+    this.submitted = true;
+
+    this.authenticationService.login(token).subscribe(
       () => {
         this.router.navigate([this.returnUrl]);
       },
-      error => {
+      (error) => {
         this.alertService.error(error);
         this.loading = false;
       },
     );
   }
 
-  public openDisclaimerDialog(): void {
+  public openDisclaimerDialog() {
     const dialogConfig = new MatDialogConfig();
 
     dialogConfig.disableClose = true;
@@ -89,9 +107,9 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.dialog.open(DialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result === 'login') {
-        this.onSubmit();
+        this.executeRecaptcha();
       }
     });
   }
@@ -111,5 +129,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.chatAvailabilitySubscription.unsubscribe();
+    this.reCaptchaSubscription.unsubscribe();
   }
 }
