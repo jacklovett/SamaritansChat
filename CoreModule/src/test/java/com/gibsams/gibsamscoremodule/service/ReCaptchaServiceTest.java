@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
 import com.gibsams.gibsamscoremodule.exception.InvalidReCaptchaException;
+import com.gibsams.gibsamscoremodule.exception.ReCaptchaUnavailableException;
 import com.gibsams.gibsamscoremodule.responses.ReCaptchaResponse;
 import com.gibsams.gibsamscoremodule.security.ReCaptchaSettings;
 
@@ -73,7 +74,7 @@ public class ReCaptchaServiceTest {
 		reCaptchaService.verifyResponse(TOKEN);
 	}
 
-	@Test(expected = InvalidReCaptchaException.class)
+	@Test(expected = ReCaptchaUnavailableException.class)
 	public void testVerifyResponseWhenRestCallFails() throws Exception {
 		doThrow(new RestClientException("Rest call failed!")).when(restTemplate).getForObject(Mockito.any(),
 				Mockito.any());

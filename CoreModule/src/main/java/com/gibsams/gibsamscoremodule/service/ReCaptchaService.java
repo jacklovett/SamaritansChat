@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
 import com.gibsams.gibsamscoremodule.exception.InvalidReCaptchaException;
+import com.gibsams.gibsamscoremodule.exception.ReCaptchaUnavailableException;
 import com.gibsams.gibsamscoremodule.responses.ReCaptchaResponse;
 import com.gibsams.gibsamscoremodule.security.ReCaptchaSettings;
 import com.google.common.cache.CacheBuilder;
@@ -54,6 +55,12 @@ public class ReCaptchaService {
 				});
 	}
 
+	/**
+	 * Verifies google Recaptcha response
+	 * 
+	 * @param response
+	 * @throws RestClientException | InvalidReCaptchaException
+	 */
 	public void verifyResponse(String response) {
 		String clientIp = getClientIP();
 		securityCheck(response, clientIp);
@@ -64,7 +71,7 @@ public class ReCaptchaService {
 		try {
 			reCaptchaResponse = restTemplate.getForObject(verifyUri, ReCaptchaResponse.class);
 		} catch (RestClientException ex) {
-			throw new InvalidReCaptchaException("ReCaptcha verification is currently unavailable", ex);
+			throw new ReCaptchaUnavailableException("ReCaptcha verification is currently unavailable", ex);
 		}
 
 		logger.info("Recaptcha Response: {}", reCaptchaResponse);

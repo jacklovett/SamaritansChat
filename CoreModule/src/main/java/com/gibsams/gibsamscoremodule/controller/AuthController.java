@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
 import com.gibsams.gibsamscoremodule.exception.InvalidReCaptchaException;
+import com.gibsams.gibsamscoremodule.exception.ReCaptchaUnavailableException;
 import com.gibsams.gibsamscoremodule.requests.LoginRequest;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.responses.JwtAuthenticationResponse;
@@ -58,7 +59,7 @@ public class AuthController {
 		logger.info("AuthController - chatLogin - init");
 		try {
 			reCaptchaService.verifyResponse(token);
-		} catch (InvalidReCaptchaException ex) {
+		} catch (ReCaptchaUnavailableException | InvalidReCaptchaException ex) {
 			throw new GibSamsException("Login failed: Blocked by ReCaptcha", ex);
 		}
 		RegisterRequest chatUserRequest = chatUserService.buildChatUserRequest();
