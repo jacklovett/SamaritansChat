@@ -37,7 +37,7 @@ export class TranscriptComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.transcriptSubscription = this.route.params.subscribe(params => {
+    this.transcriptSubscription = this.route.params.subscribe((params) => {
       this.transcriptId = +params['id'];
     });
 
@@ -66,7 +66,7 @@ export class TranscriptComponent implements OnInit, OnDestroy {
     this.username = transcript.username;
     this.notes = transcript.notes;
     this.chatMessages = JSON.parse(transcript.conversation);
-    this.rating = ratings.find(rating => rating.id === transcript.rating);
+    this.rating = ratings.find((rating) => rating.id === transcript.rating);
   }
 
   returnToChatLogs() {

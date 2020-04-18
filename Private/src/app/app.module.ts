@@ -2,11 +2,12 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRouting } from './app-routing.module';
-import { AppComponent } from './app.component';
 import { MaterialModule } from './material.module';
+import { AppComponent } from './app.component';
 
 import { ChatComponent } from './pages/chat/chat.component';
 import { LoginComponent } from './pages/login/login.component';
@@ -22,6 +23,7 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import { NotificationsComponent } from './components/notifications/notifications.component';
 import { PasswordComponent } from './components/password/password.component';
 import { MessagesComponent } from './components/messages/messages.component';
+import { TableComponent } from './components/table/table.component';
 
 import { ErrorInterceptor } from './helpers/error.interceptor';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
@@ -62,6 +64,7 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
     PasswordDirective,
     PasswordComponent,
     MessagesComponent,
+    TableComponent,
   ],
   imports: [
     BrowserModule,
@@ -73,6 +76,7 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
   ],
   entryComponents: [DialogComponent, PasswordComponent],
   providers: [
+    DatePipe,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: customTooltipDefaults },

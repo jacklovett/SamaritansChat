@@ -11,7 +11,10 @@ import { AuthenticationService } from './authentication.service';
 import { environment } from 'src/environments/environment';
 
 import { ApiResponse } from '../models/api.response';
-import { Notification, PartialNotification } from 'src/app/models/notification';
+import {
+  Notification,
+  PartialNotification,
+} from 'src/app/components/notifications/notification';
 import { ConversationRequest } from '../models/conversation.request';
 
 @Injectable({
@@ -43,13 +46,13 @@ export class NotificationService {
     _this.stompClient.connect(
       {},
       () => {
-        this.stompClient.subscribe('/chat/notifications', function(msg: any) {
+        this.stompClient.subscribe('/chat/notifications', function (msg: any) {
           _this.handleNotification(JSON.parse(msg.body));
         });
 
         this.stompClient.subscribe(
           '/chat/notifications/' + this.currentUser.username,
-          function(msg: any) {
+          function (msg: any) {
             _this.handleNotification(JSON.parse(msg.body));
           },
         );

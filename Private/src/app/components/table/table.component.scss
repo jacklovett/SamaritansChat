@@ -1,0 +1,42 @@
+.table-container {
+  overflow-x: auto;
+}
+
+.search-container {
+  display: flex;
+  font-size: 14px;
+}
+
+.search {
+  margin-left: auto;
+  width: 200px;
+}
+
+.search-icon {
+  position: relative;
+  bottom: -1px;
+  margin-right: 3px;
+}
+
+@media (max-width: 430px) {
+  .search {
+    width: 100%;
+  }
+}
+
+table {
+  width: 100%;
+}
+
+th.mat-header-cell,
+td.mat-cell {
+  padding: 0 14px !important;
+}
+
+td.mat-cell {
+  font-size: 14px;
+}
+
+.center-cell {
+  text-align: center;
+}
