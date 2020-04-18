@@ -4,7 +4,7 @@ import { AlertService } from 'src/app/services/alert.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { Subscription } from 'rxjs';
 
-import { Notification } from 'src/app/models/notification';
+import { Notification } from 'src/app/components/notifications/notification';
 import { ConversationRequest } from 'src/app/models/conversation.request';
 
 @Component({
@@ -33,7 +33,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     this.isReloadRequiredSubscription = this.notificationService
       .isReloadRequired()
-      .subscribe(result => {
+      .subscribe((result) => {
         if (result) {
           this.getNotifications();
         }
@@ -41,7 +41,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     this.notificationsSubscription = this.notificationService
       .getNotifications()
-      .subscribe(notification => {
+      .subscribe((notification) => {
         this.notifications.unshift(notification);
         ++this.notificationCount;
       });
@@ -100,7 +100,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       this.notifications = [];
       this.notifications = await this.notificationService.get().toPromise();
       const unreadNotifications = this.notifications.filter(
-        notification => !notification.read,
+        (notification) => !notification.read,
       );
       this.notificationCount = unreadNotifications.length;
     } catch (error) {

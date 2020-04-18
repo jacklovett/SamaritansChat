@@ -1,10 +1,6 @@
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
 
 import { ListUser } from './../../models/user';
 import { UserService } from './../../services/user.service';
@@ -12,6 +8,7 @@ import { AlertService } from './../../services/alert.service';
 
 import { Subscription } from 'rxjs';
 import { DialogComponent } from 'src/app/components/dialog/dialog.component';
+import { ColumnDetails } from 'src/app/components/table/columnDetails';
 
 @Component({
   selector: 'app-users',
@@ -21,21 +18,53 @@ import { DialogComponent } from 'src/app/components/dialog/dialog.component';
 export class UsersComponent implements OnInit, OnDestroy {
   loading = false;
 
-  displayedColumns: string[] = [
-    'name',
-    'username',
-    'email',
-    'contactNumber',
-    'lastActive',
-    'edit',
-    'delete',
-  ];
-
   users: ListUser[] = [];
-  dataSource: MatTableDataSource<ListUser>;
 
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  columnDetails: ColumnDetails[] = [
+    {
+      id: 'name',
+      title: 'Name',
+      value: (user: ListUser) => user.name,
+    },
+    {
+      id: 'username',
+      title: 'Username',
+      value: (user: ListUser) => user.username,
+    },
+    {
+      id: 'email',
+      title: 'Email',
+      value: (user: ListUser) => user.email,
+    },
+    {
+      id: 'contact-number',
+      title: 'Contact Number',
+      value: (user: ListUser) => user.contactNumber,
+      isDateTime: true,
+    },
+    {
+      id: 'last-active',
+      title: 'Last Active',
+      value: (user: ListUser) => user.lastActive,
+      isDateTime: true,
+    },
+    {
+      id: 'edit',
+      title: '',
+      value: (user: ListUser) => `${user.id}`,
+      iconName: 'edit',
+      tooltip: 'Edit User',
+      onClick: (id: number) => this.editUser(id),
+    },
+    {
+      id: 'delete',
+      title: '',
+      value: (user: ListUser) => `${user.id}`,
+      iconName: 'delete',
+      tooltip: 'Delete User',
+      onClick: (id: number) => this.openDeleteDialog(id),
+    },
+  ];
 
   isReloadRequiredSubscription: Subscription;
 
@@ -51,7 +80,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     this.isReloadRequiredSubscription = this.userService
       .isReloadRequired()
-      .subscribe(result => {
+      .subscribe((result) => {
         if (result) {
           this.loadUsers();
         }
@@ -72,31 +101,21 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.deleteDialog.open(DialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result === 'delete') {
         this.deleteUser(userId);
       }
     });
   }
 
-  editUser(user: ListUser) {
-    this.router.navigate(['user', JSON.stringify(user.id)]);
-  }
-
-  addUser() {
-    this.router.navigate(['register']);
-  }
-
-  search(event: Event) {
-    const searchValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = searchValue.trim().toLowerCase();
-  }
+  addUser = () => this.router.navigate(['register']);
+  editUser = (id: number) => this.router.navigate(['user', id]);
 
   private async loadUsers() {
     this.loading = true;
     try {
       const users = await this.userService.get().toPromise();
-      this.users = users.map(user => ({
+      this.users = users.map((user) => ({
         id: user.id,
         name: `${user.firstName} ${user.lastName}`,
         username: user.username,
@@ -104,11 +123,6 @@ export class UsersComponent implements OnInit, OnDestroy {
         contactNumber: user.contactNumber,
         lastActive: user.lastActive,
       }));
-      setTimeout(() => {
-        this.dataSource = new MatTableDataSource<ListUser>(this.users);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      });
     } catch (error) {
       this.alertService.error(error);
     }

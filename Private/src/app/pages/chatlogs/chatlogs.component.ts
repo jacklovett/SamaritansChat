@@ -1,12 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AlertService } from 'src/app/services/alert.service';
 import { Router } from '@angular/router';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
 
 import { ChatLog } from 'src/app/models/chat.log';
 import { ChatLogService } from 'src/app/services/chatlog.service';
-import { MatSort } from '@angular/material/sort';
+
+import { ColumnDetails } from 'src/app/components/table/columnDetails';
 
 @Component({
   selector: 'app-chatlogs',
@@ -16,20 +15,45 @@ import { MatSort } from '@angular/material/sort';
 export class ChatLogsComponent implements OnInit {
   loading = false;
 
-  displayedColumns: string[] = [
-    'volunteer',
-    'username',
-    'rating',
-    'startTime',
-    'endTime',
-    'transcript',
-  ];
-
   chatLogs: ChatLog[] = [];
-  dataSource: MatTableDataSource<ChatLog>;
 
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  columnDetails: ColumnDetails[] = [
+    {
+      id: 'volunteer',
+      title: 'Volunteer',
+      value: (chatlog: ChatLog) => chatlog.volunteer,
+    },
+    {
+      id: 'username',
+      title: 'Username',
+      value: (chatLog: ChatLog) => chatLog.username,
+    },
+    {
+      id: 'rating',
+      title: 'Rating',
+      value: (chatLog: ChatLog) => `${chatLog.rating}`,
+    },
+    {
+      id: 'start-time',
+      title: 'Start Time',
+      value: (chatLog: ChatLog) => chatLog.startTime,
+      isDateTime: true,
+    },
+    {
+      id: 'end-time',
+      title: 'End Time',
+      value: (chatLog: ChatLog) => chatLog.endTime,
+      isDateTime: true,
+    },
+    {
+      id: 'transcript',
+      title: 'Transcript',
+      value: (chatLog: ChatLog) => `${chatLog.transcriptId}`,
+      iconName: 'description',
+      tooltip: 'See Transcript',
+      onClick: (id: number) => this.goToTranscript(id),
+    },
+  ];
 
   constructor(
     private router: Router,
@@ -41,27 +65,15 @@ export class ChatLogsComponent implements OnInit {
     this.loadChatLogs();
   }
 
-  search(event: Event) {
-    const searchValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = searchValue.trim().toLowerCase();
-  }
-
   private async loadChatLogs() {
     this.loading = true;
     try {
       this.chatLogs = await this.chatLogService.get().toPromise();
-      setTimeout(() => {
-        this.dataSource = new MatTableDataSource<ChatLog>(this.chatLogs);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      });
     } catch (error) {
       this.alertService.error(error);
     }
     this.loading = false;
   }
 
-  goToTranscript(id: number) {
-    this.router.navigate(['transcript', id]);
-  }
+  goToTranscript = (id: number) => this.router.navigate(['transcript', id]);
 }
