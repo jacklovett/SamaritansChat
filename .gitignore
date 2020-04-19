@@ -25,7 +25,10 @@ hs_err_pid*
 # vscode
 /.vscode
 
-# eclipse
-CoreModule/.factorypath
-CoreModule/.settings/org.eclipse.jdt.apt.core.prefs
-CoreModule/.settings/org.eclipse.jdt.core.prefs
+# Maven/Eclipse
+.factorypath
+.classpath
+.project
+.settings/
+target/
+
