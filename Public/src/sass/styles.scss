@@ -71,8 +71,8 @@ mat-form-field {
   margin: 8px 0 !important;
 }
 
-.primary-btn:hover {
-  background: darken($primary, 5%) !important;
+button.mat-raised-button.primary-btn:hover {
+  background: darken($primary, 5%);
 }
 
 .cancel-btn:hover {

@@ -47,13 +47,8 @@ a {
   background-color: $nav-background !important;
 }
 
-.form-container {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group {
-  margin-top: 8px;
+.form-section {
+  margin: 8px 0;
 }
 
 .chat-window {
@@ -78,14 +73,14 @@ a {
   max-width: 800px;
 }
 
+.content {
+  padding: 0 16px;
+}
+
 @media (max-width: 864px) {
   .container-margin {
     margin: 16px;
   }
-}
-
-.content {
-  padding: 0 16px;
 }
 
 .title {
@@ -138,7 +133,7 @@ mat-toolbar {
   margin: 0 8px;
 }
 
-.primary-btn:hover {
+button.mat-raised-button.primary-btn:hover {
   background: darken($primary, 5%);
 }
 

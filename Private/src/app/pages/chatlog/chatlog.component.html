@@ -26,7 +26,7 @@
           />
         </mat-form-field>
       </div>
-      <div>
+      <div class="form-section">
         <p class="title">Contact Scale</p>
         <mat-radio-group aria-label="Select an option" formControlName="rating">
           <mat-radio-button
@@ -43,7 +43,7 @@
           </mat-radio-button>
         </mat-radio-group>
       </div>
-      <div class="form-group">
+      <div class="form-section">
         <div>
           Please review the conversation, adding here any notes or comments you
           have.
@@ -62,7 +62,7 @@
           >
         </mat-form-field>
       </div>
-      <div class="form-group actions-container">
+      <div class="form-section actions-container">
         <button
           *ngIf="!loading"
           mat-raised-button
@@ -76,18 +76,18 @@
           class="toggle-conversation-container"
           (click)="toggleConversation()"
         >
-          <div class="toggle-conversation" *ngIf="!this.displayChat">
+          <div class="toggle-conversation" [hidden]="this.displayChat">
             <mat-icon>expand_more</mat-icon>
             <span>Show conversation</span>
           </div>
-          <div class="toggle-conversation" *ngIf="this.displayChat">
+          <div class="toggle-conversation" [hidden]="!this.displayChat">
             <mat-icon>expand_less</mat-icon>
             <span>Hide conversation</span>
           </div>
         </div>
       </div>
     </form>
-    <div class="chat-display" *ngIf="displayChat">
+    <div class="chat-border" [hidden]="!displayChat">
       <div *ngIf="!chatMessages?.length" class="no-data-found">
         <p>No messages where sent during this conversation</p>
       </div>
