@@ -1,5 +1,6 @@
 package com.gibsams.gibsamscoremodule.security;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,8 +10,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.User;
-import com.gibsams.gibsamscoremodule.model.UserInfo;
 
 public class UserPrincipal implements UserDetails {
 
@@ -21,7 +22,6 @@ public class UserPrincipal implements UserDetails {
 
 	private Long id;
 	private String username;
-	private UserInfo userInfo;
 
 	@JsonIgnore
 	private String email;
@@ -31,22 +31,24 @@ public class UserPrincipal implements UserDetails {
 
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public UserPrincipal(Long id, String username, UserInfo userInfo, String email, String password,
+	public UserPrincipal(Long id, String username, String email, String password,
 			Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
-		this.userInfo = userInfo;
 		this.email = email;
 		this.password = password;
 		this.authorities = authorities;
 	}
 
 	public static UserPrincipal create(User user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+		List<GrantedAuthority> authorities = new ArrayList<>();
 
-		return new UserPrincipal(user.getId(), user.getUsername(), user.getUserInfo(), user.getEmail(),
-				user.getPassword(), authorities);
+		if (user instanceof BoUser) {
+			BoUser boUser = (BoUser) user;
+			authorities = boUser.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName()))
+					.collect(Collectors.toList());
+		}
+		return new UserPrincipal(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), authorities);
 	}
 
 	public Long getId() {
@@ -60,10 +62,6 @@ public class UserPrincipal implements UserDetails {
 	@Override
 	public String getUsername() {
 		return username;
-	}
-
-	public UserInfo getUserInfo() {
-		return userInfo;
 	}
 
 	@Override

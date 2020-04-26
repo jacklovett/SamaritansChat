@@ -2,51 +2,47 @@ package com.gibsams.gibsamscoremodule.responses;
 
 import java.time.Instant;
 
-import com.gibsams.gibsamscoremodule.model.User;
-import com.gibsams.gibsamscoremodule.model.UserInfo;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.utils.RoleEnum;
 
 /**
  * Response return when requesting user details
+ * 
  * @author jackl
  *
  */
 public class UserResponse {
-	
+
 	private Long id;
-	
-	private Long userInfoId;
-	
+
 	private String firstName;
-	
+
 	private String lastName;
-	
+
 	private String username;
-	
+
 	private String contactNumber;
-	
+
 	private String email;
-	
+
 	private boolean admin;
-	
+
 	private Instant lastActive;
 
-	public UserResponse() { }
-	
-	public UserResponse(User user, UserInfo userInfo) {
+	public UserResponse() {
+	}
+
+	public UserResponse(BoUser user) {
 		this.id = user.getId();
-		this.userInfoId = userInfo.getId();
 		this.username = user.getUsername();
 		this.email = user.getEmail();
-		this.admin = user.getRoles().stream()
-				.anyMatch(x -> x.getId() == RoleEnum.ADMIN.getId());
+		this.admin = user.getRoles().stream().anyMatch(x -> x.getId() == RoleEnum.ADMIN.getId());
 		this.lastActive = user.getLastActive();
-		this.firstName = userInfo.getFirstName();
-		this.lastName = userInfo.getLastName();
-		this.contactNumber = userInfo.getContactNumber();
-		
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.contactNumber = user.getContactNumber();
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -55,14 +51,6 @@ public class UserResponse {
 		this.id = id;
 	}
 
-	public Long getUserInfoId() {
-		return userInfoId;
-	}
-
-	public void setUserInfoId(Long userInfoId) {
-		this.userInfoId = userInfoId;
-	}
-	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -86,7 +74,7 @@ public class UserResponse {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
+
 	public String getContactNumber() {
 		return contactNumber;
 	}
@@ -110,7 +98,7 @@ public class UserResponse {
 	public void setAdmin(boolean admin) {
 		this.admin = admin;
 	}
-	
+
 	public Instant getLastActive() {
 		return lastActive;
 	}
@@ -130,7 +118,6 @@ public class UserResponse {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((lastActive == null) ? 0 : lastActive.hashCode());
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
-		result = prime * result + ((userInfoId == null) ? 0 : userInfoId.hashCode());
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
@@ -192,13 +179,6 @@ public class UserResponse {
 		} else if (!lastName.equals(other.lastName)) {
 			return false;
 		}
-		if (userInfoId == null) {
-			if (other.userInfoId != null) {
-				return false;
-			}
-		} else if (!userInfoId.equals(other.userInfoId)) {
-			return false;
-		}
 		if (username == null) {
 			if (other.username != null) {
 				return false;
@@ -211,9 +191,9 @@ public class UserResponse {
 
 	@Override
 	public String toString() {
-		return "UserResponse [id=" + id + ", userInfoId=" + userInfoId + ", firstName=" + firstName + ", lastName="
-				+ lastName + ", username=" + username + ", contactNumber=" + contactNumber + ", email=" + email
-				+ ", admin=" + admin + ", lastActive=" + lastActive + "]";
+		return "UserResponse [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", username="
+				+ username + ", contactNumber=" + contactNumber + ", email=" + email + ", admin=" + admin
+				+ ", lastActive=" + lastActive + "]";
 	}
 
 }

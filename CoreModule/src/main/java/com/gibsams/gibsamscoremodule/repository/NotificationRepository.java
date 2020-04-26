@@ -15,9 +15,7 @@ import com.gibsams.gibsamscoremodule.model.Notification;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-	List<Notification> findAllByOrderByIdDesc();
-
-	@Query("SELECT n FROM Notification n WHERE n.user.id = :userId")
+	@Query("SELECT n FROM Notification n WHERE n.boUser.id = :userId ORDER BY id DESC")
 	List<Notification> findAllByUserByOrderByIdDesc(@Param("userId") Long userId);
 
 	@Override

@@ -3,6 +3,7 @@ package com.gibsams.gibsamscoremodule.controller;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -22,14 +23,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.gibsams.gibsamscoremodule.dao.UserDao;
-import com.gibsams.gibsamscoremodule.model.User;
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.requests.UserDetailsRequest;
 import com.gibsams.gibsamscoremodule.requests.UserRequest;
 import com.gibsams.gibsamscoremodule.responses.ApiResponse;
 import com.gibsams.gibsamscoremodule.responses.UserResponse;
-import com.gibsams.gibsamscoremodule.service.BOUserService;
+import com.gibsams.gibsamscoremodule.service.BoUserService;
 
 /**
  * User REST controller
@@ -42,10 +43,10 @@ import com.gibsams.gibsamscoremodule.service.BOUserService;
 public class UserController {
 
 	@Autowired
-	private UserDao userDao;
+	private BoUserDao boUserDao;
 
 	@Autowired
-	private BOUserService boUserService;
+	private BoUserService boUserService;
 
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -58,7 +59,8 @@ public class UserController {
 	public ResponseEntity<List<UserResponse>> getUsers() {
 		logger.info("UserController - getUsers - init");
 
-		List<UserResponse> users = userDao.findAllUserResponses();
+		List<UserResponse> users = boUserDao.findAllUsers().stream().map(UserResponse::new)
+				.collect(Collectors.toList());
 
 		if (users.isEmpty()) {
 			logger.info("No users found in database");
@@ -77,10 +79,9 @@ public class UserController {
 	public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
 		logger.info("UserController - getUserById - init");
 		UserResponse userResponse = null;
-
-		User user = userDao.findUserById(id);
+		BoUser user = boUserDao.findUserById(id);
 		if (user != null) {
-			userResponse = new UserResponse(user, user.getUserInfo());
+			userResponse = new UserResponse(user);
 		}
 
 		return ResponseEntity.of(Optional.ofNullable(userResponse));
@@ -108,11 +109,11 @@ public class UserController {
 	@PostMapping("/register")
 	public ResponseEntity<ApiResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
 		logger.info("UserController - registerUser - init");
-		if (userDao.existsByUsername(registerRequest.getUsername())) {
+		if (boUserDao.existsByUsername(registerRequest.getUsername())) {
 			return new ResponseEntity<>(new ApiResponse(false, "Username is already taken!"), HttpStatus.BAD_REQUEST);
 		}
 
-		if (userDao.existsByEmail(registerRequest.getEmail())) {
+		if (boUserDao.existsByEmail(registerRequest.getEmail())) {
 			return new ResponseEntity<>(new ApiResponse(false, "Email Address already in use!"),
 					HttpStatus.BAD_REQUEST);
 		}
@@ -134,7 +135,7 @@ public class UserController {
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long id) {
 		logger.info("UserController - deleteUser - init");
-		userDao.deleteUserById(id);
+		boUserDao.deleteUserById(id);
 		return ResponseEntity.ok(new ApiResponse(true, "User deleted successfully"));
 	}
 
@@ -188,12 +189,12 @@ public class UserController {
 		String username = userDetailsRequest.getValue();
 
 		if (userDetailsRequest.getUserId() != null) {
-			User user = userDao.findUserById(userDetailsRequest.getUserId());
+			BoUser user = boUserDao.findUserById(userDetailsRequest.getUserId());
 			if (user.getUsername().equals(username))
 				return ResponseEntity.ok(new ApiResponse(true, "This is the same username"));
 		}
 
-		if (!userDao.existsByUsername(username))
+		if (!boUserDao.existsByUsername(username))
 			return ResponseEntity.ok(new ApiResponse(true, "This username is available"));
 		else
 			return ResponseEntity.ok(new ApiResponse(false, "This username is unavailable. Please choose another."));
@@ -213,12 +214,12 @@ public class UserController {
 		String email = userDetailsRequest.getValue();
 
 		if (userDetailsRequest.getUserId() != null) {
-			User user = userDao.findUserById(userDetailsRequest.getUserId());
+			BoUser user = boUserDao.findUserById(userDetailsRequest.getUserId());
 			if (user.getEmail().equals(email))
 				return ResponseEntity.ok(new ApiResponse(true, "This is the same email"));
 		}
 
-		if (!userDao.existsByEmail(email))
+		if (!boUserDao.existsByEmail(email))
 			return ResponseEntity.ok(new ApiResponse(true, "This email is available"));
 		else
 			return ResponseEntity.ok(new ApiResponse(false, "This email is unavailable. Please choose another."));

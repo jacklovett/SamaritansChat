@@ -26,16 +26,14 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.gibsams.gibsamscoremodule.dao.RoleDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
-import com.gibsams.gibsamscoremodule.model.User;
-import com.gibsams.gibsamscoremodule.model.UserInfo;
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.requests.UserDetailsRequest;
 import com.gibsams.gibsamscoremodule.requests.UserRequest;
 import com.gibsams.gibsamscoremodule.responses.ApiResponse;
 import com.gibsams.gibsamscoremodule.responses.UserResponse;
-import com.gibsams.gibsamscoremodule.service.BOUserService;
+import com.gibsams.gibsamscoremodule.service.BoUserService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -57,13 +55,11 @@ public class UserControllerTest {
 	private static final String NEW_USERNAME_EMAIL = "newUsernameOrEmail";
 	private static final String USER_URI = "http://localhost/api/users/username";
 
-	private List<User> users;
+	private List<BoUser> users;
 	private List<UserResponse> userResponses;
 
-	private User user;
-	private User user2;
-
-	private UserInfo userInfo;
+	private BoUser boUser;
+	private BoUser boUser2;
 
 	private UserResponse userResponse;
 
@@ -76,13 +72,11 @@ public class UserControllerTest {
 	private MockMvc mockMvc;
 
 	@Mock
-	private UserDao userDao;
-	@Mock
-	private RoleDao roleDao;
+	private BoUserDao boUserDao;
 	@Mock
 	private PasswordEncoder passwordEncoder;
 	@Mock
-	private BOUserService boUserService;
+	private BoUserService boUserService;
 	@InjectMocks
 	private UserController userController;
 
@@ -91,29 +85,27 @@ public class UserControllerTest {
 
 		gson = new GsonBuilder().serializeNulls().create();
 
-		userInfo = new UserInfo();
-		userInfo.setFirstName(FIRST_NAME);
-		userInfo.setLastName(LAST_NAME);
+		boUser = new BoUser();
+		boUser.setId(ID);
+		boUser.setUsername(USERNAME);
+		boUser.setEmail(EMAIL);
+		boUser.setFirstName(FIRST_NAME);
+		boUser.setLastName(LAST_NAME);
 
-		user = new User();
-		user.setId(ID);
-		user.setUsername(USERNAME);
-		user.setEmail(EMAIL);
-		user.setUserInfo(userInfo);
-
-		user2 = new User();
-		user2.setId(2L);
-		user2.setUserInfo(userInfo);
+		boUser2 = new BoUser();
+		boUser2.setId(2L);
+		boUser2.setUsername(USERNAME);
+		boUser2.setEmail(EMAIL);
 
 		users = new ArrayList<>();
-		users.add(user);
-		users.add(user2);
+		users.add(boUser);
+		users.add(boUser2);
 
-		userResponse = new UserResponse(user, userInfo);
+		userResponse = new UserResponse(boUser);
 
 		userResponses = new ArrayList<>();
 		userResponses.add(userResponse);
-		userResponses.add(new UserResponse(user2, userInfo));
+		userResponses.add(new UserResponse(boUser2));
 
 		userRequest = new UserRequest();
 		userRequest.setId(ID);
@@ -132,7 +124,7 @@ public class UserControllerTest {
 	@Test
 	public void testGetUsers() throws Exception {
 
-		when(userDao.findAllUserResponses()).thenReturn(userResponses);
+		when(boUserDao.findAllUsers()).thenReturn(users);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/")
 				.contentType(MediaType.APPLICATION_JSON);
@@ -149,9 +141,9 @@ public class UserControllerTest {
 	@Test
 	public void testGetUsersReturnsNoUsers() throws Exception {
 
-		userResponses.clear();
+		users.clear();
 
-		when(userDao.findAllUserResponses()).thenReturn(userResponses);
+		when(boUserDao.findAllUsers()).thenReturn(users);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/")
 				.contentType(MediaType.APPLICATION_JSON);
@@ -169,7 +161,7 @@ public class UserControllerTest {
 	@Test
 	public void testGetUserById() throws Exception {
 
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/" + ID)
 				.contentType(MediaType.APPLICATION_JSON);
@@ -186,7 +178,7 @@ public class UserControllerTest {
 	@Test
 	public void testGeUserByIdNotFound() throws Exception {
 
-		when(userDao.findUserById(ID)).thenReturn(null);
+		when(boUserDao.findUserById(ID)).thenReturn(null);
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/" + ID)
 				.contentType(MediaType.APPLICATION_JSON);
@@ -220,7 +212,7 @@ public class UserControllerTest {
 	@Test
 	public void testRegisterUserWhenUsernameAlreadyExists() throws Exception {
 
-		when(userDao.existsByUsername(registerRequest.getUsername())).thenReturn(true);
+		when(boUserDao.existsByUsername(registerRequest.getUsername())).thenReturn(true);
 
 		String json = gson.toJson(registerRequest);
 
@@ -240,7 +232,7 @@ public class UserControllerTest {
 	@Test
 	public void testRegisterUserWhenEmailAlreadyExists() throws Exception {
 
-		when(userDao.existsByEmail(registerRequest.getEmail())).thenReturn(true);
+		when(boUserDao.existsByEmail(registerRequest.getEmail())).thenReturn(true);
 
 		String json = gson.toJson(registerRequest);
 
@@ -376,8 +368,8 @@ public class UserControllerTest {
 
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
 
-		when(userDao.findUserById(ID)).thenReturn(user);
-		when(userDao.existsByUsername(NEW_USERNAME_EMAIL)).thenReturn(true);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
+		when(boUserDao.existsByUsername(NEW_USERNAME_EMAIL)).thenReturn(true);
 
 		ResponseEntity<ApiResponse> response = userController.isUsernameAvailable(userDetailsRequest);
 
@@ -394,7 +386,7 @@ public class UserControllerTest {
 		userDetailsRequest.setUserId(null);
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
 
-		when(userDao.existsByUsername(NEW_USERNAME_EMAIL)).thenReturn(false);
+		when(boUserDao.existsByUsername(NEW_USERNAME_EMAIL)).thenReturn(false);
 
 		ResponseEntity<ApiResponse> response = userController.isUsernameAvailable(userDetailsRequest);
 
@@ -408,7 +400,7 @@ public class UserControllerTest {
 	public void testCheckIsUsernameAvailableWhenTheSameAsUsers() {
 
 		userDetailsRequest.setValue(USERNAME);
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 
 		ResponseEntity<ApiResponse> response = userController.isUsernameAvailable(userDetailsRequest);
 
@@ -423,8 +415,8 @@ public class UserControllerTest {
 
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
 
-		when(userDao.findUserById(ID)).thenReturn(user);
-		when(userDao.existsByEmail(NEW_USERNAME_EMAIL)).thenReturn(true);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
+		when(boUserDao.existsByEmail(NEW_USERNAME_EMAIL)).thenReturn(true);
 
 		ResponseEntity<ApiResponse> response = userController.isEmailAvailable(userDetailsRequest);
 
@@ -441,7 +433,7 @@ public class UserControllerTest {
 		userDetailsRequest.setUserId(null);
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
 
-		when(userDao.existsByEmail(NEW_USERNAME_EMAIL)).thenReturn(false);
+		when(boUserDao.existsByEmail(NEW_USERNAME_EMAIL)).thenReturn(false);
 
 		ResponseEntity<ApiResponse> response = userController.isEmailAvailable(userDetailsRequest);
 
@@ -456,7 +448,7 @@ public class UserControllerTest {
 
 		userDetailsRequest.setValue(EMAIL);
 
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 
 		ResponseEntity<ApiResponse> response = userController.isEmailAvailable(userDetailsRequest);
 

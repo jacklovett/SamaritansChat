@@ -44,7 +44,7 @@ export class UserService {
     this.http
       .post<ApiResponse>(`${this.apiUrl}/users/register`, user)
       .subscribe(
-        response => {
+        (response) => {
           if (!response) {
             return;
           }
@@ -52,7 +52,7 @@ export class UserService {
           this.router.navigate(['users']);
           this.alertService.handleResponse(response);
         },
-        error => {
+        (error) => {
           this.alertService.error(error);
         },
       );
@@ -60,7 +60,7 @@ export class UserService {
 
   update(user: User) {
     this.http.put<ApiResponse>(`${this.apiUrl}/users/edit`, user).subscribe(
-      response => {
+      (response) => {
         if (!response) {
           return;
         }
@@ -73,7 +73,7 @@ export class UserService {
 
         this.alertService.handleResponse(response);
       },
-      error => {
+      (error) => {
         this.alertService.error(error);
       },
     );
@@ -83,14 +83,14 @@ export class UserService {
     this.http
       .delete<ApiResponse>(`${this.apiUrl}/users/delete/${id}`)
       .subscribe(
-        response => {
+        (response) => {
           if (!response) {
             return;
           }
           this.isReloadRequiredSubject.next(true);
           this.alertService.handleResponse(response);
         },
-        error => {
+        (error) => {
           this.alertService.error(error);
         },
       );

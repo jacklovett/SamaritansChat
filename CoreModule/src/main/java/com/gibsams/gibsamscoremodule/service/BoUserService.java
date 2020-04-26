@@ -10,12 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
 import com.gibsams.gibsamscoremodule.dao.RoleDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
 import com.gibsams.gibsamscoremodule.exception.ResourceNotFoundException;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.Role;
-import com.gibsams.gibsamscoremodule.model.User;
-import com.gibsams.gibsamscoremodule.model.UserInfo;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.requests.UserDetailsRequest;
 import com.gibsams.gibsamscoremodule.requests.UserRequest;
@@ -28,10 +27,10 @@ import com.gibsams.gibsamscoremodule.utils.RoleEnum;
  *
  */
 @Service
-public class BOUserService implements UserService {
+public class BoUserService {
 
 	@Autowired
-	private UserDao userDao;
+	private BoUserDao boUserDao;
 
 	@Autowired
 	private RoleDao roleDao;
@@ -39,68 +38,60 @@ public class BOUserService implements UserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	private static final Logger logger = LoggerFactory.getLogger(BOUserService.class);
+	private static final Logger logger = LoggerFactory.getLogger(BoUserService.class);
 
-	@Override
 	public void registerUser(RegisterRequest registerRequest) {
-		UserInfo userInfo = new UserInfo();
-		userInfo.setFirstName(registerRequest.getFirstName());
-		userInfo.setLastName(registerRequest.getLastName());
-		userInfo.setContactNumber(registerRequest.getContactNumber());
 
-		User user = new User();
+		BoUser user = new BoUser();
 		user.setUsername(registerRequest.getUsername());
 		user.setEmail(registerRequest.getEmail());
-		user.setChatUser(false);
+		user.setFirstName(registerRequest.getFirstName());
+		user.setLastName(registerRequest.getLastName());
+		user.setContactNumber(registerRequest.getContactNumber());
 
-		user.setUserInfo(userInfo);
 		user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 		user.setRoles(determineUserRoles(registerRequest.isAdmin()));
 
-		userDao.save(user);
+		boUserDao.save(user);
 	}
 
 	public void updateUser(UserRequest userRequest) {
 		Long userId = userRequest.getId();
-		User user = userDao.findUserById(userId);
-		if (user.getUserInfo() != null) {
-			user.getUserInfo().setFirstName(userRequest.getFirstName());
-			user.getUserInfo().setLastName(userRequest.getLastName());
-			user.getUserInfo().setContactNumber(userRequest.getContactNumber());
-		}
+		BoUser user = boUserDao.findUserById(userId);
+		user.setFirstName(userRequest.getFirstName());
+		user.setLastName(userRequest.getLastName());
+		user.setContactNumber(userRequest.getContactNumber());
 		user.setRoles(determineUserRoles(userRequest.isAdmin()));
-		userDao.save(user);
-
+		boUserDao.save(user);
 	}
 
 	public void updatePassword(UserDetailsRequest userDetailsRequest) {
 		Long userId = userDetailsRequest.getUserId();
 
-		User user = userDao.findUserById(userId);
+		BoUser user = boUserDao.findUserById(userId);
 
-		if (user != null) {
-			user.setPassword(passwordEncoder.encode(userDetailsRequest.getValue()));
-			userDao.save(user);
-		} else {
+		if (user == null) {
 			throw new ResourceNotFoundException("No user found with id " + userId + ". Password not updated");
 		}
 
+		user.setPassword(passwordEncoder.encode(userDetailsRequest.getValue()));
+		boUserDao.save(user);
 	}
 
 	public ApiResponse checkCurrentPassword(UserDetailsRequest userDetailsRequest) {
 		Long userId = userDetailsRequest.getUserId();
-		User user = userDao.findUserById(userId);
+		BoUser user = boUserDao.findUserById(userId);
 
-		if (user != null) {
-			if (passwordEncoder.matches(userDetailsRequest.getValue(), user.getPassword())) {
-				return new ApiResponse(true, "Password Match");
-			} else {
-				return new ApiResponse(false, "Incorrect Password");
-			}
-		} else {
+		if (user == null) {
 			String errorMessage = MessageFormat.format("No user found with id {0}. Unable to check password", userId);
 			logger.error(errorMessage);
 			return new ApiResponse(false, errorMessage);
+		}
+
+		if (passwordEncoder.matches(userDetailsRequest.getValue(), user.getPassword())) {
+			return new ApiResponse(true, "Password Match");
+		} else {
+			return new ApiResponse(false, "Incorrect Password");
 		}
 	}
 

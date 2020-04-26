@@ -21,11 +21,13 @@ import org.springframework.stereotype.Service;
 
 import com.gibsams.gibsamscoremodule.dao.ChatConfigDao;
 import com.gibsams.gibsamscoremodule.dao.ChatDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
+import com.gibsams.gibsamscoremodule.dao.ChatUserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
 import com.gibsams.gibsamscoremodule.exception.ResourceNotFoundException;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.ChatConfig;
 import com.gibsams.gibsamscoremodule.model.ChatMessage;
+import com.gibsams.gibsamscoremodule.model.ChatUser;
 import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.ConversationRequest;
 import com.gibsams.gibsamscoremodule.requests.Message;
@@ -47,13 +49,16 @@ public class ChatService {
 	private SimpMessagingTemplate simpMessagingTemplate;
 
 	@Autowired
-	private UserDao userDao;
+	private ChatUserDao chatUserDao;
 
 	@Autowired
 	private ChatDao chatDao;
 
 	@Autowired
 	private ChatConfigDao chatConfigDao;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private ChatUserService chatUserService;
@@ -96,19 +101,19 @@ public class ChatService {
 
 		String username = message.getSender();
 
-		User disconnectedUser = findUserByUsername(username);
+		User user = userService.getUserByUsername(username);
 
-		if (disconnectedUser != null) {
-
-			if (disconnectedUser.isChatUser()) {
-				disconnectChatUser(message, disconnectedUser);
-			} else {
-				disconnectGibSamsUser(message, disconnectedUser);
-			}
-		} else {
-			throw new GibSamsException("User unknown. Unable to disconnect");
+		if (user instanceof BoUser) {
+			disconnectGibSamsUser(message, user);
+			return;
 		}
 
+		if (user instanceof ChatUser) {
+			disconnectChatUser(message, user);
+			return;
+		}
+
+		logger.error("Unable to disconnect user: {} from chat", username);
 	}
 
 	public void addActiveUser(Message message) {
@@ -120,18 +125,15 @@ public class ChatService {
 			return;
 		}
 
-		User user = findUserByUsername(username);
+		User user = userService.getUserByUsername(username);
 
-		if (user != null) {
-
-			if (user.isChatUser()) {
-				addActiveChatUser(username);
-			} else {
-				addActiveGibSamsUser(username, message);
-			}
-		} else {
-			throw new GibSamsException("User unknown. Unable to add active user");
+		if (user instanceof BoUser) {
+			addActiveGibSamsUser(username, message);
+			return;
 		}
+
+		addActiveChatUser(username);
+
 	}
 
 	public ApiResponse startConversation(ConversationRequest conversationRequest) {
@@ -198,10 +200,10 @@ public class ChatService {
 	 */
 	public ChatAvailabilityResponse isChatAvailable() {
 
-		Optional<ChatAvailabilityResponse> response = checkConfigAvailabilitySettings();
+		Optional<ChatAvailabilityResponse> isChatBlocked = isChatBlockedByConfig();
 
-		if (response.isPresent()) {
-			return response.get();
+		if (isChatBlocked.isPresent()) {
+			return isChatBlocked.get();
 		}
 
 		if (this.activeGibSamsUsers.isEmpty()) {
@@ -305,17 +307,21 @@ public class ChatService {
 
 	private void addActiveGibSamsUser(String username, Message message) {
 		// if chat is available then add gibsams user
-		if (!checkConfigAvailabilitySettings().isPresent()) {
-			this.activeGibSamsUsers.add(username);
-			// let new users know chat is available
-			simpMessagingTemplate.convertAndSend(CHAT + "availability",
-					new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE));
-			// inform this users conversations that they are active again
-			Set<String> conversationKeys = getActiveChatUsersForGibsSamsUser(username);
-			message.setSender(AppConstants.GIB_SAMS_USERNAME);
-			for (String key : conversationKeys) {
-				simpMessagingTemplate.convertAndSend(CHAT + key, message);
-			}
+		Optional<ChatAvailabilityResponse> isChatBlocked = isChatBlockedByConfig();
+		if (isChatBlocked.isPresent()) {
+			logger.info("Chat is blocked by configuration settings");
+			return;
+		}
+		this.activeGibSamsUsers.add(username);
+		// let new users know chat is available
+		simpMessagingTemplate.convertAndSend(CHAT + "availability",
+				new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE));
+
+		// inform this users conversations that they are active again
+		Set<String> conversationKeys = getActiveChatUsersForGibsSamsUser(username);
+		message.setSender(AppConstants.GIB_SAMS_USERNAME);
+		for (String key : conversationKeys) {
+			simpMessagingTemplate.convertAndSend(CHAT + key, message);
 		}
 	}
 
@@ -337,7 +343,7 @@ public class ChatService {
 			if (messages.isEmpty()) {
 				// delete user completely
 				// no notification needed ??
-				userDao.deleteUserById(user.getId());
+				chatUserDao.deleteUserById(user.getId());
 				return;
 			} else {
 
@@ -372,12 +378,13 @@ public class ChatService {
 		}
 	}
 
-	private Optional<ChatAvailabilityResponse> checkConfigAvailabilitySettings() {
+	private Optional<ChatAvailabilityResponse> isChatBlockedByConfig() {
 
 		Optional<ChatAvailabilityResponse> chatAvailabilityResponse = Optional.empty();
-		try {
+		ChatConfig config = null;
 
-			ChatConfig config = chatConfigDao.findConfig();
+		try {
+			config = chatConfigDao.findConfig();
 
 			int availableFrom = config.getAvailableFrom();
 			int availableUntil = config.getAvailableUntil();
@@ -400,16 +407,13 @@ public class ChatService {
 		} catch (ResourceNotFoundException ex) {
 			logger.error("Unable to check chat config's availability settings: ", ex);
 		}
+
 		return chatAvailabilityResponse;
 	}
 
 	private Set<String> getActiveChatUsersForGibsSamsUser(String username) {
 		return conversations.entrySet().stream().filter(entry -> username.equalsIgnoreCase(entry.getValue()))
 				.map(Entry::getKey).collect(Collectors.toSet());
-	}
-
-	private User findUserByUsername(String username) {
-		return userDao.findUserByUsernameOrEmail(username);
 	}
 
 	private String formatTimes(int time) {

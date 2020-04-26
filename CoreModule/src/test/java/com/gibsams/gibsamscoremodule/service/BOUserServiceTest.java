@@ -14,12 +14,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
 import com.gibsams.gibsamscoremodule.dao.RoleDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
 import com.gibsams.gibsamscoremodule.exception.ResourceNotFoundException;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.Role;
-import com.gibsams.gibsamscoremodule.model.User;
-import com.gibsams.gibsamscoremodule.model.UserInfo;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.requests.UserDetailsRequest;
 import com.gibsams.gibsamscoremodule.requests.UserRequest;
@@ -38,8 +37,7 @@ public class BOUserServiceTest {
 	private static final String ENCODED_SECRET = "fgdhsdvergsdvvsdf";
 	private static final String CONTACT_NUMBER = "07777777777";
 
-	private User user;
-	private UserInfo userInfo;
+	private BoUser boUser;
 	private Role userRole;
 	private Role adminRole;
 	private UserRequest userRequest;
@@ -47,13 +45,13 @@ public class BOUserServiceTest {
 	private UserDetailsRequest userDetailsRequest;
 
 	@Mock
-	private UserDao userDao;
+	private BoUserDao boUserDao;
 	@Mock
 	private RoleDao roleDao;
 	@Mock
 	private PasswordEncoder passwordEncoder;
 	@InjectMocks
-	private BOUserService boUserService;
+	private BoUserService boUserService;
 
 	@Before
 	public void setUp() {
@@ -74,16 +72,13 @@ public class BOUserServiceTest {
 		registerRequest.setContactNumber(CONTACT_NUMBER);
 		registerRequest.setAdmin(true);
 
-		userInfo = new UserInfo();
-		userInfo.setFirstName(FIRST_NAME);
-		userInfo.setLastName(LAST_NAME);
-
-		user = new User();
-		user.setId(ID);
-		user.setUsername(USERNAME);
-		user.setEmail(EMAIL);
-		user.setUserInfo(userInfo);
-		user.setPassword(ENCODED_SECRET);
+		boUser = new BoUser();
+		boUser.setId(ID);
+		boUser.setUsername(USERNAME);
+		boUser.setEmail(EMAIL);
+		boUser.setPassword(ENCODED_SECRET);
+		boUser.setFirstName(FIRST_NAME);
+		boUser.setLastName(LAST_NAME);
 
 		userDetailsRequest = new UserDetailsRequest();
 		userDetailsRequest.setUserId(ID);
@@ -99,7 +94,7 @@ public class BOUserServiceTest {
 
 		boUserService.registerUser(registerRequest);
 
-		verify(userDao, times(1)).save(Mockito.any(User.class));
+		verify(boUserDao, times(1)).save(Mockito.any(BoUser.class));
 	}
 
 	@Test
@@ -108,39 +103,38 @@ public class BOUserServiceTest {
 		userRequest.setId(ID);
 		userRequest.setAdmin(false);
 
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 
 		when(roleDao.findRoleById(RoleEnum.USER.getId())).thenReturn(userRole);
 
 		boUserService.updateUser(userRequest);
 
-		verify(userDao, times(1)).save(Mockito.any(User.class));
+		verify(boUserDao, times(1)).save(Mockito.any(BoUser.class));
 	}
 
 	@Test
 	public void testUpdatePassword() {
 
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 		when(passwordEncoder.encode(SECRET)).thenReturn(ENCODED_SECRET);
 
 		boUserService.updatePassword(userDetailsRequest);
 
-		user.setPassword(ENCODED_SECRET);
-		verify(userDao, times(1)).save(user);
+		boUser.setPassword(ENCODED_SECRET);
+		verify(boUserDao, times(1)).save(boUser);
 
 	}
 
 	@Test(expected = ResourceNotFoundException.class)
 	public void testUpdatePasswordWhenUserNotFound() {
-
-		when(userDao.findUserById(ID)).thenReturn(null);
+		when(boUserDao.findUserById(ID)).thenReturn(null);
 		boUserService.updatePassword(userDetailsRequest);
 	}
 
 	@Test
 	public void checkCurrentPassword() {
 
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 		when(passwordEncoder.matches(SECRET, ENCODED_SECRET)).thenReturn(true);
 
 		ApiResponse response = boUserService.checkCurrentPassword(userDetailsRequest);
@@ -151,7 +145,7 @@ public class BOUserServiceTest {
 	@Test
 	public void checkCurrentPasswordWhenWrong() {
 
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 		when(passwordEncoder.matches(SECRET, ENCODED_SECRET)).thenReturn(false);
 
 		ApiResponse response = boUserService.checkCurrentPassword(userDetailsRequest);
@@ -162,7 +156,7 @@ public class BOUserServiceTest {
 	@Test
 	public void checkCurrentPasswordWhenUserNotFound() {
 
-		when(userDao.findUserById(ID)).thenReturn(null);
+		when(boUserDao.findUserById(ID)).thenReturn(null);
 
 		ApiResponse response = boUserService.checkCurrentPassword(userDetailsRequest);
 

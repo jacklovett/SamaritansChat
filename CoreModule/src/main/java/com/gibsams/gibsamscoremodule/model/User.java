@@ -1,23 +1,12 @@
 package com.gibsams.gibsamscoremodule.model;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -27,9 +16,7 @@ import javax.validation.constraints.Size;
  * @author jackl
  *
  */
-@Entity
-@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }),
-		@UniqueConstraint(columnNames = { "email" }) })
+@MappedSuperclass
 public class User extends Audit {
 
 	/**
@@ -58,30 +45,6 @@ public class User extends Audit {
 
 	@Column(name = "last_active", nullable = true)
 	private Instant lastActive;
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles = new HashSet<>();
-
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinTable(name = "user_user_info", joinColumns = {
-			@JoinColumn(name = "user_id", referencedColumnName = "id") }, inverseJoinColumns = {
-					@JoinColumn(name = "user_info_id", referencedColumnName = "id") })
-	private UserInfo userInfo;
-
-	@Column(name = "is_chat_user", nullable = false)
-	private boolean chatUser;
-
-	@OneToMany(mappedBy = "user")
-	private Set<Notification> notification;
-
-	public Set<Notification> getNotification() {
-		return notification;
-	}
-
-	public void setNotification(Set<Notification> notification) {
-		this.notification = notification;
-	}
 
 	public Long getId() {
 		return id;
@@ -129,30 +92,6 @@ public class User extends Audit {
 
 	public void setLastActive(Instant lastActive) {
 		this.lastActive = lastActive;
-	}
-
-	public Set<Role> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
-
-	public UserInfo getUserInfo() {
-		return userInfo;
-	}
-
-	public void setUserInfo(UserInfo userInfo) {
-		this.userInfo = userInfo;
-	}
-
-	public boolean isChatUser() {
-		return chatUser;
-	}
-
-	public void setChatUser(boolean chatUser) {
-		this.chatUser = chatUser;
 	}
 
 }

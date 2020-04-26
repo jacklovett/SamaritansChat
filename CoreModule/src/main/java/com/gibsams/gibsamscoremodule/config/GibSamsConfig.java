@@ -4,14 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
 import com.gibsams.gibsamscoremodule.dao.ChatConfigDao;
 import com.gibsams.gibsamscoremodule.dao.ChatDao;
 import com.gibsams.gibsamscoremodule.dao.ChatLogDao;
+import com.gibsams.gibsamscoremodule.dao.ChatUserDao;
 import com.gibsams.gibsamscoremodule.dao.NotificationDao;
 import com.gibsams.gibsamscoremodule.dao.RoleDao;
 import com.gibsams.gibsamscoremodule.dao.TranscriptDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
-import com.gibsams.gibsamscoremodule.dao.UserInfoDao;
 
 /**
  * GibSams Configuration Class
@@ -28,13 +28,13 @@ public class GibSamsConfig {
 	}
 
 	@Bean
-	public UserDao userDao() {
-		return new UserDao();
+	public ChatUserDao chatUserDao() {
+		return new ChatUserDao();
 	}
 
 	@Bean
-	public UserInfoDao userDetailsDao() {
-		return new UserInfoDao();
+	public BoUserDao boUserDao() {
+		return new BoUserDao();
 	}
 
 	@Bean

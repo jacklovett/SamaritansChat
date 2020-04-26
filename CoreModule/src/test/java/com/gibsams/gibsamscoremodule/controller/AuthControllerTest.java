@@ -26,10 +26,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.gibsams.gibsamscoremodule.dao.UserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
 import com.gibsams.gibsamscoremodule.exception.InvalidReCaptchaException;
-import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.LoginRequest;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.responses.JwtAuthenticationResponse;
@@ -43,13 +41,11 @@ import com.google.gson.Gson;
 @RunWith(MockitoJUnitRunner.class)
 public class AuthControllerTest {
 
-	private static final Long ID = 1l;
 	private static final String USERNAME = "username";
 	private static final String SECRET = "secret";
 	private static final String TOKEN = "token";
 	private static final String RECAPTCHA_TOKEN = "recaptcha_test_token";
 
-	private User user;
 	private Gson gson;
 	private String json;
 	private MockMvc mockMvc;
@@ -63,8 +59,6 @@ public class AuthControllerTest {
 	private Authentication authentication;
 	@Mock
 	private AuthenticationManager authenticationManager;
-	@Mock
-	private UserDao userDao;
 	@Mock
 	private JwtTokenProvider jwtTokenProvider;
 	@Mock
@@ -82,9 +76,6 @@ public class AuthControllerTest {
 		this.mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
 
 		gson = new Gson();
-
-		user = new User();
-		user.setId(ID);
 
 		loginRequest = new LoginRequest();
 		loginRequest.setUsernameOrEmail(USERNAME);

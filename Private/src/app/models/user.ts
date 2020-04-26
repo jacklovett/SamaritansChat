@@ -12,7 +12,6 @@ export interface User extends IUser {
   password: string;
   admin: boolean;
   token: string;
-  userInfoId: number;
 }
 
 export interface ListUser extends IUser {

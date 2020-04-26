@@ -2,6 +2,7 @@ package com.gibsams.gibsamscoremodule.config;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -41,8 +42,8 @@ class SpringSecurityAuditAwareImpl implements AuditorAware<String> {
 
 		UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
-		if (userPrincipal.getUserInfo() != null) {
-			auditorName = userPrincipal.getUserInfo().getFirstName() + " " + userPrincipal.getUserInfo().getLastName();
+		if (StringUtils.isNotBlank(userPrincipal.getEmail())) {
+			auditorName = userPrincipal.getUsername();
 		}
 		return Optional.of(auditorName);
 	}

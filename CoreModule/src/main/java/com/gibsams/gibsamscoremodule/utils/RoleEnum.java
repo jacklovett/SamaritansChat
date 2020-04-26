@@ -8,7 +8,7 @@ package com.gibsams.gibsamscoremodule.utils;
  */
 public enum RoleEnum {
 
-	USER(1, "USER"), ADMIN(2, "ADMIN"), CHAT(3, "CHAT");
+	USER(1, "USER"), ADMIN(2, "ADMIN");
 
 	private int id;
 
