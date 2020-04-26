@@ -51,10 +51,10 @@ public class Notification extends Audit {
 	@Column(name = "processed_cta")
 	private String processedCTA;
 
-	// bo user receiving notification
+	// user receiving notification
 	@ManyToOne
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "bo_user_id")
+	private BoUser boUser;
 
 	public Notification() {
 	}
@@ -109,12 +109,12 @@ public class Notification extends Audit {
 		this.username = username;
 	}
 
-	public User getUser() {
-		return user;
+	public BoUser getUser() {
+		return boUser;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUser(BoUser boUser) {
+		this.boUser = boUser;
 	}
 
 	public boolean isProcessed() {

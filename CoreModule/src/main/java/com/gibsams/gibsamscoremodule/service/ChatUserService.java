@@ -1,8 +1,7 @@
 package com.gibsams.gibsamscoremodule.service;
 
-import java.util.HashSet;
+import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -11,14 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.gibsams.gibsamscoremodule.dao.RoleDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
+import com.gibsams.gibsamscoremodule.dao.ChatUserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
-import com.gibsams.gibsamscoremodule.model.Role;
-import com.gibsams.gibsamscoremodule.model.User;
+import com.gibsams.gibsamscoremodule.exception.ResourceNotFoundException;
+import com.gibsams.gibsamscoremodule.model.ChatUser;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
 import com.gibsams.gibsamscoremodule.utils.AppConstants;
-import com.gibsams.gibsamscoremodule.utils.RoleEnum;
 import com.github.javafaker.Faker;
 
 /**
@@ -27,13 +24,10 @@ import com.github.javafaker.Faker;
  *
  */
 @Service
-public class ChatUserService implements UserService {
+public class ChatUserService {
 
 	@Autowired
-	private UserDao userDao;
-
-	@Autowired
-	private RoleDao roleDao;
+	private ChatUserDao chatUserDao;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -42,22 +36,14 @@ public class ChatUserService implements UserService {
 
 	private static final Logger logger = LoggerFactory.getLogger(ChatUserService.class);
 
-	@Override
 	public void registerUser(RegisterRequest registerRequest) {
 
-		User user = new User();
-		user.setChatUser(true);
+		ChatUser user = new ChatUser();
 		user.setUsername(registerRequest.getUsername());
-
 		user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
 
-		Set<Role> userRoles = new HashSet<>();
-
 		try {
-			Role userRole = roleDao.findRoleById(RoleEnum.CHAT.getId());
-			userRoles.add(userRole);
-			user.setRoles(userRoles);
-			userDao.save(user);
+			chatUserDao.save(user);
 		} catch (Exception e) {
 			logger.error("Unable to create chat user {} during login: ", registerRequest.getUsername(), e);
 			throw new GibSamsException(AppConstants.CHAT_ACCESS_ERROR_MESSAGE);
@@ -79,11 +65,20 @@ public class ChatUserService implements UserService {
 	 * @param username
 	 */
 	public void disableChatUser(String username) {
+		Optional<ChatUser> user = chatUserDao.findUserByUsernameOrEmail(username);
 
-		User user = userDao.findUserByUsernameOrEmail(username);
-		user.setEnabled(false);
-		userDao.save(user);
-		logger.info("Chat user {} disabled", username);
+		if (!user.isPresent()) {
+			throw new ResourceNotFoundException("No user found with username: " + username);
+		}
+
+		ChatUser chatUser = user.get();
+		chatUser.setEnabled(false);
+
+		try {
+			chatUserDao.save(chatUser);
+		} catch (Exception e) {
+			logger.error("Unable to disable chat user {}", username, e);
+		}
 	}
 
 	/**
@@ -106,7 +101,7 @@ public class ChatUserService implements UserService {
 	}
 
 	private boolean validateUsername(String username) {
-		return (!userDao.existsByUsername(username) && username.length() <= 20);
+		return (!chatUserDao.existsByUsername(username) && username.length() <= 20);
 	}
 
 	private String createRandomUsername() {

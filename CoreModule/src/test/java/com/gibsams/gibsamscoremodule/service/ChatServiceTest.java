@@ -29,11 +29,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.gibsams.gibsamscoremodule.dao.ChatConfigDao;
 import com.gibsams.gibsamscoremodule.dao.ChatDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
+import com.gibsams.gibsamscoremodule.dao.ChatUserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.ChatConfig;
 import com.gibsams.gibsamscoremodule.model.ChatMessage;
-import com.gibsams.gibsamscoremodule.model.User;
+import com.gibsams.gibsamscoremodule.model.ChatUser;
 import com.gibsams.gibsamscoremodule.requests.ConversationRequest;
 import com.gibsams.gibsamscoremodule.requests.Message;
 import com.gibsams.gibsamscoremodule.responses.ApiResponse;
@@ -58,7 +59,8 @@ public class ChatServiceTest {
 	private static final String MESSAGE_CONTENT = "I'm a little teapot!";
 
 	private Gson gson;
-	private User user;
+	private ChatUser chatUser;
+	private BoUser boUser;
 	private ChatConfig config;
 	private Message message;
 	private ChatMessage chatMessage;
@@ -71,11 +73,13 @@ public class ChatServiceTest {
 	@Mock
 	private SimpMessagingTemplate simpMessagingTemplate;
 	@Mock
-	private UserDao userDao;
+	private ChatUserDao chatUserDao;
 	@Mock
 	private ChatDao chatDao;
 	@Mock
 	private ChatConfigDao chatConfigDao;
+	@Mock
+	private UserService userService;
 	@Mock
 	private ChatUserService chatUserService;
 	@Mock
@@ -88,10 +92,13 @@ public class ChatServiceTest {
 
 		gson = new Gson();
 
-		user = new User();
-		user.setId(ID);
-		user.setUsername(GIB_SAMS_USER);
-		user.setChatUser(false);
+		chatUser = new ChatUser();
+		chatUser.setId(ID);
+		chatUser.setUsername(GIB_SAMS_USER);
+
+		boUser = new BoUser();
+		boUser.setId(ID);
+		boUser.setUsername(GIB_SAMS_USER);
 
 		config = new ChatConfig();
 		config.setTimeRestricted(true);
@@ -184,7 +191,7 @@ public class ChatServiceTest {
 		message.setSender(GIB_SAMS_USER);
 		message.setType(MessageType.LEAVE);
 
-		when(userDao.findUserByUsernameOrEmail(GIB_SAMS_USER)).thenReturn(user);
+		when(userService.getUserByUsername(GIB_SAMS_USER)).thenReturn(boUser);
 
 		chatService.disconnect(message);
 
@@ -203,10 +210,9 @@ public class ChatServiceTest {
 	@Test
 	public void testDisconnectChatUser() {
 
-		user.setUsername(USERNAME);
-		user.setChatUser(true);
+		chatUser.setUsername(USERNAME);
 
-		when(userDao.findUserByUsernameOrEmail(USERNAME)).thenReturn(user);
+		when(userService.getUserByUsername(USERNAME)).thenReturn(chatUser);
 
 		message.setSender(USERNAME);
 		message.setRecipient(AppConstants.GIB_SAMS_USERNAME);
@@ -229,24 +235,12 @@ public class ChatServiceTest {
 
 	}
 
-	@Test(expected = GibSamsException.class)
-	public void testDisconnectWhenUserNotFound() {
-
-		message.setSender(USERNAME);
-		message.setType(MessageType.LEAVE);
-
-		when(userDao.findUserByUsernameOrEmail(USERNAME)).thenReturn(null);
-
-		chatService.disconnect(message);
-	}
-
 	@Test
 	public void testDisconnectWhenConversationNotFoundAndDeleteUser() {
 
-		user.setUsername(USERNAME);
-		user.setChatUser(true);
+		chatUser.setUsername(USERNAME);
 
-		when(userDao.findUserByUsernameOrEmail(USERNAME)).thenReturn(user);
+		when(userService.getUserByUsername(USERNAME)).thenReturn(chatUser);
 
 		message.setSender(USERNAME);
 		message.setType(MessageType.LEAVE);
@@ -261,7 +255,7 @@ public class ChatServiceTest {
 		chatService.disconnect(message);
 
 		assertTrue(chatService.getActiveUsers().isEmpty());
-		verify(userDao, times(1)).deleteUserById(ID);
+		verify(chatUserDao, times(1)).deleteUserById(ID);
 		verify(notificationService, never()).addNotification(NotificationTypeEnum.USER_DISCONNECTED, GIB_SAMS_USER,
 				USERNAME);
 		verify(simpMessagingTemplate, never()).convertAndSend(CHAT + GIB_SAMS_USER, message);
@@ -271,10 +265,9 @@ public class ChatServiceTest {
 	@Test
 	public void testDisconnectWhenConversationNotFoundWhenMessagesExist() {
 
-		user.setUsername(USERNAME);
-		user.setChatUser(true);
+		chatUser.setUsername(USERNAME);
 
-		when(userDao.findUserByUsernameOrEmail(USERNAME)).thenReturn(user);
+		when(userService.getUserByUsername(USERNAME)).thenReturn(chatUser);
 
 		message.setRecipient(GIB_SAMS_USER);
 		chatMessages.add(message);
@@ -315,8 +308,7 @@ public class ChatServiceTest {
 	@Test
 	public void testAddActiveUserWhenGibSamsUserAndChatIsAvailable() {
 
-		when(userDao.findUserByUsernameOrEmail(GIB_SAMS_USER)).thenReturn(user);
-
+		when(userService.getUserByUsername(GIB_SAMS_USER)).thenReturn(boUser);
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
 		message.setSender(GIB_SAMS_USER);
@@ -339,7 +331,7 @@ public class ChatServiceTest {
 	@Test
 	public void testAddActiveUserWhenGibSamsUserAndChatIsUnAvailable() {
 
-		when(userDao.findUserByUsernameOrEmail(GIB_SAMS_USER)).thenReturn(user);
+		when(userService.getUserByUsername(GIB_SAMS_USER)).thenReturn(boUser);
 
 		config.setAvailableFrom(24);
 		config.setAvailableUntil(24);
@@ -372,7 +364,7 @@ public class ChatServiceTest {
 		assertEquals(1, chatService.getActiveGibSamsUsers().size());
 		assertTrue(chatService.getActiveGibSamsUsers().contains(GIB_SAMS_USER));
 
-		verify(userDao, never()).findUserByUsernameOrEmail(Mockito.anyString());
+		verify(userService, never()).getUserByUsername(Mockito.anyString());
 		verify(simpMessagingTemplate, never()).convertAndSend(CHAT + "availability",
 				new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE));
 		verify(simpMessagingTemplate, never()).convertAndSend(CHAT, message);
@@ -381,10 +373,9 @@ public class ChatServiceTest {
 	@Test
 	public void testAddActiveUserWhenChatUser() {
 
-		user.setUsername(USERNAME);
-		user.setChatUser(true);
+		chatUser.setUsername(USERNAME);
 
-		when(userDao.findUserByUsernameOrEmail(USERNAME)).thenReturn(user);
+		when(userService.getUserByUsername(USERNAME)).thenReturn(chatUser);
 
 		message.setSender(USERNAME);
 		message.setType(MessageType.JOIN);
@@ -420,16 +411,9 @@ public class ChatServiceTest {
 		assertEquals(1, chatService.getActiveUsers().size());
 		assertTrue(chatService.getActiveUsers().contains(USERNAME));
 
-		verify(userDao, never()).findUserByUsernameOrEmail(USERNAME);
+		verify(chatUserDao, never()).findUserByUsernameOrEmail(USERNAME);
 		verify(notificationService, never()).addNotification(Mockito.any(), Mockito.any(), Mockito.any());
 
-	}
-
-	@Test(expected = GibSamsException.class)
-	public void testAddActiveUserWhenUserUnknown() {
-
-		message.setSender(null);
-		chatService.addActiveUser(message);
 	}
 
 	@Test

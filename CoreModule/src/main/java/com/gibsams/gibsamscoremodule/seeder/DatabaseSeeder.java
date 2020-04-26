@@ -11,33 +11,29 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.ChatConfig;
 import com.gibsams.gibsamscoremodule.model.Role;
-import com.gibsams.gibsamscoremodule.model.User;
+import com.gibsams.gibsamscoremodule.repository.BoUserRepository;
 import com.gibsams.gibsamscoremodule.repository.ChatConfigRepository;
 import com.gibsams.gibsamscoremodule.repository.RoleRepository;
-import com.gibsams.gibsamscoremodule.repository.UserRepository;
 import com.gibsams.gibsamscoremodule.requests.RegisterRequest;
-import com.gibsams.gibsamscoremodule.service.BOUserService;
+import com.gibsams.gibsamscoremodule.service.BoUserService;
 import com.gibsams.gibsamscoremodule.utils.RoleEnum;
 
 @Component
 public class DatabaseSeeder {
 
-	private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
-	private BOUserService boUserService;
+	@Autowired
+	private BoUserService boUserService;
+	@Autowired
 	private ChatConfigRepository chatConfigRepository;
-	private UserRepository userRepository;
+	@Autowired
+	private BoUserRepository boUserRepository;
+	@Autowired
 	private RoleRepository roleRepository;
 
-	@Autowired
-	public DatabaseSeeder(BOUserService boUserService, ChatConfigRepository chatConfigRepository,
-			RoleRepository roleRepository, UserRepository userRepository) {
-		this.boUserService = boUserService;
-		this.chatConfigRepository = chatConfigRepository;
-		this.roleRepository = roleRepository;
-		this.userRepository = userRepository;
-	}
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 
 	@EventListener
 	public void seed(ContextRefreshedEvent event) {
@@ -57,7 +53,7 @@ public class DatabaseSeeder {
 		registerRequest.setContactNumber("+447904804644");
 		registerRequest.setAdmin(true);
 
-		Optional<User> user = userRepository.findByUsernameOrEmail(registerRequest.getUsername(),
+		Optional<BoUser> user = boUserRepository.findByUsernameOrEmail(registerRequest.getUsername(),
 				registerRequest.getEmail());
 
 		if (user.isPresent()) {
@@ -99,7 +95,6 @@ public class DatabaseSeeder {
 		List<RoleEnum> roles = new ArrayList<>();
 		roles.add(RoleEnum.USER);
 		roles.add(RoleEnum.ADMIN);
-		roles.add(RoleEnum.CHAT);
 
 		roles.stream().forEach(role -> {
 			Optional<Role> savedRole = roleRepository.findById(role.getId());

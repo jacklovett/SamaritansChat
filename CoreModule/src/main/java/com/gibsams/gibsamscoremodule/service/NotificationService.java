@@ -1,8 +1,7 @@
 package com.gibsams.gibsamscoremodule.service;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -11,10 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
 import com.gibsams.gibsamscoremodule.dao.NotificationDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.Notification;
-import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.NotificationRequest;
 import com.gibsams.gibsamscoremodule.responses.ApiResponse;
 import com.gibsams.gibsamscoremodule.responses.NotificationResponse;
@@ -26,7 +25,7 @@ public class NotificationService {
 	private static final String CHAT = "/chat/";
 
 	@Autowired
-	private UserDao userDao;
+	private BoUserDao boUserDao;
 	@Autowired
 	private NotificationDao notificationDao;
 	@Autowired
@@ -42,28 +41,31 @@ public class NotificationService {
 			logger.info("No notifications found in database");
 		}
 
-		return notifications.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
-
+		return notifications;
 	}
 
-	public void addNotification(NotificationTypeEnum notificationTypeEnum, String recipient, String chatUser) {
+	public void addNotification(NotificationTypeEnum notificationType, String recipient, String chatUser) {
 
-		Notification notification = new Notification(notificationTypeEnum, chatUser);
+		Notification notification = new Notification(notificationType, chatUser);
 
-		if (StringUtils.isNotBlank(recipient)) {
-			User gibSamsUser = userDao.findUserByUsernameOrEmail(recipient);
-			if (gibSamsUser != null) {
-				notification.setUser(gibSamsUser);
-				// get notification id
-				notification = notificationDao.save(notification);
-				simpMessagingTemplate.convertAndSend(CHAT + "notifications/" + recipient,
-						new NotificationResponse(notification));
-			} else {
-				logger.error("No user found for recipient: {}. Unable to send notification.", recipient);
-			}
-		} else {
+		if (StringUtils.isBlank(recipient)) {
 			logger.error("Notification recipient not specified. Unable to send notification");
+			return;
 		}
+
+		Optional<BoUser> user = boUserDao.findUserByUsernameOrEmail(recipient);
+
+		if (!user.isPresent()) {
+			logger.error("No user found for recipient: {}. Unable to send notification.", recipient);
+			return;
+		}
+
+		BoUser gibSamsUser = user.get();
+		notification.setUser(gibSamsUser);
+		// get notification id
+		notification = notificationDao.save(notification);
+		simpMessagingTemplate.convertAndSend(CHAT + "notifications/" + recipient,
+				new NotificationResponse(notification));
 	}
 
 	public ApiResponse deleteNotification(Long id) {

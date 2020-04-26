@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +24,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import com.gibsams.gibsamscoremodule.dao.BoUserDao;
 import com.gibsams.gibsamscoremodule.dao.NotificationDao;
-import com.gibsams.gibsamscoremodule.dao.UserDao;
+import com.gibsams.gibsamscoremodule.model.BoUser;
 import com.gibsams.gibsamscoremodule.model.Notification;
-import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.NotificationRequest;
 import com.gibsams.gibsamscoremodule.responses.NotificationResponse;
 import com.gibsams.gibsamscoremodule.utils.AppConstants;
@@ -39,14 +40,14 @@ public class NotificationServiceTest {
 	private static final String CHAT_ENDPOINT = "/chat/notifications";
 	private static final String USERNAME = "jlove0987";
 
-	private User user;
+	private BoUser boUser;
 	private Notification notification;
 	private NotificationRequest notificationRequest;
 	private NotificationResponse notificationResponse;
 	private List<NotificationResponse> notificationResponses;
 
 	@Mock
-	private UserDao userDao;
+	private BoUserDao boUserDao;
 	@Mock
 	private NotificationDao notificationDao;
 	@Mock
@@ -57,9 +58,9 @@ public class NotificationServiceTest {
 	@Before
 	public void setUp() {
 
-		user = new User();
-		user.setId(ID);
-		user.setUsername(AppConstants.GIB_SAMS_USERNAME);
+		boUser = new BoUser();
+		boUser.setId(ID);
+		boUser.setUsername(AppConstants.GIB_SAMS_USERNAME);
 
 		notification = new Notification(NotificationTypeEnum.NEW_USER_CONNECTED, USERNAME);
 		notification.setId(ID);
@@ -100,11 +101,11 @@ public class NotificationServiceTest {
 	@Test
 	public void testAddNotification() {
 
-		when(userDao.findUserByUsernameOrEmail(AppConstants.GIB_SAMS_USERNAME)).thenReturn(user);
+		when(boUserDao.findUserByUsernameOrEmail(AppConstants.GIB_SAMS_USERNAME)).thenReturn(Optional.of(boUser));
 
 		notification = new Notification(NotificationTypeEnum.USER_DISCONNECTED, USERNAME);
 		notification.setContent(MessageFormat.format(NotificationTypeEnum.USER_DISCONNECTED.getContent(), USERNAME));
-		notification.setUser(user);
+		notification.setUser(boUser);
 
 		doAnswer((Answer<Notification>) c -> {
 			notification.setId(ID);
@@ -136,7 +137,7 @@ public class NotificationServiceTest {
 	@Test
 	public void testAddNotificationWhenUserNotFound() {
 
-		when(userDao.findUserByUsernameOrEmail(AppConstants.GIB_SAMS_USERNAME)).thenReturn(null);
+		when(boUserDao.findUserByUsernameOrEmail(AppConstants.GIB_SAMS_USERNAME)).thenReturn(Optional.empty());
 
 		notification.setContent(MessageFormat.format(NotificationTypeEnum.USER_DISCONNECTED.getContent(), USERNAME));
 

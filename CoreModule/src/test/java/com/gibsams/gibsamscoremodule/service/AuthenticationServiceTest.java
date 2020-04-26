@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -19,10 +21,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
-import com.gibsams.gibsamscoremodule.dao.UserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
-import com.gibsams.gibsamscoremodule.exception.ResourceNotFoundException;
-import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.LoginRequest;
 import com.gibsams.gibsamscoremodule.responses.JwtAuthenticationResponse;
 import com.gibsams.gibsamscoremodule.security.JwtTokenProvider;
@@ -30,12 +29,10 @@ import com.gibsams.gibsamscoremodule.security.JwtTokenProvider;
 @RunWith(MockitoJUnitRunner.class)
 public class AuthenticationServiceTest {
 
-	private static final Long ID = 1l;
 	private static final String USERNAME = "username";
 	private static final String SECRET = "secret";
 	private static final String TOKEN = "token";
 
-	private User user;
 	private LoginRequest loginRequest;
 	private UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken;
 
@@ -44,7 +41,8 @@ public class AuthenticationServiceTest {
 	@Mock
 	private AuthenticationManager authenticationManager;
 	@Mock
-	private UserDao userDao;
+	private UserService userService;
+
 	@Mock
 	private JwtTokenProvider jwtTokenProvider;
 
@@ -53,9 +51,6 @@ public class AuthenticationServiceTest {
 
 	@Before
 	public void setUp() {
-
-		user = new User();
-		user.setId(ID);
 
 		loginRequest = new LoginRequest();
 		loginRequest.setUsernameOrEmail(USERNAME);
@@ -71,14 +66,15 @@ public class AuthenticationServiceTest {
 
 		when(authenticationManager.authenticate(usernamePasswordAuthenticationToken)).thenReturn(authentication);
 		when(jwtTokenProvider.generateToken(authentication)).thenReturn(TOKEN);
-		when(jwtTokenProvider.getUserIdFromJWT(TOKEN)).thenReturn(ID);
-		when(userDao.findUserById(ID)).thenReturn(user);
+		when(jwtTokenProvider.getUsernameFromJWT(TOKEN)).thenReturn(USERNAME);
 
 		ResponseEntity<JwtAuthenticationResponse> response = authenticationService.authenticate(loginRequest);
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK.value(), response.getStatusCodeValue());
 		assertEquals(TOKEN, response.getBody().getToken());
+		verify(userService, times(1)).updateLastActive(USERNAME);
+		;
 	}
 
 	@Test
@@ -99,8 +95,7 @@ public class AuthenticationServiceTest {
 
 		when(authenticationManager.authenticate(usernamePasswordAuthenticationToken)).thenReturn(authentication);
 		when(jwtTokenProvider.generateToken(authentication)).thenReturn(TOKEN);
-		when(jwtTokenProvider.getUserIdFromJWT(TOKEN)).thenReturn(0L);
-		doThrow(new ResourceNotFoundException("User not found")).when(userDao).findUserById(0L);
+		when(jwtTokenProvider.getUsernameFromJWT(TOKEN)).thenReturn(USERNAME);
 
 		ResponseEntity<JwtAuthenticationResponse> response = authenticationService.authenticate(loginRequest);
 
@@ -115,6 +110,5 @@ public class AuthenticationServiceTest {
 				.authenticate(usernamePasswordAuthenticationToken);
 
 		authenticationService.authenticate(loginRequest);
-
 	}
 }

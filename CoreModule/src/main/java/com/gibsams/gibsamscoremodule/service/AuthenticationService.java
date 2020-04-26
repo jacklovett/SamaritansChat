@@ -1,6 +1,5 @@
 package com.gibsams.gibsamscoremodule.service;
 
-import java.time.Instant;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -15,9 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.gibsams.gibsamscoremodule.dao.UserDao;
 import com.gibsams.gibsamscoremodule.exception.GibSamsException;
-import com.gibsams.gibsamscoremodule.model.User;
 import com.gibsams.gibsamscoremodule.requests.LoginRequest;
 import com.gibsams.gibsamscoremodule.responses.JwtAuthenticationResponse;
 import com.gibsams.gibsamscoremodule.security.JwtTokenProvider;
@@ -31,7 +28,7 @@ import com.gibsams.gibsamscoremodule.security.JwtTokenProvider;
 public class AuthenticationService {
 
 	@Autowired
-	private UserDao userDao;
+	private UserService userService;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -50,7 +47,6 @@ public class AuthenticationService {
 		} catch (AuthenticationException ex) {
 			throw new GibSamsException("You have entered an invalid username or password", ex);
 		}
-
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		String jwt = tokenProvider.generateToken(authentication);
@@ -70,11 +66,9 @@ public class AuthenticationService {
 	 * @param jwt
 	 */
 	private void updateLastActive(String jwt) {
-		Long userId = tokenProvider.getUserIdFromJWT(jwt);
+		String username = tokenProvider.getUsernameFromJWT(jwt);
 		try {
-			User user = userDao.findUserById(userId);
-			user.setLastActive(Instant.now());
-			userDao.save(user);
+			userService.updateLastActive(username);
 		} catch (Exception e) {
 			logger.error("Unable to update users last active date: ", e);
 		}

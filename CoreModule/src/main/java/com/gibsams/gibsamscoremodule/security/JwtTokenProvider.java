@@ -52,20 +52,20 @@ public class JwtTokenProvider {
 				.signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
 	}
 
-	public Long getUserIdFromJWT(String token) {
+	public String getUsernameFromJWT(String token) {
 		Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
 
-		Long userId = 0L;
+		String username = "";
 		JSONObject subject;
 
 		try {
 			subject = new JSONObject(claims.getSubject());
-			userId = subject.getLong("userId");
+			username = subject.getString("username");
 		} catch (JSONException e) {
-			throw new GibSamsException("getUserIdFromJWT - Unable to get userId from token", e);
+			throw new GibSamsException("getUsernameFromJWT - Unable to get username from token", e);
 		}
 
-		return userId;
+		return username;
 	}
 
 	public boolean validateToken(String authToken) {
@@ -95,7 +95,6 @@ public class JwtTokenProvider {
 	 */
 	private JSONObject getUserDetailsForResponse(UserPrincipal userPrincipal) {
 		JSONObject userDetails = new JSONObject();
-		// TODO: add is chat_user maybe ??
 		try {
 			userDetails.put("userId", Long.toString(userPrincipal.getId()));
 			userDetails.put("admin", isUserAdmin(userPrincipal));
@@ -113,13 +112,12 @@ public class JwtTokenProvider {
 	 * @return isAdmin
 	 */
 	private boolean isUserAdmin(UserPrincipal currentUser) {
-		// TODO: make a get roles method instead ??
 		Collection<? extends GrantedAuthority> userRoles = currentUser.getAuthorities();
 
 		for (GrantedAuthority role : userRoles) {
 			if (role.getAuthority().contains("ADMIN")) {
 				return true;
-			} 
+			}
 		}
 
 		return false;

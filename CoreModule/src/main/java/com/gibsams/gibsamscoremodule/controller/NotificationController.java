@@ -39,13 +39,7 @@ public class NotificationController {
 	@GetMapping("/{id}")
 	public ResponseEntity<List<NotificationResponse>> getNotifications(@PathVariable Long id) {
 		logger.info("NotificationController - getNotifications - init");
-
 		List<NotificationResponse> notifications = notificationService.findNotifications(id);
-
-		if (notifications.isEmpty()) {
-			logger.info("No notifications found in database");
-		}
-
 		return ResponseEntity.ok(notifications);
 	}
 
