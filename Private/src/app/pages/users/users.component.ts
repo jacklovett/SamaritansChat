@@ -40,7 +40,6 @@ export class UsersComponent implements OnInit, OnDestroy {
       id: 'contact-number',
       title: 'Contact Number',
       value: (user: ListUser) => user.contactNumber,
-      isDateTime: true,
     },
     {
       id: 'last-active',
@@ -93,7 +92,15 @@ export class UsersComponent implements OnInit, OnDestroy {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = false;
 
-    dialogConfig.data = { title: 'Confirm Delete' };
+    const submitValue = 'delete';
+
+    dialogConfig.data = {
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this user?',
+      submitLabel: 'Yes',
+      cancelLabel: 'No',
+      submitValue,
+    };
 
     dialogConfig.position = {
       'top': '36px',
@@ -102,7 +109,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     const dialogRef = this.deleteDialog.open(DialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === 'delete') {
+      if (result === submitValue) {
         this.deleteUser(userId);
       }
     });

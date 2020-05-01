@@ -47,7 +47,7 @@ export class UserComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.editUserSubscription = this.route.params.subscribe(params => {
+    this.editUserSubscription = this.route.params.subscribe((params) => {
       this.editUserId = params['id'];
 
       if (!this.editUserId) {
@@ -98,7 +98,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
     const dialogRef = this.passwordDialog.open(PasswordComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.updatePassword(result);
       }
@@ -172,10 +172,10 @@ export class UserComponent implements OnInit, OnDestroy {
 
   private updatePassword(passwordRequest: UserDetailsRequest) {
     this.userService.updatePassword(passwordRequest).subscribe(
-      response => {
+      (response) => {
         this.alertService.handleResponse(response);
       },
-      error => {
+      (error) => {
         this.alertService.error(error);
       },
     );

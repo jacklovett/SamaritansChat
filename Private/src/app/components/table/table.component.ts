@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  Input,
-  ViewChild,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, OnInit, Input, ViewChild, OnChanges } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -16,14 +10,13 @@ import { ColumnDetails } from './columnDetails';
   selector: 'app-table',
   templateUrl: './table.component.html',
   styleUrls: ['./table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TableComponent implements OnInit {
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-
+export class TableComponent implements OnInit, OnChanges {
   @Input() data: Object[];
   @Input() columnDetails: ColumnDetails[];
+
+  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   dataSource: MatTableDataSource<Object>;
   displayedColumns: string[];
@@ -35,6 +28,10 @@ export class TableComponent implements OnInit {
     this.dataSource = new MatTableDataSource<Object>(this.data);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+  }
+
+  ngOnChanges() {
+    this.dataSource = new MatTableDataSource<Object>(this.data);
   }
 
   search(event: Event) {

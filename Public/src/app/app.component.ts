@@ -27,12 +27,14 @@ export class AppComponent {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = false;
 
+    const submitValue = 'logout';
+
     dialogConfig.data = {
       title: 'Leave Chat',
       content: 'Are you sure you want to leave the current chat session?',
-      submitMessage: 'Continue',
-      submitValue: 'logout',
-      cancel: 'Go Back',
+      submitValue,
+      successLabel: 'Continue',
+      cancelLabel: 'Go Back',
     };
 
     dialogConfig.position = {
@@ -41,8 +43,8 @@ export class AppComponent {
 
     const dialogRef = this.dialog.open(DialogComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'logout') {
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result === submitValue) {
         this.logout();
       }
     });
