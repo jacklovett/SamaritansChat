@@ -1,19 +1,19 @@
 <div class="dialog-container content-container">
-  <h2 mat-dialog-title>{{ modalTitle }}</h2>
+  <h2 mat-dialog-title>{{ props.title }}</h2>
   <mat-dialog-content>
-    <p>{{ modalContent }}</p>
+    <p>{{ props.content }}</p>
   </mat-dialog-content>
   <mat-dialog-actions class="dialog-container">
     <button
       mat-raised-button
       color="primary"
       class="button primary-btn"
-      mat-dialog-close="{{ modalSubmitValue }}"
+      mat-dialog-close="{{ props.submitValue }}"
     >
-      {{ modalSubmitMessage }}
+      {{ props.successLabel }}
     </button>
     <button class="button" mat-raised-button mat-dialog-close>
-      {{ modalCancel }}
+      {{ props.cancelLabel }}
     </button>
   </mat-dialog-actions>
 </div>
