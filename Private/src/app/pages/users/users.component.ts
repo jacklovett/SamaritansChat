@@ -92,14 +92,11 @@ export class UsersComponent implements OnInit, OnDestroy {
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = false;
 
-    const submitValue = 'delete';
-
     dialogConfig.data = {
       title: 'Confirm Delete',
       content: 'Are you sure you want to delete this user?',
-      submitLabel: 'Yes',
+      successLabel: 'Yes',
       cancelLabel: 'No',
-      submitValue,
     };
 
     dialogConfig.position = {
@@ -109,7 +106,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     const dialogRef = this.deleteDialog.open(DialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === submitValue) {
+      if (result) {
         this.deleteUser(userId);
       }
     });

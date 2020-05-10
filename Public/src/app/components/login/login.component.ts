@@ -88,7 +88,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     dialogConfig.disableClose = true;
     dialogConfig.autoFocus = false;
-    const submitValue = 'login';
     dialogConfig.data = {
       title: 'Disclaimer',
       content:
@@ -96,7 +95,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         'You are completely anonymous, and no information you disclose will be stored. ' +
         'However, by continuing you agree that if you decide to provide us with your details, ' +
         'we have a duty of care and will take the necessary steps to prevent any harm to you.',
-      submitValue,
       successLabel: 'I agree, continue',
       cancelLabel: 'Go Back',
     };
@@ -108,7 +106,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DialogComponent, dialogConfig);
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result === submitValue) {
+      if (result) {
         this.executeRecaptcha();
       }
     });

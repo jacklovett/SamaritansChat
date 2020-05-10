@@ -4,7 +4,6 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 export interface DialogProps {
   title: string;
   content: string;
-  submitValue: string;
   successLabel: string;
   cancelLabel: string;
 }
@@ -16,6 +15,7 @@ export interface DialogProps {
 })
 export class DialogComponent {
   props: DialogProps;
+  SUBMIT_VALUE = 'CONFIRMED';
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogProps) {
     this.props = data;
   }
