@@ -1,4 +1,4 @@
 export interface ConversationRequest {
-  gibSamsUser: string;
+  samaritansUser: string;
   chatUser: string;
 }

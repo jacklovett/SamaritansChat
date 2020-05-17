@@ -110,7 +110,7 @@ export class NotificationService {
   }
 
   public startConversation(conversationRequest: ConversationRequest) {
-    conversationRequest.gibSamsUser = this.currentUser.username;
+    conversationRequest.samaritansUser = this.currentUser.username;
     return this.http.post<ApiResponse>(
       `${this.apiUrl}/chat/startConversation`,
       conversationRequest,

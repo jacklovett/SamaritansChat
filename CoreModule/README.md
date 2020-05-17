@@ -1,6 +1,6 @@
-# GibSamsCoreModule
+# SamaritansCoreModule
 
-Back end application for Gib Sams chat service and admin
+Back end application for Samaritans chat service and admin
 
 Technologies: 
 

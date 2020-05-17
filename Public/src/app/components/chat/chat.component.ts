@@ -15,7 +15,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ChatComponent implements OnInit, OnDestroy {
   displayChat = true;
-  gibSamsUsername = 'Sam';
+  samaritansUsername = 'Sam';
   volunteerConnected = true;
   conversationInProgress = false;
   chatMessages: ChatMessage[] = [];
@@ -44,13 +44,13 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.chatMessagesSubscription = this.chatService
       .getChatMessages()
-      .subscribe(msg => {
+      .subscribe((msg) => {
         this.handleMessage(msg);
       });
 
     this.connectedVolunteerSubscription = this.chatService
       .getVolunteer()
-      .subscribe(user => {
+      .subscribe((user) => {
         this.conversationInProgress = true;
         localStorage.setItem('conversationInProgress', JSON.stringify(true));
         this.volunteerConnected = true;
@@ -65,7 +65,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.chatService.connect();
-    this.displaySubscription = this.route.queryParamMap.subscribe(params => {
+    this.displaySubscription = this.route.queryParamMap.subscribe((params) => {
       const display = params.get('display');
       this.displayChat = display !== 'hide';
     });
@@ -91,7 +91,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     const message: ChatMessage = <ChatMessage>{
       sender: this.username,
-      recipient: this.gibSamsUsername,
+      recipient: this.samaritansUsername,
       content: this.controls.message.value,
       type: 'CHAT',
     };

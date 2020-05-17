@@ -4,7 +4,7 @@
 </div>
 <div *ngIf="displayChat && conversationInProgress" class="chat-container">
   <div class="primary mat-elevation-z2">
-    <mat-toolbar class="chat-contact">{{ gibSamsUsername }}</mat-toolbar>
+    <mat-toolbar class="chat-contact">{{ samaritansUsername }}</mat-toolbar>
   </div>
   <div class="chat-window">
     <div class="user-disconnected-msg" *ngIf="!volunteerConnected">
@@ -20,7 +20,7 @@
           [ngClass]="{
             primary: chatMessage.sender === username,
             'chat-user-msg': chatMessage.sender === username,
-            'gib-sams-msg': chatMessage.sender !== username
+            'sams-msg': chatMessage.sender !== username
           }"
         >
           {{ chatMessage.content }}

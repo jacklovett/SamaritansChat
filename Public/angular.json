@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "gibsamspublic": {
+    "samaritanspublic": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -18,7 +18,7 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "aot": true,
-            "outputPath": "dist/gibsamspublic",
+            "outputPath": "dist/samaritanspublic",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -66,19 +66,19 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "gibsamspublic:build",
+            "browserTarget": "samaritanspublic:build",
             "port": 4800
           },
           "configurations": {
             "production": {
-              "browserTarget": "gibsamspublic:build:production"
+              "browserTarget": "samaritanspublic:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "gibsamspublic:build"
+            "browserTarget": "samaritanspublic:build"
           }
         },
         "test": {
@@ -112,7 +112,7 @@
         }
       }
     },
-    "gibsamspublic-e2e": {
+    "samaritanspublic-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -121,11 +121,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "gibsamspublic:serve"
+            "devServerTarget": "samaritanspublic:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "gibsamspublic:serve:production"
+              "devServerTarget": "samaritanspublic:serve:production"
             }
           }
         },
@@ -141,7 +141,7 @@
       }
     }
   },
-  "defaultProject": "gibsamspublic",
+  "defaultProject": "samaritanspublic",
   "cli": {
     "analytics": false
   }
