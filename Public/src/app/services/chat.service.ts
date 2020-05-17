@@ -19,7 +19,7 @@ export class ChatService {
   private chatUrl: string = environment.chatUrl;
   private apiUrl: string = environment.apiUrl;
 
-  gibSamsUsername = 'Sam';
+  samaritansUsername = 'Sam';
 
   private chatMessagesSubject = new Subject<any>();
   private activeVolunteerSubject = new Subject<any>();
@@ -42,7 +42,7 @@ export class ChatService {
     _this.stompClient.connect(
       {},
       (fun: any) => {
-        this.stompClient.subscribe('/chat/' + this.username, function(
+        this.stompClient.subscribe('/chat/' + this.username, function (
           msg: any,
         ) {
           _this.handleMessage(JSON.parse(msg.body));
@@ -104,7 +104,7 @@ export class ChatService {
   public disconnect() {
     const message: ChatMessage = <ChatMessage>{
       sender: this.username,
-      recipient: this.gibSamsUsername,
+      recipient: this.samaritansUsername,
       type: 'LEAVE',
     };
 
@@ -138,13 +138,16 @@ export class ChatService {
       this.chatMessagesSubject.next(message);
     }
 
-    if (message.type === 'JOIN' && message.sender === this.gibSamsUsername) {
-      this.alertService.success('Sam Connected!');
+    if (message.type === 'JOIN' && message.sender === this.samaritansUsername) {
+      this.alertService.success(`${this.samaritansUsername} Connected!`);
       this.activeVolunteerSubject.next(message.sender);
     }
 
-    if (message.type === 'LEAVE' && message.sender === this.gibSamsUsername) {
-      this.alertService.error('Sam Disconnected!');
+    if (
+      message.type === 'LEAVE' &&
+      message.sender === this.samaritansUsername
+    ) {
+      this.alertService.error(`${this.samaritansUsername} Disconnected!`);
       this.disconnectedVolunteerSubject.next(message.sender);
     }
   }

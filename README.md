@@ -1,2 +1,2 @@
-# GibSamsChat
+# SamaritansChat
  
