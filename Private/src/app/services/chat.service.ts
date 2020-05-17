@@ -41,7 +41,7 @@ export class ChatService {
     _this.stompClient.connect(
       {},
       () => {
-        this.stompClient.subscribe('/chat/' + this.currentUsername, function(
+        this.stompClient.subscribe('/chat/' + this.currentUsername, function (
           msg: any,
         ) {
           _this.onMessageRecieved(JSON.parse(msg.body));
@@ -49,7 +49,7 @@ export class ChatService {
 
         this.stompClient.subscribe(
           '/chat/users/' + this.currentUsername,
-          function(msg: any) {
+          function (msg: any) {
             _this.handleActiveUserResponse(msg);
           },
         );
@@ -128,8 +128,8 @@ export class ChatService {
     this.http
       .put(`${this.apiUrl}/chat/updateUnreadMessages`, username)
       .subscribe(
-        result => {},
-        error => {
+        (result) => {},
+        (error) => {
           console.log(
             `An error occured while updating unread chat messages: ${error}`,
           );
@@ -169,7 +169,7 @@ export class ChatService {
   private onMessageRecieved(message: any) {
     if (message.type === 'CHAT') {
       this.chatMessagesSubject.next(message);
-      // need to handle case when another gibs sam volunteer logs in
+      // need to handle case when another samaritan volunteer logs in
     }
 
     if (message.type === 'JOIN' && message.sender !== this.currentUsername) {

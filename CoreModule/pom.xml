@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<groupId>com.gibsams</groupId>
-	<artifactId>gibsamscoremodule</artifactId>
+	<groupId>com.samaritans</groupId>
+	<artifactId>samaritanscoremodule</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>GibSamsCoreModule</name>
-	<description>Gib Sams Back End</description>
+	<name>SamaritansCoreModule</name>
+	<description>Samaritans Back End</description>
 	
 	<parent>
 		<groupId>org.springframework.boot</groupId>
