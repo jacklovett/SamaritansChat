@@ -22,8 +22,6 @@ import com.samaritans.samaritanscoremodule.utils.NotificationTypeEnum;
 @Service
 public class NotificationService {
 
-	private static final String CHAT = "/chat/";
-
 	@Autowired
 	private BoUserDao boUserDao;
 	@Autowired
@@ -33,9 +31,9 @@ public class NotificationService {
 
 	private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
-	public List<NotificationResponse> findNotifications(Long userId) {
+	public List<NotificationResponse> findNotifications(final Long userId) {
 
-		List<NotificationResponse> notifications = notificationDao.findNotificationByUserId(userId);
+		final List<NotificationResponse> notifications = notificationDao.findNotificationByUserId(userId);
 
 		if (notifications.isEmpty()) {
 			logger.info("No notifications found in database");
@@ -44,7 +42,8 @@ public class NotificationService {
 		return notifications;
 	}
 
-	public void addNotification(NotificationTypeEnum notificationType, String recipient, String chatUser) {
+	public void addNotification(final NotificationTypeEnum notificationType, final String recipient,
+			final String chatUser) {
 
 		Notification notification = new Notification(notificationType, chatUser);
 
@@ -53,44 +52,40 @@ public class NotificationService {
 			return;
 		}
 
-		Optional<BoUser> user = boUserDao.findUserByUsernameOrEmail(recipient);
+		final Optional<BoUser> user = boUserDao.findUserByUsernameOrEmail(recipient);
 
 		if (!user.isPresent()) {
 			logger.error("No user found for recipient: {}. Unable to send notification.", recipient);
 			return;
 		}
 
-		BoUser samaritansUser = user.get();
+		final BoUser samaritansUser = user.get();
 		notification.setUser(samaritansUser);
 		// get notification id
 		notification = notificationDao.save(notification);
-		simpMessagingTemplate.convertAndSend(CHAT + "notifications/" + recipient,
+		simpMessagingTemplate.convertAndSend("/topic/" + "notifications." + recipient,
 				new NotificationResponse(notification));
 	}
 
-	public ApiResponse deleteNotification(Long id) {
-		boolean result = notificationDao.deleteNotificationById(id);
-		if (result)
-			return new ApiResponse(true, "Notification deleted");
-		else {
-			return new ApiResponse(false, "Unable to delete notfication");
-		}
-
+	public ApiResponse deleteNotification(final Long id) {
+		final boolean result = notificationDao.deleteNotificationById(id);
+		return result ? new ApiResponse(true, "Notification deleted")
+				: new ApiResponse(false, "Unable to delete notfication");
 	}
 
 	public void deleteNotifications() {
 		notificationDao.deleteReadAndProcessedNotifications();
 	}
 
-	public void updateNotification(NotificationRequest notificationRequest) {
-		Long notificationId = notificationRequest.getId();
+	public void updateNotification(final NotificationRequest notificationRequest) {
+		final Long notificationId = notificationRequest.getId();
 		try {
-			Notification notification = notificationDao.findById(notificationId);
+			final Notification notification = notificationDao.findById(notificationId);
 			notification.setRead(notificationRequest.isRead());
 			notification.setProcessed(notificationRequest.isProcessed());
 			notificationDao.save(notification);
-		} catch (Exception ex) {
-			logger.error("Unable to update notification with id: " + notificationId, ex);
+		} catch (final Exception ex) {
+			logger.error("Unable to update notification with id: {}", notificationId, ex);
 		}
 	}
 }

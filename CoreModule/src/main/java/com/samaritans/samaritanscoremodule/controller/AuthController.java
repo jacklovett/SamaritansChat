@@ -43,7 +43,8 @@ public class AuthController {
 	private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
 	@PostMapping("/login")
-	public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<JwtAuthenticationResponse> authenticateUser(
+			@Valid @RequestBody final LoginRequest loginRequest) {
 		logger.info("AuthController - authenticateUser - init");
 		return authenticationService.authenticate(loginRequest);
 	}
@@ -55,16 +56,17 @@ public class AuthController {
 	 * @return ApiResponse
 	 */
 	@PostMapping("/chat/login")
-	public ResponseEntity<JwtAuthenticationResponse> chatLogin(@Valid @RequestBody String token) {
+	public ResponseEntity<JwtAuthenticationResponse> chatLogin(@Valid @RequestBody final String token) {
 		logger.info("AuthController - chatLogin - init");
 		try {
 			reCaptchaService.verifyResponse(token);
 		} catch (ReCaptchaUnavailableException | InvalidReCaptchaException ex) {
 			throw new SamaritansException("Login failed: Blocked by ReCaptcha", ex);
 		}
-		RegisterRequest chatUserRequest = chatUserService.buildChatUserRequest();
+		final RegisterRequest chatUserRequest = chatUserService.buildChatUserRequest();
 		chatUserService.registerUser(chatUserRequest);
-		LoginRequest loginRequest = new LoginRequest(chatUserRequest.getUsername(), chatUserRequest.getPassword());
+		final LoginRequest loginRequest = new LoginRequest(chatUserRequest.getUsername(),
+				chatUserRequest.getPassword());
 		return authenticationService.authenticate(loginRequest);
 	}
 

@@ -15,11 +15,11 @@ public class MainApplication {
 
 	@PostConstruct
 	void init() {
-		// CET - Central European Time
+		// CET - Central European Time - Change for Charities local timezone
 		TimeZone.setDefault(TimeZone.getTimeZone("CET"));
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SpringApplication.run(MainApplication.class, args);
 	}
 

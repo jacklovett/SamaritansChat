@@ -22,6 +22,11 @@ public class UserService {
 	@Autowired
 	private BoUserDao boUserDao;
 
+	/**
+	 * Find boUser/chatUser from database that matches the username/email provided
+	 * 
+	 * @throws ResourceNotFoundException
+	 */
 	public User getUserByUsername(String usernameOrEmail) {
 		Optional<BoUser> boUser = boUserDao.findUserByUsernameOrEmail(usernameOrEmail);
 

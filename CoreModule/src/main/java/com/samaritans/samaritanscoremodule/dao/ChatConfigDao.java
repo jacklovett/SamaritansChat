@@ -19,6 +19,7 @@ public class ChatConfigDao {
 	/**
 	 * Find the first chat config
 	 * 
+	 * @throws ResourceNotFoundException
 	 * @return ChatConfig
 	 */
 	public ChatConfig findConfig() {

@@ -41,8 +41,8 @@ export class ChatService {
     const _this = this;
     _this.stompClient.connect(
       {},
-      (fun: any) => {
-        this.stompClient.subscribe('/chat/' + this.username, function (
+      () => {
+        this.stompClient.subscribe('/topic/' + this.username, function (
           msg: any,
         ) {
           _this.handleMessage(JSON.parse(msg.body));
@@ -55,7 +55,7 @@ export class ChatService {
 
         try {
           this.stompClient.send(
-            '/app/send/addActiveUser',
+            '/app/send.addActiveUser',
             {},
             JSON.stringify(message),
           );
@@ -110,7 +110,7 @@ export class ChatService {
 
     try {
       this.stompClient.send(
-        '/app/send/disconnect',
+        '/app/send.disconnect',
         {},
         JSON.stringify(message),
       );
@@ -124,7 +124,7 @@ export class ChatService {
 
   public send(message: ChatMessage) {
     try {
-      this.stompClient.send('/app/send/message', {}, JSON.stringify(message));
+      this.stompClient.send('/app/send.message', {}, JSON.stringify(message));
     } catch (error) {
       this.alertService.error(error);
     }

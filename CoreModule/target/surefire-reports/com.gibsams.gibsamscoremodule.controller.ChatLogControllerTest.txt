@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.gibsams.gibsamscoremodule.controller.ChatLogControllerTest
--------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.452 s - in com.gibsams.gibsamscoremodule.controller.ChatLogControllerTest

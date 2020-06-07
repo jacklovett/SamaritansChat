@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,14 +43,8 @@ public class ChatConfigController {
 	@GetMapping()
 	public ResponseEntity<ChatConfigRequest> getChatConfig() {
 		logger.info("ChatConfigController - getChatConfig - init");
-
-		ChatConfigRequest chatConfigRequest = null;
-		ChatConfig config = chatConfigDao.findConfig();
-
-		if (config != null) {
-			chatConfigRequest = new ChatConfigRequest(config);
-		}
-
+		final ChatConfig config = chatConfigDao.findConfig();
+		final ChatConfigRequest chatConfigRequest = new ChatConfigRequest(config);
 		return ResponseEntity.of(Optional.ofNullable(chatConfigRequest));
 	}
 
@@ -62,19 +55,14 @@ public class ChatConfigController {
 	 * @return ApiResponse
 	 */
 	@PutMapping("/edit")
-	public ResponseEntity<ApiResponse> updateConfig(@Valid @RequestBody ChatConfigRequest configRequest) {
+	public ResponseEntity<ApiResponse> updateConfig(@Valid @RequestBody final ChatConfigRequest configRequest) {
 		logger.info("ChatConfigController - updateConfig - init");
 
-		ChatConfig config = chatConfigDao.findConfig();
-
-		if (config != null) {
-			config.setTimeRestricted(configRequest.isTimeRestricted());
-			config.setAvailableFrom(configRequest.getAvailableFrom());
-			config.setAvailableUntil(configRequest.getAvailableUntil());
-			chatConfigDao.save(config);
-		} else {
-			return new ResponseEntity<>(new ApiResponse(false, "Unable to update chat settings"), HttpStatus.NOT_FOUND);
-		}
+		final ChatConfig config = chatConfigDao.findConfig();
+		config.setTimeRestricted(configRequest.isTimeRestricted());
+		config.setAvailableFrom(configRequest.getAvailableFrom());
+		config.setAvailableUntil(configRequest.getAvailableUntil());
+		chatConfigDao.save(config);
 
 		return ResponseEntity.ok(new ApiResponse(true, "Settings updated successfully"));
 	}

@@ -40,14 +40,15 @@ public class ChatController {
 	/**
 	 * Endpoint to handle chat message
 	 * 
-	 * @param message
-	 * @return message back to sender
+	 * @param Message
+	 * @throws SamaritansException
+	 * @return Message
 	 */
-	@MessageMapping("/send/message")
-	public Message sendMessage(@Payload Message message) {
+	@MessageMapping("/send.message")
+	public Message sendMessage(@Payload final Message message) {
 		try {
 			return chatService.sendMessage(message);
-		} catch (MessagingException e) {
+		} catch (final MessagingException e) {
 			throw new SamaritansException("Unable to send message: " + e);
 		}
 	}
@@ -55,16 +56,17 @@ public class ChatController {
 	/**
 	 * Endpoint to handle disconnect event
 	 * 
-	 * @param message
+	 * @param Message
+	 * @throws SamaritansException
 	 */
-	@MessageMapping("/send/disconnect")
-	public void disconnect(@Payload Message message) {
+	@MessageMapping("/send.disconnect")
+	public void disconnect(@Payload final Message message) {
 		logger.info("ChatController - disconnect - init");
 		try {
 			chatService.disconnect(message);
-		} catch (MessagingException e) {
-			throw new SamaritansException("An error occurred when handling disconnection for user: " + message.getSender(),
-					e);
+		} catch (final MessagingException e) {
+			throw new SamaritansException(
+					"An error occurred when handling disconnection for user: " + message.getSender(), e);
 		}
 	}
 
@@ -74,26 +76,27 @@ public class ChatController {
 	 * @param message
 	 * @return ResponseEntity
 	 */
-	@MessageMapping("/send/addActiveUser")
-	public ResponseEntity<ApiResponse> addActiveUser(@Payload Message message) {
+	@MessageMapping("/send.addActiveUser")
+	public ResponseEntity<ApiResponse> addActiveUser(@Payload final Message message) {
 		logger.info("ChatController - addActiveUser - init");
-		if (message.getType().equals(MessageType.JOIN)) {
-			chatService.addActiveUser(message);
-		} else {
+
+		if (!message.getType().equals(MessageType.JOIN)) {
 			return ResponseEntity.badRequest()
-					.body(new ApiResponse(false, "Unexpected message type recieved from message: " + message));
+					.body(new ApiResponse(false, "Unexpected message type: " + message.getType()));
 		}
+
+		chatService.addActiveUser(message);
 		return ResponseEntity.ok(new ApiResponse(true, "Successfully Connected!"));
 	}
 
 	@PutMapping("/updateUnreadMessages")
-	public void updateUnreadMessages(@Valid @RequestBody String username) {
+	public void updateUnreadMessages(@Valid @RequestBody final String username) {
 		logger.info("ChatController - updateUnreadMessages - init");
 		chatService.updateUnreadMessages(username);
 	}
 
 	@GetMapping("/users/{username}")
-	public ResponseEntity<String> getChatUsers(@PathVariable String username) {
+	public ResponseEntity<String> getChatUsers(@PathVariable final String username) {
 		logger.info("ChatController - getChatUsers - init");
 		return ResponseEntity.ok(chatService.getChatUsers(username));
 	}
@@ -105,7 +108,7 @@ public class ChatController {
 	}
 
 	@GetMapping("/isVolunteerActive/{username}")
-	public ResponseEntity<ApiResponse> isVolunteerActive(@PathVariable String username) {
+	public ResponseEntity<ApiResponse> isVolunteerActive(@PathVariable final String username) {
 		logger.info("ChatController - isVolunteerActive - init");
 
 		if (StringUtils.isBlank(username)) {
@@ -117,7 +120,8 @@ public class ChatController {
 	}
 
 	@PostMapping("/startConversation")
-	public ResponseEntity<ApiResponse> startConversation(@Valid @RequestBody ConversationRequest conversationRequest) {
+	public ResponseEntity<ApiResponse> startConversation(
+			@Valid @RequestBody final ConversationRequest conversationRequest) {
 		logger.info("ChatController - startConversation - init");
 		return ResponseEntity.ok(chatService.startConversation(conversationRequest));
 	}
@@ -128,16 +132,9 @@ public class ChatController {
 	 * @return List of Messages
 	 */
 	@GetMapping("/conversation/{username}")
-	public ResponseEntity<List<Message>> getConversationByUsername(@PathVariable String username) {
-
+	public ResponseEntity<List<Message>> getConversationByUsername(@PathVariable final String username) {
 		logger.info("ChatController - getConversationByUsername - init");
-
-		List<Message> messages = chatService.getMessagesByUsername(username);
-
-		if (messages.isEmpty()) {
-			logger.warn("No messages found in database");
-		}
-
+		final List<Message> messages = chatService.getMessagesByUsername(username);
 		return ResponseEntity.ok(messages);
 	}
 
