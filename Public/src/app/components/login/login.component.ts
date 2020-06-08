@@ -1,14 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
-import { ReCaptchaV3Service } from 'ng-recaptcha';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
+import { Subscription } from 'rxjs'
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
+import { ReCaptchaV3Service } from 'ng-recaptcha'
 
-import { AlertService } from 'src/app/services/alert.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { DialogComponent } from '../dialog/dialog.component';
-import { ChatAvailabilityResponse } from 'src/app/models/chat.availability.response';
-import { ChatAvailabilityService } from 'src/app/services/chat.availability.service';
+import { AlertService } from 'src/app/services/alert.service'
+import { AuthenticationService } from 'src/app/services/authentication.service'
+import { DialogComponent } from '../dialog/dialog.component'
+import { ChatAvailabilityResponse } from 'src/app/models/chat.availability.response'
+import { RxStompService } from '@stomp/ng2-stompjs'
+import { Message } from 'stompjs'
 
 @Component({
   selector: 'app-login',
@@ -16,14 +17,14 @@ import { ChatAvailabilityService } from 'src/app/services/chat.availability.serv
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  loading = false;
-  submitted = false;
-  returnUrl = '';
+  loading = false
+  submitted = false
+  returnUrl = ''
 
-  chatAvailabilityResponse: ChatAvailabilityResponse;
+  chatAvailabilityResponse: ChatAvailabilityResponse
 
-  reCaptchaSubscription: Subscription;
-  chatAvailabilitySubscription: Subscription;
+  reCaptchaSubscription: Subscription
+  chatAvailabilitySubscription: Subscription
 
   constructor(
     private route: ActivatedRoute,
@@ -31,63 +32,62 @@ export class LoginComponent implements OnInit, OnDestroy {
     private alertService: AlertService,
     private recaptchaV3Service: ReCaptchaV3Service,
     private authenticationService: AuthenticationService,
-    private chatAvailabilityService: ChatAvailabilityService,
+    private rxStompService: RxStompService,
     public dialog: MatDialog,
   ) {
     // redirect if already logged in
     if (this.authenticationService.isAuthenticated) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/'])
     }
 
-    this.chatAvailabilityService.connect();
-    this.chatAvailabilitySubscription = this.chatAvailabilityService
-      .getChatAvailability()
-      .subscribe((response: ChatAvailabilityResponse) => {
-        this.chatAvailabilityResponse = response;
-      });
-
-    this.isChatAvailable();
+    this.isChatAvailable()
   }
 
   ngOnInit() {
     // get return url from route parameters or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/'
+
+    this.chatAvailabilitySubscription = this.rxStompService
+      .watch('/topic/availability')
+      .subscribe((message: Message) => {
+        this.chatAvailabilityResponse = JSON.parse(message.body)
+      })
   }
 
   public executeRecaptcha(): void {
-    this.loading = true;
+    this.loading = true
     this.reCaptchaSubscription = this.recaptchaV3Service
       .execute('register')
       .subscribe(
         (token) => {
-          this.onSubmit(token);
+          this.onSubmit(token)
         },
         (error) => {
-          this.alertService.error(error);
-          this.loading = false;
+          this.alertService.error(error)
+          this.loading = false
         },
-      );
+      )
   }
 
   public onSubmit(token: string) {
-    this.submitted = true;
+    this.submitted = true
 
     this.authenticationService.login(token).subscribe(
       () => {
-        this.router.navigate([this.returnUrl]);
+        this.router.navigate([this.returnUrl])
       },
       (error) => {
-        this.alertService.error(error);
-        this.loading = false;
+        this.alertService.error(error)
+        this.loading = false
       },
-    );
+    )
   }
 
   public openDisclaimerDialog() {
-    const dialogConfig = new MatDialogConfig();
+    const dialogConfig = new MatDialogConfig()
 
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = false;
+    dialogConfig.disableClose = true
+    dialogConfig.autoFocus = false
     dialogConfig.data = {
       title: 'Disclaimer',
       content:
@@ -97,36 +97,35 @@ export class LoginComponent implements OnInit, OnDestroy {
         'we have a duty of care and will take the necessary steps to prevent any harm to you.',
       successLabel: 'I agree, continue',
       cancelLabel: 'Go Back',
-    };
+    }
 
     dialogConfig.position = {
       top: '48px',
-    };
+    }
 
-    const dialogRef = this.dialog.open(DialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open(DialogComponent, dialogConfig)
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.executeRecaptcha();
+        this.executeRecaptcha()
       }
-    });
+    })
   }
 
   private async isChatAvailable() {
-    this.loading = true;
+    this.loading = true
     try {
-      const response = await this.chatAvailabilityService
+      this.chatAvailabilityResponse = await this.authenticationService
         .isChatAvailable()
-        .toPromise();
-      this.chatAvailabilityResponse = response;
+        .toPromise()
     } catch (error) {
-      this.alertService.error(error);
+      this.alertService.error(error)
     }
-    this.loading = false;
+    this.loading = false
   }
 
   ngOnDestroy() {
-    this.chatAvailabilitySubscription.unsubscribe();
-    this.reCaptchaSubscription.unsubscribe();
+    this.chatAvailabilitySubscription.unsubscribe()
+    this.reCaptchaSubscription.unsubscribe()
   }
 }

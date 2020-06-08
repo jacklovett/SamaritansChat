@@ -8,6 +8,8 @@ import { ChatMessage } from 'src/app/models/chat.message'
 import { ChatService } from 'src/app/services/chat.service'
 import { AlertService } from 'src/app/services/alert.service'
 import { AuthenticationService } from 'src/app/services/authentication.service'
+import { RxStompService } from '@stomp/ng2-stompjs'
+import { Message } from 'stompjs'
 
 @Component({
   selector: 'app-chat',
@@ -24,43 +26,15 @@ export class ChatComponent implements OnInit, OnDestroy {
   chatMessages: ChatMessage[] = []
   displayMessages: ChatMessage[] = []
 
-  activeChatUsersSubscription: Subscription
-  disconnectedChatUsersSubscription: Subscription
   chatMessagesSubscription: Subscription
 
   constructor(
     private formBuilder: FormBuilder,
     private alertService: AlertService,
     private chatService: ChatService,
+    private rxStompService: RxStompService,
     private authenticationService: AuthenticationService,
   ) {
-    this.activeChatUsersSubscription = this.chatService
-      .getChatUsers()
-      .subscribe((user) => {
-        // maybe reload entire list from backend instead of relying on list state
-        this.chatUsers.push(user)
-      })
-
-    this.disconnectedChatUsersSubscription = this.chatService
-      .getDisconnectedChatUsers()
-      .subscribe((disconnectedUser) => {
-        this.chatUsers.forEach((user, index) => {
-          if (user.username === disconnectedUser) {
-            this.chatUsers.splice(index, 1)
-          }
-        })
-
-        if (this.activeChat.username === disconnectedUser) {
-          this.isActiveChatConnected = false
-        }
-      })
-
-    this.chatMessagesSubscription = this.chatService
-      .getChatMessages()
-      .subscribe((msg) => {
-        this.handleNewMessage(msg)
-      })
-
     // inside .then() to ensure chatUsers is populated before we see if activeChat is connected
     this.loadActiveUsers().then(() => {
       const storedActiveChat: ChatUser = JSON.parse(
@@ -73,7 +47,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.chatService.connect()
+    this.chatMessagesSubscription = this.rxStompService
+      .watch(`/topic/${this.currentUsername}`)
+      .subscribe((message: Message) => {
+        this.onMessageRecieved(JSON.parse(message.body))
+      })
 
     this.chatForm = this.formBuilder.group({
       message: [''],
@@ -100,12 +78,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       type: 'CHAT',
     }
 
-    try {
-      this.chatService.send(message)
-    } catch (error) {
-      this.alertService.error(error)
-    }
-
+    this.chatService.publishMessage('send.message', message)
     this.clearForm()
   }
 
@@ -132,7 +105,39 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loading = false
   }
 
-  private handleNewMessage(message: ChatMessage) {
+  private onMessageRecieved(message: ChatMessage) {
+    const { type } = message
+
+    switch (type) {
+      case 'CHAT':
+        this.handleChatMessage(message)
+        break
+      case 'JOIN':
+        this.handleJoinMessage(message)
+        break
+      case 'LEAVE':
+        this.handleLeaveMessage(message)
+        break
+      default:
+        throw Error(`Unknown message type: ${type}`)
+    }
+  }
+
+  private handleJoinMessage(message: ChatMessage) {
+    const { sender } = message
+
+    if (sender === 'Sam') {
+      return
+    }
+
+    const newChatUser: ChatUser = <ChatUser>{
+      username: sender,
+      unreadMessageCount: 0,
+    }
+    this.chatUsers.push(newChatUser)
+  }
+
+  private handleChatMessage(message: ChatMessage) {
     const { sender, recipient } = message
     this.chatMessages.push(message)
     if (
@@ -143,11 +148,24 @@ export class ChatComponent implements OnInit, OnDestroy {
       this.displayMessages.push(message)
     } else {
       // increases number of unread messages for relevant chat
-      for (let i = 0; i < this.chatUsers.length; i++) {
-        if (sender === this.chatUsers[i].username) {
-          ++this.chatUsers[i].unreadMessageCount
+      this.chatUsers.forEach((user: ChatUser) => {
+        if (sender !== user.username) {
+          return
         }
+        ++user.unreadMessageCount
+      })
+    }
+  }
+
+  private handleLeaveMessage(message: ChatMessage) {
+    this.chatUsers.forEach((user, index) => {
+      if (user.username === message.sender) {
+        this.chatUsers.splice(index, 1)
       }
+    })
+
+    if (this.activeChat.username === message.sender) {
+      this.isActiveChatConnected = false
     }
   }
 
@@ -203,8 +221,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.activeChatUsersSubscription.unsubscribe()
-    this.disconnectedChatUsersSubscription.unsubscribe()
     this.chatMessagesSubscription.unsubscribe()
   }
 }

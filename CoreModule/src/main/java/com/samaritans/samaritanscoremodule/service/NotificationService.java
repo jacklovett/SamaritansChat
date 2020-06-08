@@ -63,7 +63,7 @@ public class NotificationService {
 		notification.setUser(samaritansUser);
 		// get notification id
 		notification = notificationDao.save(notification);
-		simpMessagingTemplate.convertAndSend("/topic/" + "notifications." + recipient,
+		simpMessagingTemplate.convertAndSend("/topic/notifications." + recipient,
 				new NotificationResponse(notification));
 	}
 

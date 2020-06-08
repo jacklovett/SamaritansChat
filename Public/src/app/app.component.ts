@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Component } from '@angular/core'
+import { Router } from '@angular/router'
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 
-import { AuthenticationService } from './services/authentication.service';
-import { DialogComponent } from './components/dialog/dialog.component';
-import { ChatService } from './services/chat.service';
+import { AuthenticationService } from './services/authentication.service'
+import { DialogComponent } from './components/dialog/dialog.component'
+import { ChatService } from './services/chat.service'
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ import { ChatService } from './services/chat.service';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  isChatVisible = true;
+  isChatVisible = true
 
   constructor(
     private router: Router,
@@ -22,43 +22,43 @@ export class AppComponent {
   ) {}
 
   public leaveChatDialog() {
-    const dialogConfig = new MatDialogConfig();
+    const dialogConfig = new MatDialogConfig()
 
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = false;
+    dialogConfig.disableClose = true
+    dialogConfig.autoFocus = false
 
     dialogConfig.data = {
       title: 'Leave Chat',
       content: 'Are you sure you want to leave the current chat session?',
       successLabel: 'Continue',
       cancelLabel: 'Go Back',
-    };
+    }
 
     dialogConfig.position = {
       top: '36px',
-    };
+    }
 
-    const dialogRef = this.dialog.open(DialogComponent, dialogConfig);
+    const dialogRef = this.dialog.open(DialogComponent, dialogConfig)
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.logout();
+        this.logout()
       }
-    });
+    })
   }
 
   public logout() {
-    this.chatService.disconnect();
-    this.authenticationService.logout();
+    this.chatService.disconnect()
+    this.authenticationService.logout()
   }
 
   public toggleChat() {
-    this.isChatVisible = !this.isChatVisible;
-    const display = this.isChatVisible ? 'show' : 'hide';
-    this.router.navigate(['chat'], { queryParams: { display } });
+    this.isChatVisible = !this.isChatVisible
+    const display = this.isChatVisible ? 'show' : 'hide'
+    this.router.navigate(['chat'], { queryParams: { display } })
   }
 
   get isAuthenticated() {
-    return this.authenticationService.isAuthenticated();
+    return this.authenticationService.isAuthenticated()
   }
 }
