@@ -1,16 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  FormControl,
-} from '@angular/forms';
+import { Component, OnInit } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms'
 
-import { AlertService } from 'src/app/services/alert.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
-import { AppComponent } from './../../app.component';
-import { ValidationService } from 'src/app/services/validation.service';
+import { AlertService } from 'src/app/services/alert.service'
+import { AuthenticationService } from 'src/app/services/authentication.service'
+import { AppComponent } from './../../app.component'
+import { ValidationService } from 'src/app/services/validation.service'
 
 @Component({
   selector: 'app-login',
@@ -18,10 +13,10 @@ import { ValidationService } from 'src/app/services/validation.service';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
-  loading = false;
-  submitted = false;
-  returnUrl: string;
+  loginForm: FormGroup
+  loading = false
+  submitted = false
+  returnUrl: string
 
   constructor(
     private formBuilder: FormBuilder,
@@ -33,8 +28,8 @@ export class LoginComponent implements OnInit {
     private appComponent: AppComponent,
   ) {
     // redirect if already logged in
-    if (this.authenticationService.currentUserValue) {
-      this.router.navigate(['/users']);
+    if (this.authenticationService.jwtResponse?.token) {
+      this.router.navigate(['/'])
     }
   }
 
@@ -42,25 +37,25 @@ export class LoginComponent implements OnInit {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
-    });
+    })
 
     // get return url from route parameters or default to '/'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/users';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/users'
   }
 
   // convenience getter for easy access to form fields
   get controls() {
-    return this.loginForm.controls;
+    return this.loginForm.controls
   }
 
   onSubmit() {
-    this.submitted = true;
+    this.submitted = true
 
     if (this.loginForm.invalid) {
-      return;
+      return
     }
 
-    this.loading = true;
+    this.loading = true
 
     this.authenticationService
       .login(this.controls.username.value, this.controls.password.value)
@@ -68,17 +63,17 @@ export class LoginComponent implements OnInit {
         () => {
           // refresh appComponent to ensure admin property is set correctly
           // see if you can resolve this with a subscribe/subscription
-          this.appComponent.ngOnInit();
-          this.router.navigate([this.returnUrl]);
+          this.appComponent.ngOnInit()
+          this.router.navigate([this.returnUrl])
         },
-        error => {
-          this.alertService.error(error);
-          this.loading = false;
+        (error) => {
+          this.alertService.error(error)
+          this.loading = false
         },
-      );
+      )
   }
 
   getErrorMessage(formControl: FormControl) {
-    return this.validationService.getErrorMessage(formControl);
+    return this.validationService.getErrorMessage(formControl)
   }
 }
