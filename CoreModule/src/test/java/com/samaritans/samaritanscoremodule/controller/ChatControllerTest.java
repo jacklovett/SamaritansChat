@@ -36,7 +36,6 @@ import com.samaritans.samaritanscoremodule.requests.ConversationRequest;
 import com.samaritans.samaritanscoremodule.requests.Message;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
 import com.samaritans.samaritanscoremodule.responses.ChatAvailabilityResponse;
-import com.samaritans.samaritanscoremodule.responses.ChatUserResponse;
 import com.samaritans.samaritanscoremodule.service.ChatService;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
@@ -52,10 +51,9 @@ public class ChatControllerTest {
 
 	private Message message;
 	private Gson gson;
-	private ChatUserResponse chatUserResponse;
 	private ConversationRequest conversationRequest;
 	private List<Message> conversation;
-	private Set<ChatUserResponse> chatUsers;
+	private Set<String> chatUsers;
 	private MockMvc mockMvc;
 
 	@Mock
@@ -75,9 +73,8 @@ public class ChatControllerTest {
 		conversation = new ArrayList<>();
 		conversation.add(message);
 
-		chatUserResponse = new ChatUserResponse(USERNAME, 0);
 		chatUsers = new HashSet<>();
-		chatUsers.add(chatUserResponse);
+		chatUsers.add(USERNAME);
 
 		conversationRequest = new ConversationRequest();
 		conversationRequest.setSamaritansUser(AppConstants.SAMARITANS_USERNAME);

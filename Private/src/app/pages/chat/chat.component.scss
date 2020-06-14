@@ -34,12 +34,15 @@
 
 .chat-user-item {
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   & .chat-user {
     white-space: nowrap;
     text-overflow: ellipsis;
     display: block;
-    max-width: 140px;
+    width: 100%;
     overflow: hidden;
   }
 }

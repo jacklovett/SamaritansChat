@@ -1,5 +1,6 @@
 package com.samaritans.samaritanscoremodule.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,7 +40,8 @@ public class ChatMessage extends DateAudit {
 	@NotBlank
 	private String content;
 
-	private boolean seen;
+	@Column(name = "isRead", nullable = false)
+	private boolean read = false;
 
 	public ChatMessage() {
 	}
@@ -48,7 +50,6 @@ public class ChatMessage extends DateAudit {
 		this.sender = message.getSender();
 		this.recipient = message.getRecipient();
 		this.content = message.getContent();
-		this.seen = false;
 	}
 
 	public Long getId() {
@@ -83,12 +84,12 @@ public class ChatMessage extends DateAudit {
 		this.content = content;
 	}
 
-	public boolean isSeen() {
-		return seen;
+	public boolean isRead() {
+		return read;
 	}
 
-	public void setSeen(boolean seen) {
-		this.seen = seen;
+	public void setRead(boolean read) {
+		this.read = read;
 	}
 
 }

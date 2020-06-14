@@ -16,11 +16,8 @@ public interface ChatRepository extends JpaRepository<ChatMessage, Long> {
 
 	List<ChatMessage> findAllBySenderOrRecipient(String username, String recipient);
 
-	@Query("SELECT COUNT(*) FROM ChatMessage ch WHERE ch.sender = :username AND ch.seen = 0")
-	int findNumberOfUnreadMessagesByUsername(@Param("username") String username);
-
 	@Modifying
 	@Transactional
-	@Query("UPDATE ChatMessage ch SET ch.seen = 1 WHERE ch.sender = :username AND ch.seen = 0")
+	@Query("UPDATE ChatMessage ch SET ch.read = 1 WHERE ch.sender = :username AND ch.read = 0")
 	int updateSeenMessagesByUsername(@Param("username") String username);
 }

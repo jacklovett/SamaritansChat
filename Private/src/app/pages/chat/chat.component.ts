@@ -35,15 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     private rxStompService: RxStompService,
     private authenticationService: AuthenticationService,
   ) {
-    // inside .then() to ensure chatUsers is populated before we see if activeChat is connected
-    this.loadActiveUsers().then(() => {
-      const storedActiveChat: ChatUser = JSON.parse(
-        localStorage.getItem('activeChat'),
-      )
-      if (!this.activeChat && storedActiveChat) {
-        this.setActiveChat(storedActiveChat)
-      }
-    })
+    this.loadActiveUsers()
   }
 
   ngOnInit() {
@@ -82,26 +74,41 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.clearForm()
   }
 
-  private async loadActiveUsers() {
+  loadActiveUsers() {
     this.loading = true
-    try {
-      this.chatUsers = []
-      this.chatUsers = await this.chatService.fetchChatUsers().toPromise()
-    } catch (error) {
-      this.alertService.error(error)
-    }
+    this.chatService.fetchChatUsers().subscribe(
+      (users) => {
+        this.chatUsers = users.map((user) => {
+          return {
+            username: user,
+            unreadMessageCount: 0,
+          }
+        })
+
+        const storedActiveChat: ChatUser = JSON.parse(
+          localStorage.getItem('activeChat'),
+        )
+        if (!this.activeChat && storedActiveChat) {
+          this.setActiveChat(storedActiveChat)
+        }
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
     this.loading = false
   }
 
-  private async loadConversation(username: string) {
+  private loadConversation(username: string) {
     this.loading = true
-    try {
-      this.displayMessages = await this.chatService
-        .getConversationByUsername(username)
-        .toPromise()
-    } catch (error) {
-      this.alertService.error(error)
-    }
+    this.chatService.getConversationByUsername(username).subscribe(
+      (messages) => {
+        this.displayMessages = messages
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
     this.loading = false
   }
 
@@ -134,6 +141,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       username: sender,
       unreadMessageCount: 0,
     }
+
     this.chatUsers.push(newChatUser)
   }
 
@@ -141,18 +149,16 @@ export class ChatComponent implements OnInit, OnDestroy {
     const { sender, recipient } = message
     this.chatMessages.push(message)
     if (
-      this.activeChat &&
-      (this.activeChat.username === sender ||
-        this.activeChat.username === recipient)
+      this.activeChat?.username === sender ||
+      this.activeChat?.username === recipient
     ) {
       this.displayMessages.push(message)
     } else {
-      // increases number of unread messages for relevant chat
       this.chatUsers.forEach((user: ChatUser) => {
         if (sender !== user.username) {
           return
         }
-        ++user.unreadMessageCount
+        user.unreadMessageCount = this.getUnreadMessageCount(sender)
       })
     }
   }
@@ -164,7 +170,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     })
 
-    if (this.activeChat.username === message.sender) {
+    if (this.activeChat?.username === message.sender) {
       this.isActiveChatConnected = false
     }
   }
@@ -197,7 +203,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
     this.activeChat = newActiveChatUser
     localStorage.setItem('activeChat', JSON.stringify(this.activeChat))
-    this.isActiveChatUserConnected(this.activeChat)
+    this.isActiveChatConnected = this.isChatUserConnected(this.activeChat)
 
     if (chatUser.unreadMessageCount > 0) {
       chatUser.unreadMessageCount = 0
@@ -205,15 +211,16 @@ export class ChatComponent implements OnInit, OnDestroy {
     }
   }
 
-  private isActiveChatUserConnected(chatUser: ChatUser) {
-    // try to get .includes() working. upgrade to ES6+ somehow ??
-    this.isActiveChatConnected = false
-    this.chatUsers.forEach((user) => {
-      if (user.username === chatUser.username) {
-        this.isActiveChatConnected = true
-        return
-      }
-    })
+  private isChatUserConnected(chatUser: ChatUser) {
+    return this.chatUsers.some(
+      (user: ChatUser) => user.username === chatUser.username,
+    )
+  }
+
+  private getUnreadMessageCount(user: string) {
+    return this.chatMessages.filter(
+      (chatMessage) => chatMessage.sender === user && !chatMessage.read,
+    ).length
   }
 
   disableForm(): boolean {
