@@ -34,7 +34,6 @@ import com.samaritans.samaritanscoremodule.requests.ConversationRequest;
 import com.samaritans.samaritanscoremodule.requests.Message;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
 import com.samaritans.samaritanscoremodule.responses.ChatAvailabilityResponse;
-import com.samaritans.samaritanscoremodule.responses.ChatUserResponse;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
 import com.samaritans.samaritanscoremodule.utils.MessageType;
@@ -186,14 +185,7 @@ public class ChatService {
 	}
 
 	public String getChatUsers(final String username) {
-
-		final Set<String> usersActiveChatUsers = getActiveChatUsersForUser(username);
-
-		final Set<ChatUserResponse> chatUsers = usersActiveChatUsers.stream()
-				.map(user -> new ChatUserResponse(user, chatDao.findNumberOfUnreadMessagesByUsername(user)))
-				.collect(Collectors.toSet());
-
-		return gson.toJson(chatUsers);
+		return gson.toJson(getActiveChatUsersForUser(username));
 	}
 
 	/**

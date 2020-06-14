@@ -24,10 +24,6 @@ public class ChatDao {
 				.collect(Collectors.toList());
 	}
 
-	public int findNumberOfUnreadMessagesByUsername(String username) {
-		return chatRepository.findNumberOfUnreadMessagesByUsername(username);
-	}
-
 	public int updateSeenMessagesByUsername(String username) {
 		return chatRepository.updateSeenMessagesByUsername(username);
 	}

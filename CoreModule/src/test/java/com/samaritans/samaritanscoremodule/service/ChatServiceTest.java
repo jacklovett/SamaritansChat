@@ -40,7 +40,6 @@ import com.samaritans.samaritanscoremodule.requests.ConversationRequest;
 import com.samaritans.samaritanscoremodule.requests.Message;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
 import com.samaritans.samaritanscoremodule.responses.ChatAvailabilityResponse;
-import com.samaritans.samaritanscoremodule.responses.ChatUserResponse;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
 import com.samaritans.samaritanscoremodule.utils.MessageType;
@@ -422,21 +421,14 @@ public class ChatServiceTest {
 		conversations.put(USERNAME_2, SAMARITANS_USER);
 		chatService.setConversations(conversations);
 
-		final ChatUserResponse expectedChatUser1 = new ChatUserResponse(USERNAME, 1);
-		final ChatUserResponse expectedChatUser2 = new ChatUserResponse(USERNAME_2, 1);
-
-		final Set<ChatUserResponse> expectedUsers = new HashSet<>();
-		expectedUsers.add(expectedChatUser1);
-		expectedUsers.add(expectedChatUser2);
-
-		when(chatDao.findNumberOfUnreadMessagesByUsername(Mockito.anyString())).thenReturn(1);
+		final Set<String> expectedUsers = new HashSet<>();
+		expectedUsers.add(USERNAME);
+		expectedUsers.add(USERNAME_2);
 
 		final String response = chatService.getChatUsers(SAMARITANS_USER);
 
 		assertNotNull(response);
 		assertEquals(gson.toJson(expectedUsers), response);
-		verify(chatDao, times(2)).findNumberOfUnreadMessagesByUsername(Mockito.anyString());
-
 	}
 
 	@Test
@@ -449,7 +441,6 @@ public class ChatServiceTest {
 
 		assertNotNull(response);
 		assertEquals("[]", response);
-		verify(chatDao, never()).findNumberOfUnreadMessagesByUsername(Mockito.anyString());
 	}
 
 	@Test

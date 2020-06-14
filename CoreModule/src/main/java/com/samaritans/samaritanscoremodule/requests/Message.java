@@ -23,6 +23,8 @@ public class Message {
 
 	private MessageType type;
 
+	private boolean read;
+
 	public Message() {
 	}
 
@@ -32,6 +34,7 @@ public class Message {
 		this.recipient = chatMessage.getRecipient();
 		this.content = chatMessage.getContent();
 		this.type = MessageType.CHAT;
+		this.setRead(chatMessage.isRead());
 	}
 
 	public Instant getDateSent() {
@@ -74,12 +77,21 @@ public class Message {
 		this.type = type;
 	}
 
+	public boolean isRead() {
+		return read;
+	}
+
+	public void setRead(boolean read) {
+		this.read = read;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((content == null) ? 0 : content.hashCode());
 		result = prime * result + ((dateSent == null) ? 0 : dateSent.hashCode());
+		result = prime * result + (read ? 1231 : 1237);
 		result = prime * result + ((recipient == null) ? 0 : recipient.hashCode());
 		result = prime * result + ((sender == null) ? 0 : sender.hashCode());
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -112,6 +124,9 @@ public class Message {
 		} else if (!dateSent.equals(other.dateSent)) {
 			return false;
 		}
+		if (read != other.read) {
+			return false;
+		}
 		if (recipient == null) {
 			if (other.recipient != null) {
 				return false;
@@ -135,7 +150,7 @@ public class Message {
 	@Override
 	public String toString() {
 		return "Message [dateSent=" + dateSent + ", sender=" + sender + ", recipient=" + recipient + ", content="
-				+ content + ", type=" + type + "]";
+				+ content + ", type=" + type + ", read=" + read + "]";
 	}
 
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { RxStompService } from '@stomp/ng2-stompjs'
 
-import { ChatUser } from '../models/chat.user'
 import { ChatMessage } from '../models/chat.message'
 
 import { AlertService } from './alert.service'
@@ -70,7 +69,7 @@ export class ChatService {
   }
 
   public fetchChatUsers() {
-    return this.http.get<ChatUser[]>(
+    return this.http.get<string[]>(
       `${this.apiUrl}/chat/users/${this.currentUsername}`,
     )
   }
