@@ -12,6 +12,4 @@ public interface ChatConfigRepository extends JpaRepository<ChatConfig, Long> {
 
 	Optional<ChatConfig> findFirstByOrderByIdAsc();
 
-	Optional<ChatConfig> findById(int id);
-
 }

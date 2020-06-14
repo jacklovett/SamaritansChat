@@ -2,6 +2,7 @@ package com.samaritans.samaritanscoremodule.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -19,11 +20,12 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.google.gson.Gson;
 import com.samaritans.samaritanscoremodule.dao.ChatConfigDao;
+import com.samaritans.samaritanscoremodule.exception.ResourceNotFoundException;
 import com.samaritans.samaritanscoremodule.model.ChatConfig;
 import com.samaritans.samaritanscoremodule.requests.ChatConfigRequest;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
-import com.google.gson.Gson;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChatConfigControllerTest {
@@ -65,12 +67,12 @@ public class ChatConfigControllerTest {
 
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/config")
+		final RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/config")
 				.contentType(MediaType.APPLICATION_JSON);
 
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		final MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-		MockHttpServletResponse response = result.getResponse();
+		final MockHttpServletResponse response = result.getResponse();
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -80,14 +82,14 @@ public class ChatConfigControllerTest {
 	@Test
 	public void testGetChatNotFound() throws Exception {
 
-		when(chatConfigDao.findConfig()).thenReturn(null);
+		doThrow(new ResourceNotFoundException("No chat config found")).when(chatConfigDao).findConfig();
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/config/")
+		final RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/config/")
 				.contentType(MediaType.APPLICATION_JSON);
 
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		final MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-		MockHttpServletResponse response = result.getResponse();
+		final MockHttpServletResponse response = result.getResponse();
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
@@ -98,14 +100,14 @@ public class ChatConfigControllerTest {
 
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
-		String json = gson.toJson(chatConfigRequest);
+		final String json = gson.toJson(chatConfigRequest);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/config/edit")
+		final RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/config/edit")
 				.accept(MediaType.APPLICATION_JSON).content(json).contentType(MediaType.APPLICATION_JSON);
 
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		final MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-		MockHttpServletResponse response = result.getResponse();
+		final MockHttpServletResponse response = result.getResponse();
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
@@ -116,16 +118,16 @@ public class ChatConfigControllerTest {
 	@Test
 	public void testUpdateConfigWhenNotFound() throws Exception {
 
-		when(chatConfigDao.findConfig()).thenReturn(null);
+		doThrow(new ResourceNotFoundException("No chat config found")).when(chatConfigDao).findConfig();
 
-		String json = gson.toJson(chatConfigRequest);
+		final String json = gson.toJson(chatConfigRequest);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/config/edit")
+		final RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/config/edit")
 				.accept(MediaType.APPLICATION_JSON).content(json).contentType(MediaType.APPLICATION_JSON);
 
-		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
+		final MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
-		MockHttpServletResponse response = result.getResponse();
+		final MockHttpServletResponse response = result.getResponse();
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());

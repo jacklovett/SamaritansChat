@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.samaritans.samaritanscoremodule.exception.SamaritansException;
 import com.samaritans.samaritanscoremodule.exception.ResourceNotFoundException;
+import com.samaritans.samaritanscoremodule.exception.SamaritansException;
 import com.samaritans.samaritanscoremodule.model.Notification;
 import com.samaritans.samaritanscoremodule.repository.NotificationRepository;
 import com.samaritans.samaritanscoremodule.responses.NotificationResponse;
@@ -26,12 +26,12 @@ public class NotificationDao {
 	 * @param username
 	 * @return List of notifications
 	 */
-	public List<NotificationResponse> findNotificationByUserId(Long userId) {
+	public List<NotificationResponse> findNotificationByUserId(final Long userId) {
 		return notificationRepository.findAllByUserByOrderByIdDesc(userId).stream().map(NotificationResponse::new)
 				.collect(Collectors.toList());
 	}
 
-	public Notification save(Notification notification) {
+	public Notification save(final Notification notification) {
 		return notificationRepository.save(notification);
 	}
 
@@ -40,26 +40,23 @@ public class NotificationDao {
 	 * 
 	 * @param id
 	 */
-	public boolean deleteNotificationById(Long id) {
-		boolean result = false;
+	public void deleteNotificationById(final Long id) {
 		try {
 			notificationRepository.deleteById(id);
-			result = true;
-		} catch (IllegalArgumentException e) {
+		} catch (final IllegalArgumentException e) {
 			throw new SamaritansException("Unable to delete notification with id: " + id, e);
 		}
-		return result;
 	}
 
 	public void deleteReadAndProcessedNotifications() {
 		try {
 			notificationRepository.deleteReadAndProcessedNotifications();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.error("Unable to delete notifications", e);
 		}
 	}
 
-	public Notification findById(Long id) {
+	public Notification findById(final Long id) {
 		return notificationRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("No notification found with id: " + id));
 	}

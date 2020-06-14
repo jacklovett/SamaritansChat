@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.samaritans.samaritanscoremodule.dao.BoUserDao;
 import com.samaritans.samaritanscoremodule.dao.NotificationDao;
+import com.samaritans.samaritanscoremodule.exception.SamaritansException;
 import com.samaritans.samaritanscoremodule.model.BoUser;
 import com.samaritans.samaritanscoremodule.model.Notification;
 import com.samaritans.samaritanscoremodule.requests.NotificationRequest;
@@ -68,9 +69,12 @@ public class NotificationService {
 	}
 
 	public ApiResponse deleteNotification(final Long id) {
-		final boolean result = notificationDao.deleteNotificationById(id);
-		return result ? new ApiResponse(true, "Notification deleted")
-				: new ApiResponse(false, "Unable to delete notfication");
+		try {
+			notificationDao.deleteNotificationById(id);
+			return new ApiResponse(true, "Notification deleted");
+		} catch (final SamaritansException e) {
+			return new ApiResponse(false, "Unable to delete notfication");
+		}
 	}
 
 	public void deleteNotifications() {
