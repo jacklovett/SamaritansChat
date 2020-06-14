@@ -8,16 +8,20 @@
     </div>
     <mat-list [hidden]="!chatUsers.length" class="contacts mat-elevation-z1">
       <mat-list-item
-        class="chat-user-item"
         *ngFor="let chatUser of chatUsers"
         (click)="setActiveChat(chatUser)"
       >
-        <mat-icon matListIcon>account_circle</mat-icon>
-        {{ chatUser.username }}
-        <span [hidden]="!chatUser.unreadMessageCount" class="new-msg-icon">{{
-          chatUser.unreadMessageCount
-        }}</span>
-        <mat-divider></mat-divider>
+        <div class="chat-user-item">
+          <mat-icon matListIcon>account_circle</mat-icon>
+          <div class="chat-user">
+            {{ chatUser.username }}
+          </div>
+          <!-- Get unreadMessageCount by filtering chat messages -->
+          <!-- This can avoid unwanted API calls -->
+          <span [hidden]="!chatUser.unreadMessageCount" class="new-msg-icon">{{
+            chatUser.unreadMessageCount
+          }}</span>
+        </div>
       </mat-list-item>
     </mat-list>
   </div>

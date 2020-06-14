@@ -19,6 +19,7 @@ public class ChatConfigDao {
 	/**
 	 * Find the first chat config
 	 * 
+	 * @throws ResourceNotFoundException
 	 * @return ChatConfig
 	 */
 	public ChatConfig findConfig() {
@@ -27,19 +28,9 @@ public class ChatConfigDao {
 	}
 
 	/**
-	 * Find config in database by id
-	 * 
-	 * @return ChatConfig
-	 */
-	public ChatConfig findConfigById(int id) {
-		return chatConfigRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("No chat config found with id: " + id));
-	}
-
-	/**
 	 * @param config to save
 	 */
-	public ChatConfig save(ChatConfig config) {
+	public ChatConfig save(final ChatConfig config) {
 		return chatConfigRepository.save(config);
 	}
 }

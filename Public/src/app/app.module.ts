@@ -24,6 +24,13 @@ import {
   MatTooltipDefaultOptions,
 } from '@angular/material/tooltip';
 
+import {
+  InjectableRxStompConfig,
+  RxStompService,
+  rxStompServiceFactory,
+} from '@stomp/ng2-stompjs';
+import { rxStompConfig } from './rx-stomp.config';
+
 export const customTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 1000,
   hideDelay: 1000,
@@ -55,6 +62,15 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
     {
       provide: RECAPTCHA_V3_SITE_KEY,
       useValue: '6LfaqOgUAAAAADoZGvOQ6f4eOnFrGmHwEBMq5rcP',
+    },
+    {
+      provide: InjectableRxStompConfig,
+      useValue: rxStompConfig,
+    },
+    {
+      provide: RxStompService,
+      useFactory: rxStompServiceFactory,
+      deps: [InjectableRxStompConfig],
     },
   ],
   bootstrap: [AppComponent],

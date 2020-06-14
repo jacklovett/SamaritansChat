@@ -1,7 +1,5 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import java.util.Optional;
-
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.samaritans.samaritanscoremodule.dao.ChatConfigDao;
+import com.samaritans.samaritanscoremodule.exception.ResourceNotFoundException;
 import com.samaritans.samaritanscoremodule.model.ChatConfig;
 import com.samaritans.samaritanscoremodule.requests.ChatConfigRequest;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
@@ -44,15 +43,9 @@ public class ChatConfigController {
 	@GetMapping()
 	public ResponseEntity<ChatConfigRequest> getChatConfig() {
 		logger.info("ChatConfigController - getChatConfig - init");
-
-		ChatConfigRequest chatConfigRequest = null;
-		ChatConfig config = chatConfigDao.findConfig();
-
-		if (config != null) {
-			chatConfigRequest = new ChatConfigRequest(config);
-		}
-
-		return ResponseEntity.of(Optional.ofNullable(chatConfigRequest));
+		final ChatConfig config = chatConfigDao.findConfig();
+		final ChatConfigRequest chatConfigRequest = new ChatConfigRequest(config);
+		return ResponseEntity.ok(chatConfigRequest);
 	}
 
 	/**
@@ -62,20 +55,17 @@ public class ChatConfigController {
 	 * @return ApiResponse
 	 */
 	@PutMapping("/edit")
-	public ResponseEntity<ApiResponse> updateConfig(@Valid @RequestBody ChatConfigRequest configRequest) {
+	public ResponseEntity<ApiResponse> updateConfig(@Valid @RequestBody final ChatConfigRequest configRequest) {
 		logger.info("ChatConfigController - updateConfig - init");
-
-		ChatConfig config = chatConfigDao.findConfig();
-
-		if (config != null) {
+		try {
+			final ChatConfig config = chatConfigDao.findConfig();
 			config.setTimeRestricted(configRequest.isTimeRestricted());
 			config.setAvailableFrom(configRequest.getAvailableFrom());
 			config.setAvailableUntil(configRequest.getAvailableUntil());
 			chatConfigDao.save(config);
-		} else {
+		} catch (ResourceNotFoundException e) {
 			return new ResponseEntity<>(new ApiResponse(false, "Unable to update chat settings"), HttpStatus.NOT_FOUND);
 		}
-
 		return ResponseEntity.ok(new ApiResponse(true, "Settings updated successfully"));
 	}
 

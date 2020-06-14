@@ -1,79 +1,55 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Subject, Observable } from 'rxjs';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { RxStompService } from '@stomp/ng2-stompjs'
 
-import * as Stomp from 'stompjs';
-import * as SockJS from 'sockjs-client';
+import { ChatUser } from '../models/chat.user'
+import { ChatMessage } from '../models/chat.message'
 
-import { AlertService } from './alert.service';
-import { environment } from 'src/environments/environment';
+import { AlertService } from './alert.service'
+import { AuthenticationService } from './authentication.service'
 
-import { ChatUser } from '../models/chat.user';
-import { ChatMessage } from '../models/chat.message';
-import { AuthenticationService } from './authentication.service';
+import { environment } from 'src/environments/environment'
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService {
-  private chatUrl: string = environment.chatUrl;
-  private apiUrl: string = environment.apiUrl;
-
-  private activeUsersSubject = new Subject<any>();
-  private disconnectedUsersSubject = new Subject<any>();
-  private chatMessagesSubject = new Subject<any>();
-
-  stompClient: any;
-
-  activeUsers: ChatUser[] = [];
-  messages: ChatMessage[] = [];
+  private apiUrl: string = environment.apiUrl
 
   constructor(
     private http: HttpClient,
     private alertService: AlertService,
+    private rxStompService: RxStompService,
     private authenticationService: AuthenticationService,
-  ) {}
-
-  public connect() {
-    const socket = new SockJS(this.chatUrl);
-    this.stompClient = Stomp.over(socket);
-    const _this = this;
-    _this.stompClient.connect(
-      {},
-      () => {
-        this.stompClient.subscribe('/chat/' + this.currentUsername, function (
-          msg: any,
-        ) {
-          _this.onMessageRecieved(JSON.parse(msg.body));
-        });
-
-        this.stompClient.subscribe(
-          '/chat/users/' + this.currentUsername,
-          function (msg: any) {
-            _this.handleActiveUserResponse(msg);
-          },
-        );
-
-        this.connectToChat();
-        this.setConnected(true);
-      },
-      (error: string) => {
-        this.alertService.error(
-          `Unable to connect to WebSocket server: ${error}`,
-        );
-      },
-    );
+  ) {
+    this.connect()
   }
 
   get currentUsername() {
-    return this.authenticationService.getUserDetailsFromJWT().username;
+    return this.authenticationService.getUserDetailsFromJWT().username
   }
 
-  public send(message: ChatMessage) {
+  public publishMessage = (destination: string, message: ChatMessage) => {
     try {
-      this.stompClient.send('/app/send/message', {}, JSON.stringify(message));
+      this.rxStompService.publish({
+        destination: `/app/${destination}`,
+        body: JSON.stringify(message),
+      })
     } catch (error) {
-      this.alertService.error(error);
+      this.alertService.error(error)
+    }
+  }
+
+  public connect() {
+    const message: ChatMessage = <ChatMessage>{
+      sender: this.currentUsername,
+      type: 'JOIN',
+    }
+
+    this.publishMessage('send.addActiveUser', message)
+
+    if (!JSON.parse(localStorage.getItem('isChatConnected'))) {
+      localStorage.setItem('isChatConnected', JSON.stringify(true))
     }
   }
 
@@ -81,115 +57,36 @@ export class ChatService {
     const message: ChatMessage = <ChatMessage>{
       sender: this.currentUsername,
       type: 'LEAVE',
-    };
-
-    if (this.stompClient) {
-      try {
-        this.stompClient.send(
-          '/app/send/disconnect',
-          {},
-          JSON.stringify(message),
-        );
-        this.stompClient.disconnect();
-        this.setConnected(false);
-      } catch (error) {
-        this.alertService.error(error);
-      }
     }
 
-    this.clearLocalStorage();
-  }
-
-  public getChatUsers(): Observable<any> {
-    return this.activeUsersSubject.asObservable();
-  }
-
-  public getDisconnectedChatUsers(): Observable<any> {
-    return this.disconnectedUsersSubject.asObservable();
-  }
-
-  public getChatMessages(): Observable<ChatMessage[]> {
-    return this.chatMessagesSubject.asObservable();
+    this.publishMessage('send.disconnect', message)
+    this.clearLocalStorage()
   }
 
   public getConversationByUsername(username: string) {
     return this.http.get<ChatMessage[]>(
       `${this.apiUrl}/chat/conversation/${username}`,
-    );
+    )
   }
 
   public fetchChatUsers() {
     return this.http.get<ChatUser[]>(
       `${this.apiUrl}/chat/users/${this.currentUsername}`,
-    );
+    )
   }
 
   public updateUnreadMessages(username: string) {
     this.http
       .put(`${this.apiUrl}/chat/updateUnreadMessages`, username)
-      .subscribe(
-        (result) => {},
-        (error) => {
-          console.log(
-            `An error occured while updating unread chat messages: ${error}`,
-          );
-        },
-      );
-  }
-
-  public async connectToChat() {
-    const message: ChatMessage = <ChatMessage>{
-      sender: this.currentUsername,
-      type: 'JOIN',
-    };
-
-    try {
-      this.stompClient.send(
-        '/app/send/addActiveUser',
-        {},
-        JSON.stringify(message),
-      );
-    } catch (error) {
-      this.alertService.error(error);
-    }
-  }
-
-  private handleActiveUserResponse(message: any) {
-    const users = JSON.parse(message.body);
-    if (!users) {
-      console.log('No active users found');
-      return;
-    }
-
-    users.forEach((u: any) => {
-      this.activeUsersSubject.next(u);
-    });
-  }
-
-  private onMessageRecieved(message: any) {
-    if (message.type === 'CHAT') {
-      this.chatMessagesSubject.next(message);
-      // need to handle case when another samaritan volunteer logs in
-    }
-
-    if (message.type === 'JOIN' && message.sender !== this.currentUsername) {
-      const newChatUser: ChatUser = <ChatUser>{
-        username: message.sender,
-        unreadMessageCount: 0,
-      };
-      this.activeUsersSubject.next(newChatUser);
-    }
-
-    if (message.type === 'LEAVE') {
-      this.disconnectedUsersSubject.next(message.sender);
-    }
-  }
-
-  private setConnected(connected: boolean) {
-    return connected ? console.log('Connected!') : console.log('Disconnected!');
+      .subscribe((error) => {
+        console.log(
+          `An error occured while updating unread chat messages: ${error}`,
+        )
+      })
   }
 
   clearLocalStorage() {
-    localStorage.removeItem('activeChat');
+    localStorage.removeItem('activeChat')
+    localStorage.removeItem('isChatConnected')
   }
 }

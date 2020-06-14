@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@angular/core'
 import {
   Router,
   CanActivate,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
-} from '@angular/router';
+} from '@angular/router'
 
-import { AuthenticationService } from './../services/authentication.service';
+import { AuthenticationService } from './../services/authentication.service'
 
 @Injectable({ providedIn: 'root' })
 export class AdminGuard implements CanActivate {
@@ -15,22 +15,21 @@ export class AdminGuard implements CanActivate {
     private authenticationService: AuthenticationService,
   ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+  canActivate(_route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     if (this.isAdmin()) {
-      return true;
+      return true
     }
 
     // if user is not an admin but has logged in, then direct them to the chat page
-    if (this.authenticationService.currentUserValue) {
+    if (this.authenticationService.jwtResponse?.token) {
       this.router.navigate(['/chat'], {
         queryParams: { returnUrl: state.url },
-      });
+      })
     }
-    return false;
+    return false
   }
 
   public isAdmin() {
-    const details = this.authenticationService.getUserDetailsFromJWT();
-    return details?.admin;
+    return this.authenticationService.getUserDetailsFromJWT()?.admin
   }
 }

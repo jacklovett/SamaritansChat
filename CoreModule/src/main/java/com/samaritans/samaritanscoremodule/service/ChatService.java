@@ -19,11 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.google.gson.Gson;
 import com.samaritans.samaritanscoremodule.dao.ChatConfigDao;
 import com.samaritans.samaritanscoremodule.dao.ChatDao;
 import com.samaritans.samaritanscoremodule.dao.ChatUserDao;
-import com.samaritans.samaritanscoremodule.exception.SamaritansException;
 import com.samaritans.samaritanscoremodule.exception.ResourceNotFoundException;
+import com.samaritans.samaritanscoremodule.exception.SamaritansException;
 import com.samaritans.samaritanscoremodule.model.BoUser;
 import com.samaritans.samaritanscoremodule.model.ChatConfig;
 import com.samaritans.samaritanscoremodule.model.ChatMessage;
@@ -38,12 +39,9 @@ import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
 import com.samaritans.samaritanscoremodule.utils.MessageType;
 import com.samaritans.samaritanscoremodule.utils.NotificationTypeEnum;
-import com.google.gson.Gson;
 
 @Service
 public class ChatService {
-
-	private static final String CHAT = "/chat/";
 
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
@@ -72,14 +70,14 @@ public class ChatService {
 
 	private Map<String, String> conversations = new HashMap<>();
 
-	private Gson gson = new Gson();
+	private final Gson gson = new Gson();
 
 	private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
 
-	public Message sendMessage(Message message) {
+	public Message sendMessage(final Message message) {
 
-		String sender = message.getSender();
-		String recipient = message.getRecipient();
+		final String sender = message.getSender();
+		final String recipient = message.getRecipient();
 
 		if (!conversations.containsKey(sender) && !conversations.containsKey(recipient)) {
 			throw new SamaritansException("No conversation found. Unable to send chat message");
@@ -93,15 +91,15 @@ public class ChatService {
 
 	}
 
-	public void disconnect(Message message) {
+	public void disconnect(final Message message) {
 
 		if (!message.getType().equals(MessageType.LEAVE)) {
 			throw new SamaritansException("Invalid message recieved. Unable to disconnect");
 		}
 
-		String username = message.getSender();
+		final String username = message.getSender();
 
-		User user = userService.getUserByUsername(username);
+		final User user = userService.getUserByUsername(username);
 
 		if (user instanceof BoUser) {
 			disconnectSamaritansUser(message, user);
@@ -116,30 +114,45 @@ public class ChatService {
 		logger.error("Unable to disconnect user: {} from chat", username);
 	}
 
-	public void addActiveUser(Message message) {
+	/**
+	 * Add active user to chat
+	 * 
+	 * @param Message
+	 * @throws SamaritansException
+	 */
+	public void addActiveUser(final Message message) {
 
-		String username = message.getSender();
+		final String username = message.getSender();
+
+		if (StringUtils.isBlank(username)) {
+			throw new SamaritansException("Unable to connect to chat: No user found");
+		}
 
 		if (activeUsers.contains(username) || activeSamaritansUsers.contains(username)) {
-			logger.info("User already active");
+			logger.info("User {} already active", username);
 			return;
 		}
 
-		User user = userService.getUserByUsername(username);
+		final User user = userService.getUserByUsername(username);
 
 		if (user instanceof BoUser) {
 			addActiveSamaritansUser(username, message);
-			return;
+		} else {
+			addActiveChatUser(username);
 		}
-
-		addActiveChatUser(username);
-
 	}
 
-	public ApiResponse startConversation(ConversationRequest conversationRequest) {
+	/**
+	 * Starts the conversation session between the two participants
+	 * 
+	 * @param conversationRequest
+	 * @throws SamaritansException
+	 * @return ApiResponse
+	 */
+	public ApiResponse startConversation(final ConversationRequest conversationRequest) {
 
-		String samaritansUser = conversationRequest.getSamaritansUser();
-		String chatUser = conversationRequest.getChatUser();
+		final String samaritansUser = conversationRequest.getSamaritansUser();
+		final String chatUser = conversationRequest.getChatUser();
 
 		if (!activeSamaritansUsers.contains(samaritansUser)) {
 			throw new SamaritansException("You are not connected to chat");
@@ -150,33 +163,33 @@ public class ChatService {
 		}
 
 		if (conversations.containsKey(chatUser)) {
-			return new ApiResponse(false, chatUser + " is already assigned to a Samaritans volunteer");
-		} else {
-			conversations.put(chatUser, samaritansUser);
+			return new ApiResponse(false, chatUser + " is already assigned to a volunteer");
 		}
 
-		Message joinMessage = new Message();
+		conversations.put(chatUser, samaritansUser);
+
+		final Message joinMessage = new Message();
 		joinMessage.setType(MessageType.JOIN);
 		joinMessage.setDateSent(Instant.now());
 		joinMessage.setRecipient(chatUser);
 		// samaritans username is used to keep volunteer private
 		joinMessage.setSender(AppConstants.SAMARITANS_USERNAME);
 		// send join message to public user
-		simpMessagingTemplate.convertAndSend(CHAT + chatUser, joinMessage);
+		convertAndSend(chatUser, joinMessage);
 
 		joinMessage.setSender(chatUser);
 		joinMessage.setRecipient(samaritansUser);
 		// send join message to samaritans user
-		simpMessagingTemplate.convertAndSend(CHAT + samaritansUser, joinMessage);
+		convertAndSend(samaritansUser, joinMessage);
 
 		return new ApiResponse(true, chatUser + " added to contacts");
 	}
 
-	public String getChatUsers(String username) {
+	public String getChatUsers(final String username) {
 
-		Set<String> usersActiveChatUsers = getActiveChatUsersForUser(username);
+		final Set<String> usersActiveChatUsers = getActiveChatUsersForUser(username);
 
-		Set<ChatUserResponse> chatUsers = usersActiveChatUsers.stream()
+		final Set<ChatUserResponse> chatUsers = usersActiveChatUsers.stream()
 				.map(user -> new ChatUserResponse(user, chatDao.findNumberOfUnreadMessagesByUsername(user)))
 				.collect(Collectors.toSet());
 
@@ -189,7 +202,7 @@ public class ChatService {
 	 * @param username
 	 * @return List of Messages
 	 */
-	public List<Message> getMessagesByUsername(String username) {
+	public List<Message> getMessagesByUsername(final String username) {
 		return chatDao.findChatMessagesByUsername(username);
 	}
 
@@ -200,7 +213,7 @@ public class ChatService {
 	 */
 	public ChatAvailabilityResponse isChatAvailable() {
 
-		Optional<ChatAvailabilityResponse> isChatBlocked = isChatBlockedByConfig();
+		final Optional<ChatAvailabilityResponse> isChatBlocked = isChatBlockedByConfig();
 
 		if (isChatBlocked.isPresent()) {
 			return isChatBlocked.get();
@@ -213,20 +226,20 @@ public class ChatService {
 		return new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE);
 	}
 
-	public void updateUnreadMessages(String username) {
+	public void updateUnreadMessages(final String username) {
 		try {
-			int numOfUpdatedMessages = chatDao.updateSeenMessagesByUsername(username);
+			final int numOfUpdatedMessages = chatDao.updateSeenMessagesByUsername(username);
 			if (numOfUpdatedMessages > 0) {
 				logger.info("{} unread messages successfully updated for user: {}", numOfUpdatedMessages, username);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			logger.error("Unable to update unread messages for user: {}", username, e);
 		}
 	}
 
-	public ApiResponse isVolunteerActive(String username) {
+	public ApiResponse isVolunteerActive(final String username) {
 
-		String activeSamaritansUser = conversations.get(username);
+		final String activeSamaritansUser = conversations.get(username);
 
 		if (StringUtils.isBlank(activeSamaritansUser)) {
 			return new ApiResponse(false, "No active conversation found");
@@ -243,7 +256,7 @@ public class ChatService {
 		return activeUsers;
 	}
 
-	protected void setActiveUsers(Set<String> activeUsers) {
+	protected void setActiveUsers(final Set<String> activeUsers) {
 		this.activeUsers = activeUsers;
 	}
 
@@ -251,11 +264,11 @@ public class ChatService {
 		return activeSamaritansUsers;
 	}
 
-	protected void setActiveSamaritansUsers(Set<String> activeSamaritansUsers) {
+	protected void setActiveSamaritansUsers(final Set<String> activeSamaritansUsers) {
 		this.activeSamaritansUsers = activeSamaritansUsers;
 	}
 
-	protected void setConversations(Map<String, String> conversations) {
+	protected void setConversations(final Map<String, String> conversations) {
 		this.conversations = conversations;
 	}
 
@@ -266,15 +279,15 @@ public class ChatService {
 	 * @param message
 	 * @return message
 	 */
-	private Message sendToSamaritansUser(String sender, Message message) {
+	private Message sendToSamaritansUser(final String sender, final Message message) {
 		// return message to chat user
-		simpMessagingTemplate.convertAndSend(CHAT + sender, message);
+		convertAndSend(sender, message);
 		// find samaritans user to send to.
-		String recipient = conversations.get(sender);
+		final String recipient = conversations.get(sender);
 		message.setRecipient(recipient);
-		ChatMessage savedMessage = chatDao.save(message);
+		final ChatMessage savedMessage = chatDao.save(message);
 		message.setDateSent(savedMessage.getDateCreated());
-		simpMessagingTemplate.convertAndSend(CHAT + recipient, message);
+		convertAndSend(recipient, message);
 		return message;
 	}
 
@@ -285,61 +298,60 @@ public class ChatService {
 	 * @param message
 	 * @return message
 	 */
-	private Message sendToChatUser(String sender, String recipient, Message message) {
+	private Message sendToChatUser(final String sender, final String recipient, final Message message) {
 
-		ChatMessage savedMessage = chatDao.save(message);
+		final ChatMessage savedMessage = chatDao.save(message);
 		message.setDateSent(savedMessage.getDateCreated());
 		// return message to sender
-		simpMessagingTemplate.convertAndSend(CHAT + sender, message);
+		convertAndSend(sender, message);
 		message.setSender(AppConstants.SAMARITANS_USERNAME);
 		// send to chat user
-		simpMessagingTemplate.convertAndSend(CHAT + recipient, message);
+		convertAndSend(recipient, message);
 
 		return message;
 	}
 
-	private void addActiveChatUser(String username) {
+	private void addActiveChatUser(final String username) {
 		activeUsers.add(username);
-		for (String samaritansUser : activeSamaritansUsers) {
+		for (final String samaritansUser : activeSamaritansUsers) {
 			notificationService.addNotification(NotificationTypeEnum.NEW_USER_CONNECTED, samaritansUser, username);
 		}
 	}
 
-	private void addActiveSamaritansUser(String username, Message message) {
+	private void addActiveSamaritansUser(final String username, final Message message) {
 		// if chat is available then add samaritans user
-		Optional<ChatAvailabilityResponse> isChatBlocked = isChatBlockedByConfig();
+		final Optional<ChatAvailabilityResponse> isChatBlocked = isChatBlockedByConfig();
 		if (isChatBlocked.isPresent()) {
 			logger.info("Chat is blocked by configuration settings");
 			return;
 		}
 		this.activeSamaritansUsers.add(username);
 		// let new users know chat is available
-		simpMessagingTemplate.convertAndSend(CHAT + "availability",
-				new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE));
+		convertAndSend("availability", new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE));
 
 		// inform this users conversations that they are active again
-		Set<String> conversationKeys = getActiveChatUsersForUser(username);
+		final Set<String> conversationKeys = getActiveChatUsersForUser(username);
 		message.setSender(AppConstants.SAMARITANS_USERNAME);
-		for (String key : conversationKeys) {
-			simpMessagingTemplate.convertAndSend(CHAT + key, message);
+		for (final String key : conversationKeys) {
+			convertAndSend(key, message);
 		}
 	}
 
-	private void disconnectChatUser(Message message, User user) {
-		String username = user.getUsername();
+	private void disconnectChatUser(final Message message, final User user) {
+		final String username = user.getUsername();
 		logger.info("User {} disconnected", username);
 		this.activeUsers.remove(username);
 		String recipient = conversations.get(username);
 
 		if (StringUtils.isNotBlank(recipient)) {
 			this.conversations.remove(username, recipient);
-			simpMessagingTemplate.convertAndSend(CHAT + recipient, message);
+			convertAndSend(recipient, message);
 			// need to send this to correct user
 			notificationService.addNotification(NotificationTypeEnum.USER_DISCONNECTED, recipient, username);
 		} else {
 			// check to see if any messages were sent
 			// if none, then we will delete the user completely.
-			List<Message> messages = getMessagesByUsername(username);
+			final List<Message> messages = getMessagesByUsername(username);
 			if (messages.isEmpty()) {
 				// delete user completely
 				// no notification needed ??
@@ -347,7 +359,7 @@ public class ChatService {
 				return;
 			} else {
 
-				Message lastMessage = messages.get(messages.size() - 1);
+				final Message lastMessage = messages.get(messages.size() - 1);
 				// determine who the samaritans volunteer was.
 				recipient = lastMessage.getRecipient().equalsIgnoreCase(username) ? lastMessage.getSender()
 						: lastMessage.getRecipient();
@@ -359,22 +371,21 @@ public class ChatService {
 		chatUserService.disableChatUser(username);
 	}
 
-	private void disconnectSamaritansUser(Message message, User user) {
+	private void disconnectSamaritansUser(final Message message, final User user) {
 
-		String username = user.getUsername();
+		final String username = user.getUsername();
 		logger.info("Samaritans user {} disconnected from chat", username);
 		message.setSender(AppConstants.SAMARITANS_USERNAME);
 		// get all chat users for samaritans user
-		Set<String> conversationKeys = getActiveChatUsersForUser(username);
+		final Set<String> conversationKeys = getActiveChatUsersForUser(username);
 
-		for (String key : conversationKeys) {
-			simpMessagingTemplate.convertAndSend(CHAT + key, message);
+		for (final String key : conversationKeys) {
+			convertAndSend(key, message);
 		}
 
 		this.activeSamaritansUsers.remove(username);
 		if (this.activeSamaritansUsers.isEmpty()) {
-			simpMessagingTemplate.convertAndSend(CHAT + "availability",
-					new ChatAvailabilityResponse(ChatAvailabilityEnum.NO_VOLUNTEERS));
+			convertAndSend("availability", new ChatAvailabilityResponse(ChatAvailabilityEnum.NO_VOLUNTEERS));
 		}
 	}
 
@@ -386,13 +397,13 @@ public class ChatService {
 		try {
 			config = chatConfigDao.findConfig();
 
-			int availableFrom = config.getAvailableFrom();
-			int availableUntil = config.getAvailableUntil();
+			final int availableFrom = config.getAvailableFrom();
+			final int availableUntil = config.getAvailableUntil();
 
 			if (config.isTimeRestricted()) {
 
-				LocalTime now = LocalTime.now();
-				int currentHour = now.getHour();
+				final LocalTime now = LocalTime.now();
+				final int currentHour = now.getHour();
 
 				if (currentHour < availableFrom || currentHour >= availableUntil) {
 
@@ -404,19 +415,23 @@ public class ChatService {
 									formatTimes(availableFrom), formatTimes(availableUntil)));
 				}
 			}
-		} catch (ResourceNotFoundException ex) {
+		} catch (final ResourceNotFoundException ex) {
 			logger.error("Unable to check chat config's availability settings: ", ex);
 		}
 
 		return chatAvailabilityResponse;
 	}
 
-	private Set<String> getActiveChatUsersForUser(String username) {
+	private Set<String> getActiveChatUsersForUser(final String username) {
 		return conversations.entrySet().stream().filter(entry -> username.equalsIgnoreCase(entry.getValue()))
 				.map(Entry::getKey).collect(Collectors.toSet());
 	}
 
-	private String formatTimes(int time) {
+	private void convertAndSend(final String destination, final Object payload) {
+		simpMessagingTemplate.convertAndSend("/topic/" + destination, payload);
+	}
+
+	private String formatTimes(final int time) {
 
 		if (time < 10) {
 			return "0" + time + ":00";

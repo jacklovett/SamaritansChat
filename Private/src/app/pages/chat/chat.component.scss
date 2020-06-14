@@ -11,12 +11,12 @@
 }
 
 .contacts-container {
-  width: 224px;
+  width: 240px;
 }
 
 .contacts {
-  overflow-y: scroll;
-  width: inherit;
+  overflow-y: auto;
+  width: 240px;
 }
 
 .chat-container {
@@ -32,23 +32,23 @@
   border-right: 0;
 }
 
-.info-icon {
-  font-size: 24px;
-
-  &.info-icon:hover {
-    color: $white;
-  }
-}
-
 .chat-user-item {
   cursor: pointer;
+
+  & .chat-user {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 140px;
+    overflow: hidden;
+  }
 }
 
 .new-msg-icon {
   width: 24px;
   height: 24px;
   line-height: 24px;
-  margin-left: 8px;
+  margin-left: 4px;
   font-size: 14px;
   color: $white;
   text-align: center;

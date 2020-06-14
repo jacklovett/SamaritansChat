@@ -33,14 +33,14 @@ class SpringSecurityAuditAwareImpl implements AuditorAware<String> {
 	@Override
 	public Optional<String> getCurrentAuditor() {
 		String auditorName = "System";
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		if (authentication == null || !authentication.isAuthenticated()
 				|| authentication instanceof AnonymousAuthenticationToken) {
 			return Optional.of(auditorName);
 		}
 
-		UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+		final UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
 		if (StringUtils.isNotBlank(userPrincipal.getEmail())) {
 			auditorName = userPrincipal.getUsername();

@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core'
+import { Router } from '@angular/router'
 
-import { AdminGuard } from './guards/admin.guard';
-import { AuthenticationService } from './services/authentication.service';
-import { ChatService } from './services/chat.service';
+import { AdminGuard } from './guards/admin.guard'
+import { AuthenticationService } from './services/authentication.service'
+import { ChatService } from './services/chat.service'
+import { RxStompService } from '@stomp/ng2-stompjs'
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ import { ChatService } from './services/chat.service';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  isAdmin: boolean;
+  isAdmin: boolean
 
   constructor(
     private router: Router,
@@ -21,24 +22,24 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.isAdmin = this.adminGuard.isAdmin();
+    this.isAdmin = this.adminGuard.isAdmin()
   }
 
   get currentUser() {
-    return this.authenticationService.getUserDetailsFromJWT();
+    return this.authenticationService.getUserDetailsFromJWT()
   }
 
   logout() {
-    this.chatService.disconnect();
-    this.authenticationService.logout();
-    this.router.navigate(['/login']);
+    this.chatService.disconnect()
+    this.authenticationService.logout()
+    this.router.navigate(['/login'])
   }
 
   viewProfile() {
-    this.router.navigate(['user', this.currentUser.userId]);
+    this.router.navigate(['user', this.currentUser.userId])
   }
 
   get isAuthenticated() {
-    return this.authenticationService.isAuthenticated();
+    return this.authenticationService.isAuthenticated()
   }
 }

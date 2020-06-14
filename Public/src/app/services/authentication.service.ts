@@ -1,72 +1,82 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { Router } from '@angular/router'
+import { BehaviorSubject } from 'rxjs'
+import { map } from 'rxjs/operators'
 
-import { environment } from './../../environments/environment';
+import { environment } from './../../environments/environment'
 
-import { User } from './../models/user';
+import { ChatAvailabilityResponse } from '../models/chat.availability.response'
+import { JwtResponse } from '../models/jwt.response'
 
 export interface UserDetails {
-  userId: string;
-  username: string;
+  userId: string
+  username: string
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-  apiUrl: string = environment.apiUrl;
-  public currentUser: Observable<User>;
-  private currentUserSubject: BehaviorSubject<User>;
+  apiUrl: string = environment.apiUrl
+
+  private jwtSubject: BehaviorSubject<JwtResponse>
 
   constructor(private http: HttpClient, private router: Router) {
-    this.currentUserSubject = new BehaviorSubject<User>(
-      JSON.parse(localStorage.getItem('currentUser')),
-    );
-    this.currentUser = this.currentUserSubject.asObservable();
+    this.jwtSubject = new BehaviorSubject<JwtResponse>(
+      JSON.parse(localStorage.getItem('jwt')),
+    )
   }
 
   login(token: string) {
-    return this.http.post<any>(`${this.apiUrl}/auth/chat/login`, token).pipe(
-      map((jwt) => {
-        if (jwt?.token) {
+    return this.http
+      .post<JwtResponse>(`${this.apiUrl}/auth/chat/login`, token)
+      .pipe(
+        map((jwt) => {
+          if (!jwt.token) {
+            return
+          }
+
           // store jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem('currentUser', JSON.stringify(jwt));
-          this.currentUserSubject.next(jwt);
-        }
-      }),
-    );
+          localStorage.setItem('jwt', JSON.stringify(jwt))
+          this.jwtSubject.next(jwt)
+        }),
+      )
   }
 
   logout() {
-    localStorage.removeItem('currentUser');
-    this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    localStorage.removeItem('jwt')
+    this.jwtSubject.next(null)
+    this.router.navigate(['/login'])
   }
 
   public getUsername(): string {
-    return this.getUserDetails().username;
+    return this.getUserDetails().username
   }
 
   public getUserDetails(): UserDetails {
-    if (this.currentUserValue?.token) {
-      const jwt = this.currentUserValue.token;
-      const jwtData = jwt.split('.')[1];
-      const decodedJwtData = JSON.parse(window.atob(jwtData));
-      return JSON.parse(decodedJwtData.sub);
-    } else {
-      console.log('No token found');
-      this.logout();
+    const jwtToken = this.jwtResponse?.token
+    if (!jwtToken) {
+      console.log('No token found')
+      this.logout()
+      return
     }
+    const jwtData = jwtToken.split('.')[1]
+    const decodedJwtData = JSON.parse(window.atob(jwtData))
+    return JSON.parse(decodedJwtData.sub)
+  }
+
+  public isChatAvailable() {
+    return this.http.get<ChatAvailabilityResponse>(
+      `${this.apiUrl}/chat/availability`,
+    )
   }
 
   isAuthenticated(): boolean {
-    if (this.currentUserValue) {
-      return true;
+    if (this.jwtResponse?.token) {
+      return true
     }
   }
 
-  public get currentUserValue(): User {
-    return this.currentUserSubject.value;
+  public get jwtResponse(): JwtResponse {
+    return this.jwtSubject.value
   }
 }
