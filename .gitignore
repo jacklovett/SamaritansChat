@@ -32,4 +32,12 @@ hs_err_pid*
 .settings/
 target/
 bin/
+tmp/
+.metadata
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.loadpath
 
