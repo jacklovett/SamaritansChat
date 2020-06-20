@@ -127,13 +127,13 @@ public class ChatController {
 	}
 
 	/**
-	 * Endpoint to load conversation for user
+	 * Endpoint to load chat messages for user
 	 * 
 	 * @return List of Messages
 	 */
-	@GetMapping("/conversation/{username}")
-	public ResponseEntity<List<Message>> getConversationByUsername(@PathVariable final String username) {
-		logger.info("ChatController - getConversationByUsername - init");
+	@GetMapping("/messages/{username}")
+	public ResponseEntity<List<Message>> getMessages(@PathVariable final String username) {
+		logger.info("ChatController - getMessages - init");
 		final List<Message> messages = chatService.getMessagesByUsername(username);
 		return ResponseEntity.ok(messages);
 	}

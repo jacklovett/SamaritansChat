@@ -25,7 +25,7 @@ export class ChatService {
   }
 
   get currentUsername() {
-    return this.authenticationService.getUserDetailsFromJWT().username
+    return this.authenticationService.getUserDetailsFromJWT()?.username
   }
 
   public publishMessage = (destination: string, message: ChatMessage) => {
@@ -62,9 +62,9 @@ export class ChatService {
     this.clearLocalStorage()
   }
 
-  public getConversationByUsername(username: string) {
+  public fetchChatMessages(username: string) {
     return this.http.get<ChatMessage[]>(
-      `${this.apiUrl}/chat/conversation/${username}`,
+      `${this.apiUrl}/chat/messages/${username}`,
     )
   }
 
@@ -79,7 +79,7 @@ export class ChatService {
       .put(`${this.apiUrl}/chat/updateUnreadMessages`, username)
       .subscribe((error) => {
         console.log(
-          `An error occured while updating unread chat messages: ${error}`,
+          `Unable to update unread messages for user: ${username} - ${error}`,
         )
       })
   }

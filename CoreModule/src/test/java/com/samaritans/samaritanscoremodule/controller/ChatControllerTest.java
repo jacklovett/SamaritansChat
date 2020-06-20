@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.samaritans.samaritanscoremodule.exception.SamaritansException;
 import com.samaritans.samaritanscoremodule.requests.ConversationRequest;
 import com.samaritans.samaritanscoremodule.requests.Message;
@@ -40,8 +42,6 @@ import com.samaritans.samaritanscoremodule.service.ChatService;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
 import com.samaritans.samaritanscoremodule.utils.MessageType;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChatControllerTest {
@@ -214,11 +214,11 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testGetConversationByUsername() throws Exception {
+	public void testGetMessages() throws Exception {
 
 		when(chatService.getMessagesByUsername(USERNAME)).thenReturn(conversation);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/conversation/" + USERNAME)
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/messages/" + USERNAME)
 				.accept(MediaType.APPLICATION_JSON).content(USERNAME).contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
@@ -231,9 +231,9 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testGetConversationByUsernameWhenNoMessages() throws Exception {
+	public void testGetMessagesWhenNoMessages() throws Exception {
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/conversation/" + USERNAME)
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/messages/" + USERNAME)
 				.accept(MediaType.APPLICATION_JSON).content(USERNAME).contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();

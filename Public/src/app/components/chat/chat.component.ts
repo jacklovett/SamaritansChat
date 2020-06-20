@@ -25,7 +25,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   loading = false
 
   private displaySubscription: Subscription
-  private chatMessagesSubscription: Subscription
+  private stompMessagesSubscription: Subscription
+  private isVolunteerConnectedSubscription: Subscription
 
   constructor(
     private route: ActivatedRoute,
@@ -44,7 +45,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.chatMessagesSubscription = this.rxStompService
+    this.stompMessagesSubscription = this.rxStompService
       .watch(`/topic/${this.username}`)
       .subscribe((message: Message) => {
         this.handleMessage(JSON.parse(message.body))
@@ -79,7 +80,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.publishMessage('send.addActiveUser', message)
   }
 
-  public async onSend() {
+  public onSend() {
     // return if message is empty
     if (!this.controls.message.value) {
       return
@@ -97,23 +98,28 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private async isVolunteerActive() {
-    try {
-      if (this.conversationInProgress) {
-        const response = await this.chatService.isVolunteerActive().toPromise()
-        this.volunteerConnected = response.success
-      }
-    } catch (error) {
-      console.log(error)
-    }
+    this.isVolunteerConnectedSubscription = this.chatService
+      .isVolunteerActive()
+      .subscribe(
+        (response) => {
+          this.volunteerConnected = response.success
+        },
+        (error) => {
+          console.log(error)
+        },
+      )
   }
 
   private async loadConversation() {
     this.loading = true
-    try {
-      this.chatMessages = await this.chatService.getConversation().toPromise()
-    } catch (error) {
-      this.alertService.error(error)
-    }
+    this.chatService.fetchChatMessages(this.username).subscribe(
+      (messages) => {
+        this.chatMessages = messages
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
     this.loading = false
   }
 
@@ -168,7 +174,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.chatMessagesSubscription.unsubscribe()
+    this.stompMessagesSubscription.unsubscribe()
     this.displaySubscription.unsubscribe()
+    this.isVolunteerConnectedSubscription.unsubscribe()
   }
 }

@@ -1,14 +1,14 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Router } from '@angular/router'
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 
-import { ListUser } from './../../models/user';
-import { UserService } from './../../services/user.service';
-import { AlertService } from './../../services/alert.service';
+import { ListUser } from './../../models/user'
+import { UserService } from './../../services/user.service'
+import { AlertService } from './../../services/alert.service'
 
-import { Subscription } from 'rxjs';
-import { DialogComponent } from 'src/app/components/dialog/dialog.component';
-import { ColumnDetails } from 'src/app/components/table/columnDetails';
+import { Subscription } from 'rxjs'
+import { DialogComponent } from 'src/app/components/dialog/dialog.component'
+import { ColumnDetails } from 'src/app/components/table/columnDetails'
 
 @Component({
   selector: 'app-users',
@@ -16,9 +16,9 @@ import { ColumnDetails } from 'src/app/components/table/columnDetails';
   styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit, OnDestroy {
-  loading = false;
+  loading = false
 
-  users: ListUser[] = [];
+  users: ListUser[] = []
 
   columnDetails: ColumnDetails[] = [
     {
@@ -63,9 +63,10 @@ export class UsersComponent implements OnInit, OnDestroy {
       tooltip: 'Delete User',
       onClick: (id: number) => this.openDeleteDialog(id),
     },
-  ];
+  ]
 
-  isReloadRequiredSubscription: Subscription;
+  usersSubscription: Subscription
+  isReloadRequiredSubscription: Subscription
 
   constructor(
     public deleteDialog: MatDialog,
@@ -75,71 +76,74 @@ export class UsersComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.loadUsers();
+    this.loadUsers()
 
     this.isReloadRequiredSubscription = this.userService
       .isReloadRequired()
       .subscribe((result) => {
         if (result) {
-          this.loadUsers();
+          this.loadUsers()
         }
-      });
+      })
   }
 
   openDeleteDialog(userId: number) {
-    const dialogConfig = new MatDialogConfig();
+    const dialogConfig = new MatDialogConfig()
 
-    dialogConfig.disableClose = true;
-    dialogConfig.autoFocus = false;
+    dialogConfig.disableClose = true
+    dialogConfig.autoFocus = false
 
     dialogConfig.data = {
       title: 'Confirm Delete',
       content: 'Are you sure you want to delete this user?',
       successLabel: 'Yes',
       cancelLabel: 'No',
-    };
+    }
 
     dialogConfig.position = {
       'top': '36px',
-    };
+    }
 
-    const dialogRef = this.deleteDialog.open(DialogComponent, dialogConfig);
+    const dialogRef = this.deleteDialog.open(DialogComponent, dialogConfig)
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.deleteUser(userId);
+        this.deleteUser(userId)
       }
-    });
+    })
   }
 
-  addUser = () => this.router.navigate(['register']);
-  editUser = (id: number) => this.router.navigate(['user', id]);
+  addUser = () => this.router.navigate(['register'])
+  editUser = (id: number) => this.router.navigate(['user', id])
 
   private async loadUsers() {
-    this.loading = true;
-    try {
-      const users = await this.userService.get().toPromise();
-      this.users = users.map((user) => ({
-        id: user.id,
-        name: `${user.firstName} ${user.lastName}`,
-        username: user.username,
-        email: user.email,
-        contactNumber: user.contactNumber,
-        lastActive: user.lastActive,
-      }));
-    } catch (error) {
-      this.alertService.error(error);
-    }
-    this.loading = false;
+    this.loading = true
+    this.usersSubscription = this.userService.get().subscribe(
+      (users) => {
+        this.users = users.map((user) => ({
+          id: user.id,
+          name: `${user.firstName} ${user.lastName}`,
+          username: user.username,
+          email: user.email,
+          contactNumber: user.contactNumber,
+          lastActive: user.lastActive,
+        }))
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
+    this.loading = false
   }
 
   private deleteUser(userId: number) {
-    this.loading = true;
-    this.userService.delete(userId);
-    this.loading = false;
+    this.loading = true
+    this.userService.delete(userId)
+    this.loading = false
   }
 
   ngOnDestroy() {
-    this.isReloadRequiredSubscription.unsubscribe();
+    this.usersSubscription.unsubscribe()
+    this.isReloadRequiredSubscription.unsubscribe()
   }
 }

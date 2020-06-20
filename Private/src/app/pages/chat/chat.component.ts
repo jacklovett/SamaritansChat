@@ -26,7 +26,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   chatMessages: ChatMessage[] = []
   displayMessages: ChatMessage[] = []
 
+  activeUsersSubscription: Subscription
   chatMessagesSubscription: Subscription
+  stompMessagesSubscription: Subscription
 
   constructor(
     private formBuilder: FormBuilder,
@@ -35,11 +37,12 @@ export class ChatComponent implements OnInit, OnDestroy {
     private rxStompService: RxStompService,
     private authenticationService: AuthenticationService,
   ) {
+    this.loadChatMessage()
     this.loadActiveUsers()
   }
 
   ngOnInit() {
-    this.chatMessagesSubscription = this.rxStompService
+    this.stompMessagesSubscription = this.rxStompService
       .watch(`/topic/${this.currentUsername}`)
       .subscribe((message: Message) => {
         this.onMessageRecieved(JSON.parse(message.body))
@@ -76,12 +79,12 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   loadActiveUsers() {
     this.loading = true
-    this.chatService.fetchChatUsers().subscribe(
+    this.activeUsersSubscription = this.chatService.fetchChatUsers().subscribe(
       (users) => {
         this.chatUsers = users.map((user) => {
           return {
             username: user,
-            unreadMessageCount: 0,
+            unreadMessageCount: this.getUnreadMessageCount(user),
           }
         })
 
@@ -99,17 +102,26 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.loading = false
   }
 
-  private loadConversation(username: string) {
+  private loadChatMessage() {
     this.loading = true
-    this.chatService.getConversationByUsername(username).subscribe(
-      (messages) => {
-        this.displayMessages = messages
-      },
-      (error) => {
-        this.alertService.error(error)
-      },
-    )
+    this.chatMessagesSubscription = this.chatService
+      .fetchChatMessages(this.currentUsername)
+      .subscribe(
+        (messages) => {
+          this.chatMessages = messages
+        },
+        (error) => {
+          this.alertService.error(error)
+        },
+      )
     this.loading = false
+  }
+
+  private loadConversation(username: string) {
+    this.displayMessages = this.chatMessages.filter(
+      (message) =>
+        message.recipient === username || message.sender === username,
+    )
   }
 
   private onMessageRecieved(message: ChatMessage) {
@@ -176,12 +188,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private updateUnreadMessages(username: string) {
-    try {
-      this.chatService.updateUnreadMessages(username)
-    } catch (error) {
-      console.log('Unable to update unread messages for user: ' + username)
-      console.log(error)
-    }
+    this.chatService.updateUnreadMessages(username)
   }
 
   private clearForm() {
@@ -228,6 +235,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.activeUsersSubscription.unsubscribe()
     this.chatMessagesSubscription.unsubscribe()
+    this.stompMessagesSubscription.unsubscribe()
   }
 }
