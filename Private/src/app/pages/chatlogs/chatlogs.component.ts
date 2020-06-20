@@ -1,21 +1,22 @@
-import { Component, OnInit } from '@angular/core';
-import { AlertService } from 'src/app/services/alert.service';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { AlertService } from 'src/app/services/alert.service'
+import { Router } from '@angular/router'
 
-import { ChatLog } from 'src/app/models/chat.log';
-import { ChatLogService } from 'src/app/services/chatlog.service';
+import { ChatLog } from 'src/app/models/chat.log'
+import { ChatLogService } from 'src/app/services/chatlog.service'
 
-import { ColumnDetails } from 'src/app/components/table/columnDetails';
+import { ColumnDetails } from 'src/app/components/table/columnDetails'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-chatlogs',
   templateUrl: './chatlogs.component.html',
   styleUrls: ['./chatlogs.component.scss'],
 })
-export class ChatLogsComponent implements OnInit {
-  loading = false;
+export class ChatLogsComponent implements OnInit, OnDestroy {
+  loading = false
 
-  chatLogs: ChatLog[] = [];
+  chatLogs: ChatLog[] = []
 
   columnDetails: ColumnDetails[] = [
     {
@@ -53,7 +54,9 @@ export class ChatLogsComponent implements OnInit {
       tooltip: 'See Transcript',
       onClick: (id: number) => this.goToTranscript(id),
     },
-  ];
+  ]
+
+  chatLogsSubscription: Subscription
 
   constructor(
     private router: Router,
@@ -62,18 +65,25 @@ export class ChatLogsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadChatLogs();
+    this.loadChatLogs()
   }
 
   private async loadChatLogs() {
-    this.loading = true;
-    try {
-      this.chatLogs = await this.chatLogService.get().toPromise();
-    } catch (error) {
-      this.alertService.error(error);
-    }
-    this.loading = false;
+    this.loading = true
+    this.chatLogsSubscription = this.chatLogService.get().subscribe(
+      (logs) => {
+        this.chatLogs = logs
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
+    this.loading = false
   }
 
-  goToTranscript = (id: number) => this.router.navigate(['transcript', id]);
+  goToTranscript = (id: number) => this.router.navigate(['transcript', id])
+
+  ngOnDestroy() {
+    this.chatLogsSubscription.unsubscribe()
+  }
 }

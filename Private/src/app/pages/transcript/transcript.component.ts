@@ -1,13 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core'
 
-import { AlertService } from 'src/app/services/alert.service';
-import { ChatLogService } from 'src/app/services/chatlog.service';
+import { AlertService } from 'src/app/services/alert.service'
+import { ChatLogService } from 'src/app/services/chatlog.service'
 
-import { ChatMessage } from 'src/app/models/chat.message';
-import { Transcript } from 'src/app/models/transcript';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { Rating, ratings } from 'src/app/models/chat.log';
+import { ChatMessage } from 'src/app/models/chat.message'
+import { Transcript } from 'src/app/models/transcript'
+import { ActivatedRoute, Router } from '@angular/router'
+import { Subscription } from 'rxjs'
+import { Rating, ratings } from 'src/app/models/chat.log'
 
 @Component({
   selector: 'app-transcript',
@@ -15,19 +15,20 @@ import { Rating, ratings } from 'src/app/models/chat.log';
   styleUrls: ['./transcript.component.scss'],
 })
 export class TranscriptComponent implements OnInit, OnDestroy {
-  transcriptId: number;
-  transcript: Transcript;
+  transcriptId: number
+  transcript: Transcript
 
-  username: string;
-  volunteer: string;
-  rating: Rating;
-  notes: string;
+  username: string
+  volunteer: string
+  rating: Rating
+  notes: string
 
-  chatMessages: ChatMessage[] = [];
+  chatMessages: ChatMessage[] = []
 
-  private transcriptSubscription: Subscription;
+  transcriptSubscription: Subscription
+  transcriptIdSubscription: Subscription
 
-  loading = false;
+  loading = false
 
   constructor(
     private route: ActivatedRoute,
@@ -37,43 +38,43 @@ export class TranscriptComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.transcriptSubscription = this.route.params.subscribe((params) => {
-      this.transcriptId = +params['id'];
-    });
+    this.transcriptIdSubscription = this.route.params.subscribe((params) => {
+      this.transcriptId = +params['id']
+    })
 
-    this.loadTranscript(this.transcriptId);
+    this.loadTranscript(this.transcriptId)
   }
 
-  private async loadTranscript(id: number) {
-    this.loading = true;
-    try {
-      this.transcript = await this.chatLogService
-        .getTranscriptById(id)
-        .toPromise();
-    } catch (error) {
-      this.alertService.error(error);
-    }
-
-    if (this.transcript) {
-      this.populateComponent(this.transcript);
-    }
-
-    this.loading = false;
+  private loadTranscript(id: number) {
+    this.loading = true
+    this.transcriptSubscription = this.chatLogService
+      .getTranscriptById(id)
+      .subscribe(
+        (transcript) => {
+          this.transcript = transcript
+          this.populateComponent(transcript)
+        },
+        (error) => {
+          this.alertService.error(error)
+        },
+      )
+    this.loading = false
   }
 
   populateComponent(transcript: Transcript) {
-    this.volunteer = transcript.volunteer;
-    this.username = transcript.username;
-    this.notes = transcript.notes;
-    this.chatMessages = JSON.parse(transcript.conversation);
-    this.rating = ratings.find((rating) => rating.id === transcript.rating);
+    this.volunteer = transcript.volunteer
+    this.username = transcript.username
+    this.notes = transcript.notes
+    this.chatMessages = JSON.parse(transcript.conversation)
+    this.rating = ratings.find((rating) => rating.id === transcript.rating)
   }
 
   returnToChatLogs() {
-    this.router.navigate(['chatlogs']);
+    this.router.navigate(['chatlogs'])
   }
 
   ngOnDestroy() {
-    this.transcriptSubscription.unsubscribe();
+    this.transcriptSubscription.unsubscribe()
+    this.transcriptIdSubscription.unsubscribe()
   }
 }

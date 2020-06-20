@@ -28,6 +28,7 @@ export class UserComponent implements OnInit, OnDestroy {
   loading = false
   submitted = false
 
+  private userSubscription: Subscription
   private editUserSubscription: Subscription
 
   constructor(
@@ -172,14 +173,15 @@ export class UserComponent implements OnInit, OnDestroy {
 
   private async loadUser() {
     this.loading = true
-    try {
-      this.user = await this.userService.getById(this.editUserId).toPromise()
-    } catch (error) {
-      this.alertService.error(error)
-    }
-
-    this.populateForm(this.user)
-
+    this.userSubscription = this.userService.getById(this.editUserId).subscribe(
+      (user) => {
+        this.user = user
+        this.populateForm(this.user)
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
     this.loading = false
   }
 
@@ -212,6 +214,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.userSubscription.unsubscribe()
     this.editUserSubscription.unsubscribe()
   }
 }

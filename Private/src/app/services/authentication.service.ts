@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators'
 import { environment } from './../../environments/environment'
 
 import { JwtResponse } from '../models/jwt.response'
+import { Router } from '@angular/router'
 
 export interface UserDetails {
   userId: number
@@ -19,7 +20,7 @@ export class AuthenticationService {
 
   private jwtSubject: BehaviorSubject<JwtResponse>
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.jwtSubject = new BehaviorSubject<JwtResponse>(
       JSON.parse(localStorage.getItem('jwt')),
     )
@@ -52,6 +53,7 @@ export class AuthenticationService {
     // remove user from local storage to log user out
     localStorage.removeItem('jwt')
     this.jwtSubject.next(null)
+    this.router.navigate(['/login'])
   }
 
   public getUserDetailsFromJWT(): UserDetails {

@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { Subject } from 'rxjs'
 
 import { ChatMessage } from '../models/chat.message'
 import { environment } from './../../environments/environment'
@@ -40,9 +39,9 @@ export class ChatService {
     return this.authenticationService.getUsername()
   }
 
-  public getConversation() {
+  public fetchChatMessages(username: string) {
     return this.http.get<ChatMessage[]>(
-      `${this.apiUrl}/chat/conversation/${this.username}`,
+      `${this.apiUrl}/chat/messages/${username}`,
     )
   }
 

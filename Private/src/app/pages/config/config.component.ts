@@ -1,25 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { FormBuilder, FormGroup, FormControl } from '@angular/forms'
 
-import { ChatConfig } from 'src/app/models/chat.config';
-import { AvailableTimes } from 'src/app/models/available.times';
+import { ChatConfig } from 'src/app/models/chat.config'
+import { AvailableTimes } from 'src/app/models/available.times'
 
-import { AlertService } from 'src/app/services/alert.service';
-import { ConfigService } from 'src/app/services/config.service';
-import { ValidationService } from 'src/app/services/validation.service';
+import { AlertService } from 'src/app/services/alert.service'
+import { ConfigService } from 'src/app/services/config.service'
+import { ValidationService } from 'src/app/services/validation.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-config',
   templateUrl: './config.component.html',
-  styleUrls: ['./config.component.scss']
+  styleUrls: ['./config.component.scss'],
 })
-export class ConfigComponent implements OnInit {
+export class ConfigComponent implements OnInit, OnDestroy {
+  configForm: FormGroup
+  chatConfig: ChatConfig
 
-  configForm: FormGroup;
-  chatConfig: ChatConfig;
-
-  loading = false;
-  submitted = false;
+  loading = false
+  submitted = false
 
   availableTimes: AvailableTimes[] = [
     { value: 0, viewValue: '00:00' },
@@ -47,89 +47,104 @@ export class ConfigComponent implements OnInit {
     { value: 22, viewValue: '22:00' },
     { value: 23, viewValue: '23:00' },
     { value: 24, viewValue: '23:59' },
-  ];
+  ]
+
+  configSubscription: Subscription
 
   constructor(
     private formBuilder: FormBuilder,
     private configService: ConfigService,
     private alertService: AlertService,
-    private validationService: ValidationService) { }
+    private validationService: ValidationService,
+  ) {}
 
   ngOnInit() {
-
-    this.configForm = this.formBuilder.group({
-      isTimeRestricted: true,
-      availableFrom: [{ value: '', disabled: false }],
-      availableUntil: [{ value: '', disabled: false }],
-    }, {
-     validator: this.validationService.chatAvailabilityValidators('availableFrom', 'availableUntil')
-    });
+    this.configForm = this.formBuilder.group(
+      {
+        isTimeRestricted: true,
+        availableFrom: [{ value: '', disabled: false }],
+        availableUntil: [{ value: '', disabled: false }],
+      },
+      {
+        validator: this.validationService.chatAvailabilityValidators(
+          'availableFrom',
+          'availableUntil',
+        ),
+      },
+    )
 
     this.loadConfig().then(() => {
-      this.toggleTimeRestrictions();
-    });
-
+      this.toggleTimeRestrictions()
+    })
   }
 
   // convenience getter for easy access to form fields
-  get controls() { return this.configForm.controls; }
+  get controls() {
+    return this.configForm.controls
+  }
 
   getErrorMessage(formControl: FormControl) {
-    return this.validationService.getErrorMessage(formControl);
+    return this.validationService.getErrorMessage(formControl)
   }
 
   private populateForm(config: ChatConfig) {
-    this.controls.isTimeRestricted.setValue(config.timeRestricted);
-    this.controls.availableFrom.setValue(config.availableFrom);
-    this.controls.availableUntil.setValue(config.availableUntil);
+    this.controls.isTimeRestricted.setValue(config.timeRestricted)
+    this.controls.availableFrom.setValue(config.availableFrom)
+    this.controls.availableUntil.setValue(config.availableUntil)
   }
 
   private async loadConfig() {
-    this.loading = true;
-    try {
-      const data = await this.configService.get().toPromise();
-      this.populateForm(data);
-    } catch (error) {
-      this.alertService.error(error);
-    }
-
-    this.loading = false;
+    this.loading = true
+    this.configSubscription = this.configService.get().subscribe(
+      (config) => {
+        this.chatConfig = config
+        this.populateForm(this.chatConfig)
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
+    this.loading = false
   }
 
   public onSubmit() {
+    this.submitted = true
 
-    this.submitted = true;
+    if (!this.configForm.valid) {
+      return
+    }
 
-    if (!this.configForm.valid) { return; }
+    this.loading = true
 
-    this.loading = true;
-
-    const config: ChatConfig = <ChatConfig>({
+    const config: ChatConfig = <ChatConfig>{
       timeRestricted: this.controls.isTimeRestricted.value,
       availableFrom: this.controls.availableFrom.value,
-      availableUntil: this.controls.availableUntil.value
-    });
+      availableUntil: this.controls.availableUntil.value,
+    }
 
-    this.configService
-        .update(config)
-        .subscribe(response => {
-          this.alertService.handleResponse(response);
-        }, error => {
-            this.alertService.error(error);
-        });
+    this.configService.update(config).subscribe(
+      (response) => {
+        this.alertService.handleResponse(response)
+      },
+      (error) => {
+        this.alertService.error(error)
+      },
+    )
 
-    this.loading = false;
-
+    this.loading = false
   }
 
   public toggleTimeRestrictions() {
     if (this.controls.isTimeRestricted.value) {
-      this.controls.availableFrom.enable();
-      this.controls.availableUntil.enable();
+      this.controls.availableFrom.enable()
+      this.controls.availableUntil.enable()
     } else {
-      this.controls.availableFrom.disable();
-      this.controls.availableUntil.disable();
+      this.controls.availableFrom.disable()
+      this.controls.availableUntil.disable()
     }
   }
 
+  ngOnDestroy() {
+    this.configSubscription.unsubscribe()
+  }
 }

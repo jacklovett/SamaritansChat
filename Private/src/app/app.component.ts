@@ -32,7 +32,6 @@ export class AppComponent implements OnInit {
   logout() {
     this.chatService.disconnect()
     this.authenticationService.logout()
-    this.router.navigate(['/login'])
   }
 
   viewProfile() {
