@@ -33,6 +33,7 @@ hs_err_pid*
 target/
 bin/
 tmp/
+.sts4-cache/
 .metadata
 *.tmp
 *.bak
@@ -40,4 +41,4 @@ tmp/
 *~.nib
 local.properties
 .loadpath
-
+maven-status/

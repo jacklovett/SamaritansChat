@@ -13,7 +13,7 @@
 /var/logs
 
 /src/main/resources/application.properties
-/target
+target/
 
 # misc
 .DS_Store
