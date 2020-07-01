@@ -1,23 +1,21 @@
-<div class="chat-window">
-  <div class="user-disconnected-msg" *ngIf="displayDisconnectedMsg">
-    User is no longer connected to chat
-  </div>
-  <mat-spinner class="center" *ngIf="loading" [diameter]="32"></mat-spinner>
-  <mat-list>
-    <mat-list-item class="msg-container" *ngFor="let message of messages">
-      <div
-        class="msg"
-        [ngClass]="{
-          'primary': message.sender === username,
-          'sams-msg': message.sender === username,
-          'chat-user-msg': message.sender !== username
-        }"
-      >
-        {{ message.content }}
-        <span class="date-sent">{{
-          message.dateSent | date: 'dd/MM/yyyy h:mm a'
-        }}</span>
-      </div>
-    </mat-list-item>
-  </mat-list>
+<div class="user-disconnected-msg" *ngIf="isDisconnected">
+  User is no longer connected to chat
 </div>
+<mat-spinner class="center" *ngIf="loading" [diameter]="32"></mat-spinner>
+<mat-list>
+  <mat-list-item class="msg-container" *ngFor="let message of messages">
+    <div
+      class="msg"
+      [ngClass]="{
+        'primary': message.sender === username,
+        'sams-msg': message.sender === username,
+        'chat-user-msg': message.sender !== username
+      }"
+    >
+      {{ message.content }}
+      <span class="date-sent">{{
+        message.dateSent | date: 'dd/MM/yyyy h:mm a'
+      }}</span>
+    </div>
+  </mat-list-item>
+</mat-list>

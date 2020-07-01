@@ -1,11 +1,5 @@
 @import './../../../sass/theme';
 
-.chat-window {
-  position: relative;
-  height: 250px;
-  overflow-y: auto;
-}
-
 mat-list-item.msg-container {
   margin: 8px 0;
   height: auto;
