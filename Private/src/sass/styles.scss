@@ -51,17 +51,11 @@ a {
   margin: 8px 0;
 }
 
-.chat-window {
+.chat-display {
   position: relative;
   height: 250px;
-  overflow-y: scroll;
-}
-
-.chat-border {
-  border: 1px;
-  border-style: double;
-  border-color: $background-color;
-  border-width: 1px;
+  border: solid 1px $light-grey;
+  overflow-y: auto;
 }
 
 .password-container {

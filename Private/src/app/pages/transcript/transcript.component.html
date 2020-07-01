@@ -25,11 +25,12 @@
       <p class="title">Additional Comments</p>
       <p>{{ notes }}</p>
     </div>
-    <div class="chat-border">
+    <div class="chat-display">
       <div [hidden]="chatMessages" class="no-data-found">
         No messages where sent during this conversation
       </div>
       <app-messages
+        class="chat-display"
         [hidden]="!chatMessages"
         [username]="volunteer"
         [loading]="loading"

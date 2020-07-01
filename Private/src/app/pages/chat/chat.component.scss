@@ -1,48 +1,128 @@
 @import './../../../sass/theme';
 
-.chat-component {
+.chat-container {
+  height: calc(100% - 52px);
+  width: 100%;
+  position: absolute;
+}
+
+.chat-content {
   display: flex;
-  flex-direction: row;
-  padding: 0;
+  flex-direction: column;
+  height: 100%;
+}
+
+.contact-toggle-container {
+  position: absolute;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  right: 0;
+
+  & .contact-toggle {
+    display: flex;
+    background: $light-grey;
+    padding: 8px;
+    border-radius: 25% 0 0 25%;
+  }
+
+  // issue with hover styling persisting on touchscreens
+  // https://medium.com/@mezoistvan/finally-a-css-only-solution-to-hover-on-touchscreens-c498af39c31c
+  @media (hover: hover) and (pointer: fine) {
+    & .contact-toggle:hover {
+      opacity: 0.5;
+      cursor: pointer;
+    }
+  }
 }
 
 .chat-toolbar {
-  color: darken($white, 10%);
+  height: 60px;
+
+  & mat-toolbar {
+    color: $white;
+  }
 }
 
-.contacts-container {
-  width: 240px;
-}
-
-.contacts {
-  overflow-y: auto;
-  width: 240px;
-}
-
-.chat-container {
+.chat-window {
+  position: absolute;
   width: 100%;
+  top: 60px;
+  bottom: 70px;
+  overflow-y: auto;
+}
+
+.chat-form-section {
+  position: absolute;
+  bottom: 0px;
+  height: 70px;
+  left: 0px;
+  right: 0px;
+  border-top: solid 1px #e6e5e5;
+  background: #f3f2f2;
 }
 
 .chat-form {
+  width: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
   padding: 0 16px;
   border-left: 0;
   border-right: 0;
 }
 
-.chat-user-item {
-  cursor: pointer;
+.contacts {
+  overflow-y: auto;
+  width: 300px;
+  padding: 0;
+
+  & .chat-user-item:hover {
+    cursor: pointer;
+    background: $primary;
+    opacity: 0.8;
+
+    & .chat-user {
+      & mat-icon {
+        color: $white;
+        background: $primary;
+      }
+      & .chat-username {
+        color: $white;
+      }
+    }
+  }
+
+  & .chat-user-item:not(:last-child) {
+    border-bottom: solid 1px #d9d9d9;
+  }
+}
+
+.active-user {
+  background: $primary;
+
+  & .chat-user {
+    & mat-icon {
+      color: $white;
+      background: $primary;
+    }
+    & .chat-username {
+      color: $white;
+    }
+  }
+}
+
+.chat-user {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 
-  & .chat-user {
+  & .chat-username {
     white-space: nowrap;
     text-overflow: ellipsis;
     display: block;
     width: 100%;
+    margin-left: 4px;
     overflow: hidden;
   }
 }
@@ -51,7 +131,6 @@
   width: 24px;
   height: 24px;
   line-height: 24px;
-  margin-left: 4px;
   font-size: 14px;
   color: $white;
   text-align: center;

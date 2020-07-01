@@ -17,10 +17,13 @@ import { Message } from 'stompjs'
   styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  loading = false
+
+  isContactsVisible = true
+  isActiveChatConnected = false
+
   chatForm: FormGroup
   activeChat: ChatUser
-  isActiveChatConnected = false
-  loading = false
 
   chatUsers: ChatUser[] = []
   chatMessages: ChatMessage[] = []
@@ -232,6 +235,10 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   disableForm(): boolean {
     return !this.activeChat || this.loading || !this.isActiveChatConnected
+  }
+
+  toggleContacts() {
+    this.isContactsVisible = !this.isContactsVisible
   }
 
   ngOnDestroy() {
