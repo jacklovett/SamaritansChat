@@ -24,6 +24,7 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { PasswordComponent } from './components/password/password.component'
 import { MessagesComponent } from './components/messages/messages.component'
 import { TableComponent } from './components/table/table.component'
+import { ContactsComponent } from './components/contacts/contacts.component'
 
 import { ErrorInterceptor } from './helpers/error.interceptor'
 import { JwtInterceptor } from './helpers/jwt.interceptor'
@@ -72,6 +73,7 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
     PasswordComponent,
     MessagesComponent,
     TableComponent,
+    ContactsComponent,
   ],
   imports: [
     BrowserModule,

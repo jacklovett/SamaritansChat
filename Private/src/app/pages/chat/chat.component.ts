@@ -1,6 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core'
 import { FormBuilder, FormGroup } from '@angular/forms'
 import { Subscription } from 'rxjs'
+
+import { RxStompService } from '@stomp/ng2-stompjs'
+import { Message } from 'stompjs'
 
 import { ChatUser } from 'src/app/models/chat.user'
 import { ChatMessage } from 'src/app/models/chat.message'
@@ -8,8 +11,8 @@ import { ChatMessage } from 'src/app/models/chat.message'
 import { ChatService } from 'src/app/services/chat.service'
 import { AlertService } from 'src/app/services/alert.service'
 import { AuthenticationService } from 'src/app/services/authentication.service'
-import { RxStompService } from '@stomp/ng2-stompjs'
-import { Message } from 'stompjs'
+
+import { ContactsComponent } from 'src/app/components/contacts/contacts.component'
 
 @Component({
   selector: 'app-chat',
@@ -17,6 +20,9 @@ import { Message } from 'stompjs'
   styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent implements OnInit, OnDestroy {
+  @ViewChild(ContactsComponent)
+  private contacts: ContactsComponent
+
   loading = false
 
   isContactsVisible = true
@@ -25,11 +31,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   chatForm: FormGroup
   activeChat: ChatUser
 
-  chatUsers: ChatUser[] = []
   chatMessages: ChatMessage[] = []
   displayMessages: ChatMessage[] = []
 
-  activeUsersSubscription: Subscription
   chatMessagesSubscription: Subscription
   stompMessagesSubscription: Subscription
 
@@ -40,8 +44,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     private rxStompService: RxStompService,
     private authenticationService: AuthenticationService,
   ) {
-    this.loadChatMessage()
-    this.loadActiveUsers()
+    this.loadChatMessages()
   }
 
   ngOnInit() {
@@ -64,7 +67,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     return this.chatForm.controls
   }
 
-  public async onSend() {
+  async onSend() {
     if (!this.controls.message.value) {
       return
     }
@@ -80,32 +83,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.clearForm()
   }
 
-  loadActiveUsers() {
-    this.loading = true
-    this.activeUsersSubscription = this.chatService.fetchChatUsers().subscribe(
-      (users) => {
-        this.chatUsers = users.map((user) => {
-          return {
-            username: user,
-            unreadMessageCount: this.getUnreadMessageCount(user),
-          }
-        })
-
-        const storedActiveChat: ChatUser = JSON.parse(
-          localStorage.getItem('activeChat'),
-        )
-        if (!this.activeChat && storedActiveChat) {
-          this.setActiveChat(storedActiveChat)
-        }
-      },
-      (error) => {
-        this.alertService.error(error)
-      },
-    )
-    this.loading = false
-  }
-
-  private loadChatMessage() {
+  private loadChatMessages() {
     this.loading = true
     this.chatMessagesSubscription = this.chatService
       .fetchChatMessages(this.currentUsername)
@@ -152,12 +130,7 @@ export class ChatComponent implements OnInit, OnDestroy {
       return
     }
 
-    const newChatUser: ChatUser = <ChatUser>{
-      username: sender,
-      unreadMessageCount: 0,
-    }
-
-    this.chatUsers.push(newChatUser)
+    this.contacts.addContact(sender)
   }
 
   private handleChatMessage(message: ChatMessage) {
@@ -169,68 +142,28 @@ export class ChatComponent implements OnInit, OnDestroy {
     ) {
       this.displayMessages.push(message)
     } else {
-      this.chatUsers.forEach((user: ChatUser) => {
-        if (sender !== user.username) {
-          return
-        }
-        user.unreadMessageCount = this.getUnreadMessageCount(sender)
-      })
+      this.contacts.updateUnreadMessageCount(sender)
     }
   }
 
   private handleLeaveMessage(message: ChatMessage) {
-    this.chatUsers.forEach((user, index) => {
-      if (user.username === message.sender) {
-        this.chatUsers.splice(index, 1)
-      }
-    })
+    const { sender } = message
+    this.contacts.removeContact(sender)
 
-    if (this.activeChat?.username === message.sender) {
+    if (this.activeChat?.username === sender) {
       this.isActiveChatConnected = false
     }
-  }
-
-  private updateUnreadMessages(username: string) {
-    this.chatService.updateUnreadMessages(username)
   }
 
   private clearForm() {
     this.chatForm.reset()
   }
 
-  setActiveChat(chatUser: ChatUser) {
-    // update unread messages of current chat before changing
-    if (this.activeChat) {
-      this.updateUnreadMessages(this.activeChat.username)
-    }
-
-    this.loadConversation(chatUser.username)
-
-    const newActiveChatUser: ChatUser = <ChatUser>{
-      username: chatUser.username,
-      unreadMessageCount: 0,
-    }
-
-    this.activeChat = newActiveChatUser
-    localStorage.setItem('activeChat', JSON.stringify(this.activeChat))
-    this.isActiveChatConnected = this.isChatUserConnected(this.activeChat)
-
-    if (chatUser.unreadMessageCount > 0) {
-      chatUser.unreadMessageCount = 0
-      this.updateUnreadMessages(chatUser.username)
-    }
-  }
-
-  private isChatUserConnected(chatUser: ChatUser) {
-    return this.chatUsers.some(
-      (user: ChatUser) => user.username === chatUser.username,
-    )
-  }
-
-  private getUnreadMessageCount(user: string) {
-    return this.chatMessages.filter(
-      (chatMessage) => chatMessage.sender === user && !chatMessage.read,
-    ).length
+  onSetActiveChat(chatUser: ChatUser) {
+    const { username } = chatUser
+    this.activeChat = chatUser
+    this.loadConversation(username)
+    this.isActiveChatConnected = this.contacts.isChatUserConnected(username)
   }
 
   disableForm(): boolean {
@@ -242,7 +175,6 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.activeUsersSubscription.unsubscribe()
     this.chatMessagesSubscription.unsubscribe()
     this.stompMessagesSubscription.unsubscribe()
   }

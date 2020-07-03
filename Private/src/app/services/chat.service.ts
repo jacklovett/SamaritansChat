@@ -77,11 +77,14 @@ export class ChatService {
   public updateUnreadMessages(username: string) {
     this.http
       .put(`${this.apiUrl}/chat/updateUnreadMessages`, username)
-      .subscribe((error) => {
-        console.log(
-          `Unable to update unread messages for user: ${username} - ${error}`,
-        )
-      })
+      .subscribe(
+        () => {},
+        (error) => {
+          console.log(
+            `Unable to update unread messages for user: ${username} - ${error}`,
+          )
+        },
+      )
   }
 
   clearLocalStorage() {

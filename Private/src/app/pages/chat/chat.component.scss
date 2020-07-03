@@ -23,7 +23,7 @@
     display: flex;
     background: $light-grey;
     padding: 8px;
-    border-radius: 25% 0 0 25%;
+    border-radius: 8px 0 0 8px;
   }
 
   // issue with hover styling persisting on touchscreens
@@ -69,73 +69,6 @@
   padding: 0 16px;
   border-left: 0;
   border-right: 0;
-}
-
-.contacts {
-  overflow-y: auto;
-  width: 300px;
-  padding: 0;
-
-  & .chat-user-item:hover {
-    cursor: pointer;
-    background: $primary;
-    opacity: 0.8;
-
-    & .chat-user {
-      & mat-icon {
-        color: $white;
-        background: $primary;
-      }
-      & .chat-username {
-        color: $white;
-      }
-    }
-  }
-
-  & .chat-user-item:not(:last-child) {
-    border-bottom: solid 1px #d9d9d9;
-  }
-}
-
-.active-user {
-  background: $primary;
-
-  & .chat-user {
-    & mat-icon {
-      color: $white;
-      background: $primary;
-    }
-    & .chat-username {
-      color: $white;
-    }
-  }
-}
-
-.chat-user {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-
-  & .chat-username {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    display: block;
-    width: 100%;
-    margin-left: 4px;
-    overflow: hidden;
-  }
-}
-
-.new-msg-icon {
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
-  font-size: 14px;
-  color: $white;
-  text-align: center;
-  border-radius: 50%;
-  background: $warn;
 }
 
 .message-input-container {
