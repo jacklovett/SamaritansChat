@@ -14,7 +14,7 @@ import { Subscription } from 'rxjs'
   styleUrls: ['./chatlogs.component.scss'],
 })
 export class ChatLogsComponent implements OnInit, OnDestroy {
-  loading = false
+  isLoading = false
 
   chatLogs: ChatLog[] = []
 
@@ -69,7 +69,7 @@ export class ChatLogsComponent implements OnInit, OnDestroy {
   }
 
   private async loadChatLogs() {
-    this.loading = true
+    this.isLoading = true
     this.chatLogsSubscription = this.chatLogService.get().subscribe(
       (logs) => {
         this.chatLogs = logs
@@ -78,7 +78,7 @@ export class ChatLogsComponent implements OnInit, OnDestroy {
         this.alertService.error(error)
       },
     )
-    this.loading = false
+    this.isLoading = false
   }
 
   goToTranscript = (id: number) => this.router.navigate(['transcript', id])

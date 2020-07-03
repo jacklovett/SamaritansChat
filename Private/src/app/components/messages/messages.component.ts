@@ -8,7 +8,7 @@ import { ChatMessage } from 'src/app/models/chat.message'
 })
 export class MessagesComponent implements OnInit {
   @Input() username: string
-  @Input() loading: boolean
+  @Input() isLoading: boolean
   @Input() isDisconnected: boolean
   @Input() messages: ChatMessage[]
   constructor() {}

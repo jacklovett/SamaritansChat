@@ -1,8 +1,8 @@
-<mat-spinner class="center" [hidden]="!loading" [diameter]="32"></mat-spinner>
-<mat-card class="container-margin" [hidden]="loading">
+<app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
+<mat-card class="container-margin" [hidden]="isLoading">
   <mat-toolbar>Chat Logs</mat-toolbar>
   <app-table
-    *ngIf="chatLogs.length"
+    [hidden]="!chatLogs.length"
     [data]="chatLogs"
     [columnDetails]="columnDetails"
   ></app-table>

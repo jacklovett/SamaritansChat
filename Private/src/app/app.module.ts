@@ -44,7 +44,8 @@ import {
   RxStompService,
   rxStompServiceFactory,
 } from '@stomp/ng2-stompjs'
-import { rxStompConfig } from './rx-stomp.config'
+import { rxStompConfig } from './rx-stomp.config';
+import { LoadingComponent } from './components/loading/loading.component'
 
 export const customTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 1000,
@@ -74,6 +75,7 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
     MessagesComponent,
     TableComponent,
     ContactsComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,

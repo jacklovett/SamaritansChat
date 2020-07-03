@@ -25,7 +25,7 @@ export class UserComponent implements OnInit, OnDestroy {
   userForm: FormGroup
   dummyPassword = '**********'
 
-  loading = false
+  isLoading = false
   submitted = false
 
   private userSubscription: Subscription
@@ -108,7 +108,7 @@ export class UserComponent implements OnInit, OnDestroy {
       return
     }
 
-    this.loading = true
+    this.isLoading = true
 
     return this.editUserId ? this.edit() : this.register()
   }
@@ -172,7 +172,7 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   private async loadUser() {
-    this.loading = true
+    this.isLoading = true
     this.userSubscription = this.userService.getById(this.editUserId).subscribe(
       (user) => {
         this.user = user
@@ -182,7 +182,7 @@ export class UserComponent implements OnInit, OnDestroy {
         this.alertService.error(error)
       },
     )
-    this.loading = false
+    this.isLoading = false
   }
 
   private edit() {
@@ -196,7 +196,7 @@ export class UserComponent implements OnInit, OnDestroy {
 
     user.id = this.user.id
     this.userService.update(user)
-    this.loading = false
+    this.isLoading = false
   }
 
   private register() {
@@ -210,7 +210,7 @@ export class UserComponent implements OnInit, OnDestroy {
       admin: this.controls.admin.value,
     }
     this.userService.register(user)
-    this.loading = false
+    this.isLoading = false
   }
 
   ngOnDestroy() {

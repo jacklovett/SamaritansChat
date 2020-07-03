@@ -22,7 +22,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
   @Input() chatMessages: ChatMessage[]
   @Output() activeChatSet = new EventEmitter<ChatUser>()
 
-  loading = false
+  isLoading = false
   chatUsers: ChatUser[] = []
 
   activeUsersSubscription: Subscription
@@ -37,7 +37,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {}
 
   loadActiveUsers() {
-    this.loading = true
+    this.isLoading = true
     this.activeUsersSubscription = this.chatService.fetchChatUsers().subscribe(
       (users) => {
         this.chatUsers = users.map((username) => {
@@ -56,7 +56,7 @@ export class ContactsComponent implements OnInit, OnDestroy {
         this.alertService.error(error)
       },
     )
-    this.loading = false
+    this.isLoading = false
   }
 
   addContact(username: string) {

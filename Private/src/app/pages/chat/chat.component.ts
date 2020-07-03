@@ -23,7 +23,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild(ContactsComponent)
   private contacts: ContactsComponent
 
-  loading = false
+  isLoading = false
 
   isContactsVisible = true
   isActiveChatConnected = false
@@ -84,7 +84,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private loadChatMessages() {
-    this.loading = true
+    this.isLoading = true
     this.chatMessagesSubscription = this.chatService
       .fetchChatMessages(this.currentUsername)
       .subscribe(
@@ -95,7 +95,7 @@ export class ChatComponent implements OnInit, OnDestroy {
           this.alertService.error(error)
         },
       )
-    this.loading = false
+    this.isLoading = false
   }
 
   private loadConversation(username: string) {
@@ -167,7 +167,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   disableForm(): boolean {
-    return !this.activeChat || this.loading || !this.isActiveChatConnected
+    return !this.activeChat || this.isLoading || !this.isActiveChatConnected
   }
 
   toggleContacts() {

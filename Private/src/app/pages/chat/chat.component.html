@@ -23,7 +23,7 @@
       class="chat-window"
       [username]="currentUsername"
       [isDisconnected]="!isActiveChatConnected && activeChat"
-      [loading]="loading"
+      [isLoading]="isLoading"
       [messages]="displayMessages"
     ></app-messages>
     <div class="chat-form-section">
@@ -40,14 +40,14 @@
         <div class="send-button-container">
           <button
             [disabled]="disableForm()"
-            [hidden]="loading"
+            [hidden]="isLoading"
             mat-raised-button
             color="primary"
             class="primary-btn"
           >
             Send
           </button>
-          <mat-spinner [hidden]="!loading" [diameter]="32"></mat-spinner>
+          <app-loading [isLoading]="isLoading"></app-loading>
         </div>
       </form>
     </div>

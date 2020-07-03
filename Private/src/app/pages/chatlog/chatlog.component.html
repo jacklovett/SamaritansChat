@@ -64,14 +64,14 @@
       </div>
       <div class="form-section actions-container">
         <button
-          *ngIf="!loading"
+          [hidden]="isLoading"
           mat-raised-button
           color="primary"
           class="primary-btn"
         >
           Save
         </button>
-        <mat-spinner *ngIf="loading" [diameter]="32"></mat-spinner>
+        <app-loading [isLoading]="isLoading"></app-loading>
         <div
           class="toggle-conversation-container"
           (click)="toggleConversation()"
@@ -88,12 +88,12 @@
       </div>
     </form>
     <div class="chat-display" [hidden]="!displayChat">
-      <div *ngIf="!chatMessages?.length" class="no-data-found">
+      <div [hidden]="chatMessages?.length" class="no-data-found">
         <p>No messages where sent during this conversation</p>
       </div>
       <app-messages
         [username]="volunteer"
-        [loading]="loading"
+        [isLoading]="isLoading"
         [messages]="chatMessages"
       ></app-messages>
     </div>

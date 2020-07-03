@@ -13,7 +13,6 @@ import { AuthenticationService } from 'src/app/services/authentication.service'
   styleUrls: ['./password.component.scss'],
 })
 export class PasswordComponent {
-  loading = false
   submitted = false
 
   userId: number

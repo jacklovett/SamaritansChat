@@ -1,5 +1,5 @@
 <div class="contacts-container">
-  <mat-spinner class="center" *ngIf="loading" [diameter]="32"></mat-spinner>
+  <app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
   <div class="mat-elevation-z2">
     <mat-toolbar>Contacts</mat-toolbar>
   </div>

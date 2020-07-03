@@ -6,10 +6,10 @@
   >
     <!-- ng-template is here for lazy loading -->
     <ng-template matMenuContent>
-      <p class="no-notifications" *ngIf="notifications.length === 0">
+      <p class="no-notifications" [hidden]="notifications.length > 0">
         No new notifications
       </p>
-      <mat-list *ngIf="notifications.length > 0">
+      <mat-list [hidden]="!notifications?.length">
         <mat-list-item
           class="notification"
           [ngClass]="{
@@ -42,7 +42,7 @@
   </mat-menu>
   <mat-icon
     [matMenuTriggerFor]="appMenu"
-    *ngIf="notificationCount > 0"
+    [hidden]="!notificationCount"
     [matBadge]="notificationCount"
     matBadgeSize="small"
     matBadgeColor="warn"
@@ -54,7 +54,7 @@
   </mat-icon>
   <mat-icon
     [matMenuTriggerFor]="appMenu"
-    *ngIf="notificationCount === 0"
+    [hidden]="notificationCount > 0"
     matTooltip="Notifications"
     class="nav-link material-icons material-icons-btn md-18"
   >

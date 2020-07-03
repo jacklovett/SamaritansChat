@@ -19,7 +19,7 @@ import { NotificationService } from 'src/app/services/notification.service'
   styleUrls: ['./chatlog.component.scss'],
 })
 export class ChatLogComponent implements OnDestroy {
-  loading = false
+  isLoading = false
   displayChat = false
   rating = 0
 
@@ -75,7 +75,7 @@ export class ChatLogComponent implements OnDestroy {
   }
 
   private loadConversation(username: string) {
-    this.loading = true
+    this.isLoading = true
     this.chatMessagesSubscription = this.chatService
       .fetchChatMessages(username)
       .subscribe(
@@ -86,11 +86,11 @@ export class ChatLogComponent implements OnDestroy {
           this.alertService.error(error)
         },
       )
-    this.loading = false
+    this.isLoading = false
   }
 
   onSubmit() {
-    this.loading = true
+    this.isLoading = true
     const chatLog: ChatLog = <ChatLog>{
       volunteer: this.controls.volunteer.value,
       username: this.controls.username.value,
@@ -114,7 +114,7 @@ export class ChatLogComponent implements OnDestroy {
         this.alertService.error(error)
       },
     )
-    this.loading = false
+    this.isLoading = false
   }
 
   toggleConversation() {
