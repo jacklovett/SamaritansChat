@@ -48,11 +48,11 @@ export class AuthenticationService {
     this.router.navigate(['/login'])
   }
 
-  public getUsername(): string {
+  getUsername(): string {
     return this.getUserDetails().username
   }
 
-  public getUserDetails(): UserDetails {
+  getUserDetails(): UserDetails {
     const jwtToken = this.jwtResponse?.token
     if (!jwtToken) {
       console.log('No token found')
@@ -64,7 +64,7 @@ export class AuthenticationService {
     return JSON.parse(decodedJwtData.sub)
   }
 
-  public isChatAvailable() {
+  isChatAvailable() {
     return this.http.get<ChatAvailabilityResponse>(
       `${this.apiUrl}/chat/availability`,
     )
@@ -76,7 +76,7 @@ export class AuthenticationService {
     }
   }
 
-  public get jwtResponse(): JwtResponse {
+  get jwtResponse(): JwtResponse {
     return this.jwtSubject.value
   }
 }

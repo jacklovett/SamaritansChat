@@ -26,7 +26,7 @@ export class AuthenticationService {
     )
   }
 
-  public get jwtResponse(): JwtResponse {
+  get jwtResponse(): JwtResponse {
     return this.jwtSubject.value
   }
 
@@ -56,7 +56,7 @@ export class AuthenticationService {
     this.router.navigate(['/login'])
   }
 
-  public getUserDetailsFromJWT(): UserDetails {
+  getUserDetailsFromJWT(): UserDetails {
     const jwtToken = this.jwtResponse?.token
     if (!jwtToken) {
       console.log('No token found')

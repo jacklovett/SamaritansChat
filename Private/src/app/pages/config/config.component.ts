@@ -107,7 +107,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.loading = false
   }
 
-  public onSubmit() {
+  onSubmit() {
     this.submitted = true
 
     if (!this.configForm.valid) {
@@ -134,7 +134,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.loading = false
   }
 
-  public toggleTimeRestrictions() {
+  toggleTimeRestrictions() {
     if (this.controls.isTimeRestricted.value) {
       this.controls.availableFrom.enable()
       this.controls.availableUntil.enable()

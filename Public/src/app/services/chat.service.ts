@@ -24,7 +24,7 @@ export class ChatService {
     private authenticationService: AuthenticationService,
   ) {}
 
-  public publishMessage = (destination: string, message: ChatMessage) => {
+  publishMessage = (destination: string, message: ChatMessage) => {
     try {
       this.rxStompService.publish({
         destination: `/app/${destination}`,
@@ -39,19 +39,19 @@ export class ChatService {
     return this.authenticationService.getUsername()
   }
 
-  public fetchChatMessages(username: string) {
+  fetchChatMessages(username: string) {
     return this.http.get<ChatMessage[]>(
       `${this.apiUrl}/chat/messages/${username}`,
     )
   }
 
-  public isVolunteerActive() {
+  isVolunteerActive() {
     return this.http.get<ApiResponse>(
       `${this.apiUrl}/chat/isVolunteerActive/${this.username}`,
     )
   }
 
-  public disconnect() {
+  disconnect() {
     const message: ChatMessage = <ChatMessage>{
       sender: this.username,
       recipient: this.samaritansUsername,

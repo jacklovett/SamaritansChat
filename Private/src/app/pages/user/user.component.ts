@@ -101,7 +101,7 @@ export class UserComponent implements OnInit, OnDestroy {
     })
   }
 
-  public onSubmit() {
+  onSubmit() {
     this.submitted = true
 
     if (!this.userForm.valid) {

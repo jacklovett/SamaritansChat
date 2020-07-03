@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
 
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment'
 
-import { User } from './../models/user';
-import { ApiResponse } from './../models/api.response';
-import { UserDetailsRequest } from 'src/app/models/user.details.request';
-import { AlertService } from './alert.service';
-import { Subject, Observable } from 'rxjs';
-import { AuthenticationService } from './authentication.service';
-import { Router } from '@angular/router';
+import { User } from './../models/user'
+import { ApiResponse } from './../models/api.response'
+import { UserDetailsRequest } from 'src/app/models/user.details.request'
+import { AlertService } from './alert.service'
+import { Subject, Observable } from 'rxjs'
+import { AuthenticationService } from './authentication.service'
+import { Router } from '@angular/router'
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  apiUrl: string = environment.apiUrl;
+  apiUrl: string = environment.apiUrl
 
-  private isReloadRequiredSubject = new Subject<boolean>();
+  private isReloadRequiredSubject = new Subject<boolean>()
 
   constructor(
     private http: HttpClient,
@@ -24,20 +24,20 @@ export class UserService {
     private authenticationService: AuthenticationService,
   ) {}
 
-  public isReloadRequired(): Observable<boolean> {
-    return this.isReloadRequiredSubject.asObservable();
+  isReloadRequired(): Observable<boolean> {
+    return this.isReloadRequiredSubject.asObservable()
   }
 
   get currentUser() {
-    return this.authenticationService.getUserDetailsFromJWT();
+    return this.authenticationService.getUserDetailsFromJWT()
   }
 
   get() {
-    return this.http.get<User[]>(`${this.apiUrl}/users`);
+    return this.http.get<User[]>(`${this.apiUrl}/users`)
   }
 
   getById(id: number) {
-    return this.http.get<User>(`${this.apiUrl}/users/${id}`);
+    return this.http.get<User>(`${this.apiUrl}/users/${id}`)
   }
 
   register(user: User) {
@@ -46,37 +46,37 @@ export class UserService {
       .subscribe(
         (response) => {
           if (!response) {
-            return;
+            return
           }
-          this.isReloadRequiredSubject.next(true);
-          this.router.navigate(['users']);
-          this.alertService.handleResponse(response);
+          this.isReloadRequiredSubject.next(true)
+          this.router.navigate(['users'])
+          this.alertService.handleResponse(response)
         },
         (error) => {
-          this.alertService.error(error);
+          this.alertService.error(error)
         },
-      );
+      )
   }
 
   update(user: User) {
     this.http.put<ApiResponse>(`${this.apiUrl}/users/edit`, user).subscribe(
       (response) => {
         if (!response) {
-          return;
+          return
         }
 
-        this.isReloadRequiredSubject.next(true);
+        this.isReloadRequiredSubject.next(true)
 
         if (this.currentUser.admin) {
-          this.router.navigate(['users']);
+          this.router.navigate(['users'])
         }
 
-        this.alertService.handleResponse(response);
+        this.alertService.handleResponse(response)
       },
       (error) => {
-        this.alertService.error(error);
+        this.alertService.error(error)
       },
-    );
+    )
   }
 
   delete(id: number) {
@@ -85,42 +85,42 @@ export class UserService {
       .subscribe(
         (response) => {
           if (!response) {
-            return;
+            return
           }
-          this.isReloadRequiredSubject.next(true);
-          this.alertService.handleResponse(response);
+          this.isReloadRequiredSubject.next(true)
+          this.alertService.handleResponse(response)
         },
         (error) => {
-          this.alertService.error(error);
+          this.alertService.error(error)
         },
-      );
+      )
   }
 
   updatePassword(changePasswordRequest: UserDetailsRequest) {
     return this.http.put<ApiResponse>(
       `${this.apiUrl}/users/updatePassword`,
       changePasswordRequest,
-    );
+    )
   }
 
   checkPassword(checkPasswordRequest: UserDetailsRequest) {
     return this.http.post<ApiResponse>(
       `${this.apiUrl}/users/checkCurrentPassword`,
       checkPasswordRequest,
-    );
+    )
   }
 
   isUsernameAvailable(checkUsernameRequest: UserDetailsRequest) {
     return this.http.post<ApiResponse>(
       `${this.apiUrl}/users/checkUsernameAvailability`,
       checkUsernameRequest,
-    );
+    )
   }
 
   isEmailAvailable(checkEmailRequest: UserDetailsRequest) {
     return this.http.post<ApiResponse>(
       `${this.apiUrl}/users/checkEmailAvailablilty`,
       checkEmailRequest,
-    );
+    )
   }
 }

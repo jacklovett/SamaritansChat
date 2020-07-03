@@ -21,7 +21,7 @@ export class AppComponent {
     public dialog: MatDialog,
   ) {}
 
-  public leaveChatDialog() {
+  leaveChatDialog() {
     const dialogConfig = new MatDialogConfig()
 
     dialogConfig.disableClose = true
@@ -47,12 +47,12 @@ export class AppComponent {
     })
   }
 
-  public logout() {
+  logout() {
     this.chatService.disconnect()
     this.authenticationService.logout()
   }
 
-  public toggleChat() {
+  toggleChat() {
     this.isChatVisible = !this.isChatVisible
     const display = this.isChatVisible ? 'show' : 'hide'
     this.router.navigate(['chat'], { queryParams: { display } })
