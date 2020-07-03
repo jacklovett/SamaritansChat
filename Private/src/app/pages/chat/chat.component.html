@@ -23,7 +23,7 @@
       class="chat-window"
       [username]="currentUsername"
       [isDisconnected]="!isActiveChatConnected && activeChat"
-      [loading]="loading"
+      [isLoading]="isLoading"
       [messages]="displayMessages"
     ></app-messages>
     <div class="chat-form-section">
@@ -40,14 +40,14 @@
         <div class="send-button-container">
           <button
             [disabled]="disableForm()"
-            [hidden]="loading"
+            [hidden]="isLoading"
             mat-raised-button
             color="primary"
             class="primary-btn"
           >
             Send
           </button>
-          <mat-spinner [hidden]="!loading" [diameter]="32"></mat-spinner>
+          <app-loading [isLoading]="isLoading"></app-loading>
         </div>
       </form>
     </div>
@@ -58,31 +58,10 @@
     [(opened)]="isContactsVisible"
     position="end"
   >
-    <div class="mat-elevation-z2">
-      <mat-toolbar>Contacts</mat-toolbar>
-    </div>
-    <div [hidden]="chatUsers.length" class="no-data-found">
-      No users active
-    </div>
-    <mat-list [hidden]="!chatUsers.length" class="contacts mat-elevation-z1">
-      <mat-list-item
-        class="chat-user-item"
-        *ngFor="let chatUser of chatUsers"
-        (click)="setActiveChat(chatUser)"
-        [ngClass]="{
-          'active-user': activeChat?.username === chatUser.username
-        }"
-      >
-        <div class="chat-user">
-          <mat-icon matListIcon>account_circle</mat-icon>
-          <div class="chat-username">
-            {{ chatUser.username }}
-          </div>
-          <span [hidden]="!chatUser.unreadMessageCount" class="new-msg-icon">{{
-            chatUser.unreadMessageCount
-          }}</span>
-        </div>
-      </mat-list-item>
-    </mat-list>
+    <app-contacts
+      [activeChat]="this.activeChat"
+      [chatMessages]="this.chatMessages"
+      (activeChatSet)="onSetActiveChat($event)"
+    ></app-contacts>
   </mat-sidenav>
 </mat-sidenav-container>

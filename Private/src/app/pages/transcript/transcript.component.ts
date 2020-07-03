@@ -28,7 +28,7 @@ export class TranscriptComponent implements OnInit, OnDestroy {
   transcriptSubscription: Subscription
   transcriptIdSubscription: Subscription
 
-  loading = false
+  isLoading = false
 
   constructor(
     private route: ActivatedRoute,
@@ -46,7 +46,7 @@ export class TranscriptComponent implements OnInit, OnDestroy {
   }
 
   private loadTranscript(id: number) {
-    this.loading = true
+    this.isLoading = true
     this.transcriptSubscription = this.chatLogService
       .getTranscriptById(id)
       .subscribe(
@@ -58,7 +58,7 @@ export class TranscriptComponent implements OnInit, OnDestroy {
           this.alertService.error(error)
         },
       )
-    this.loading = false
+    this.isLoading = false
   }
 
   populateComponent(transcript: Transcript) {

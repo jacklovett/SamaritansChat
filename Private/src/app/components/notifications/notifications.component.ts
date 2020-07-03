@@ -53,7 +53,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     return this.authenticationService.getUserDetailsFromJWT().username
   }
 
-  public selectNotification(notification: Notification) {
+  selectNotification(notification: Notification) {
     const { id, username, processed, read, type } = notification
     if (processed) {
       return
@@ -79,7 +79,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public deleteNotification(e: MouseEvent, id: number) {
+  deleteNotification(e: MouseEvent, id: number) {
     e.stopPropagation()
     this.notificationService.delete(id)
   }

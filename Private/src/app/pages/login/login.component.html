@@ -1,5 +1,5 @@
-<mat-spinner class="center" [hidden]="!loading" [diameter]="32"></mat-spinner>
-<mat-card class="login-panel" [hidden]="loading">
+<app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
+<mat-card class="login-panel" [hidden]="isLoading">
   <mat-toolbar>Login</mat-toolbar>
   <form
     [formGroup]="loginForm"
@@ -37,8 +37,8 @@
     </mat-form-field>
     <div class="form-section">
       <button
-        [disabled]="loading"
-        *ngIf="!loading"
+        [disabled]="isLoading"
+        [hidden]="isLoading"
         mat-raised-button
         color="primary"
         class="primary-btn"

@@ -16,7 +16,7 @@ import { ColumnDetails } from 'src/app/components/table/columnDetails'
   styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit, OnDestroy {
-  loading = false
+  isLoading = false
 
   users: ListUser[] = []
 
@@ -117,7 +117,7 @@ export class UsersComponent implements OnInit, OnDestroy {
   editUser = (id: number) => this.router.navigate(['user', id])
 
   private async loadUsers() {
-    this.loading = true
+    this.isLoading = true
     this.usersSubscription = this.userService.get().subscribe(
       (users) => {
         this.users = users.map((user) => ({
@@ -133,13 +133,13 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.alertService.error(error)
       },
     )
-    this.loading = false
+    this.isLoading = false
   }
 
   private deleteUser(userId: number) {
-    this.loading = true
+    this.isLoading = true
     this.userService.delete(userId)
-    this.loading = false
+    this.isLoading = false
   }
 
   ngOnDestroy() {

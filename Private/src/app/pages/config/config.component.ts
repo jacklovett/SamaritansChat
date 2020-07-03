@@ -18,7 +18,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
   configForm: FormGroup
   chatConfig: ChatConfig
 
-  loading = false
+  isLoading = false
   submitted = false
 
   availableTimes: AvailableTimes[] = [
@@ -61,7 +61,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.configForm = this.formBuilder.group(
       {
-        isTimeRestricted: true,
+        isTimeRestricted: false,
         availableFrom: [{ value: '', disabled: false }],
         availableUntil: [{ value: '', disabled: false }],
       },
@@ -73,9 +73,7 @@ export class ConfigComponent implements OnInit, OnDestroy {
       },
     )
 
-    this.loadConfig().then(() => {
-      this.toggleTimeRestrictions()
-    })
+    this.loadConfig()
   }
 
   // convenience getter for easy access to form fields
@@ -94,27 +92,28 @@ export class ConfigComponent implements OnInit, OnDestroy {
   }
 
   private async loadConfig() {
-    this.loading = true
+    this.isLoading = true
     this.configSubscription = this.configService.get().subscribe(
       (config) => {
         this.chatConfig = config
         this.populateForm(this.chatConfig)
+        this.toggleTimeRestrictions()
       },
       (error) => {
         this.alertService.error(error)
       },
     )
-    this.loading = false
+    this.isLoading = false
   }
 
-  public onSubmit() {
+  onSubmit() {
     this.submitted = true
 
     if (!this.configForm.valid) {
       return
     }
 
-    this.loading = true
+    this.isLoading = true
 
     const config: ChatConfig = <ChatConfig>{
       timeRestricted: this.controls.isTimeRestricted.value,
@@ -131,10 +130,10 @@ export class ConfigComponent implements OnInit, OnDestroy {
       },
     )
 
-    this.loading = false
+    this.isLoading = false
   }
 
-  public toggleTimeRestrictions() {
+  toggleTimeRestrictions() {
     if (this.controls.isTimeRestricted.value) {
       this.controls.availableFrom.enable()
       this.controls.availableUntil.enable()

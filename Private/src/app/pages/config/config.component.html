@@ -44,15 +44,15 @@
     </mat-form-field>
     <div class="form-section">
       <button
-        [disabled]="loading"
-        *ngIf="!loading"
+        [disabled]="isLoading"
+        [hidden]="isLoading"
         mat-raised-button
         color="primary"
         class="primary-btn"
       >
         Save Changes
       </button>
-      <mat-spinner [hidden]="!loading" [diameter]="32"></mat-spinner>
+      <app-loading [isLoading]="isLoading"></app-loading>
     </div>
   </form>
 </mat-card>

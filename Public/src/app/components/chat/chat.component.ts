@@ -80,7 +80,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.publishMessage('send.addActiveUser', message)
   }
 
-  public onSend() {
+  onSend() {
     // return if message is empty
     if (!this.controls.message.value) {
       return

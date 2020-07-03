@@ -1,7 +1,7 @@
 <div class="user-disconnected-msg" *ngIf="isDisconnected">
   User is no longer connected to chat
 </div>
-<mat-spinner class="center" *ngIf="loading" [diameter]="32"></mat-spinner>
+<app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
 <mat-list>
   <mat-list-item class="msg-container" *ngFor="let message of messages">
     <div

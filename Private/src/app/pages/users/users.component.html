@@ -1,5 +1,5 @@
-<mat-spinner class="center" *ngIf="loading" [diameter]="32"></mat-spinner>
-<mat-card class="container-margin" [hidden]="loading">
+<app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
+<mat-card class="container-margin" [hidden]="isLoading">
   <div class="toolbar">
     <mat-toolbar>Users</mat-toolbar>
     <mat-icon

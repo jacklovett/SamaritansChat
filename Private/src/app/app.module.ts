@@ -24,6 +24,7 @@ import { NotificationsComponent } from './components/notifications/notifications
 import { PasswordComponent } from './components/password/password.component'
 import { MessagesComponent } from './components/messages/messages.component'
 import { TableComponent } from './components/table/table.component'
+import { ContactsComponent } from './components/contacts/contacts.component'
 
 import { ErrorInterceptor } from './helpers/error.interceptor'
 import { JwtInterceptor } from './helpers/jwt.interceptor'
@@ -43,7 +44,8 @@ import {
   RxStompService,
   rxStompServiceFactory,
 } from '@stomp/ng2-stompjs'
-import { rxStompConfig } from './rx-stomp.config'
+import { rxStompConfig } from './rx-stomp.config';
+import { LoadingComponent } from './components/loading/loading.component'
 
 export const customTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 1000,
@@ -72,6 +74,8 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
     PasswordComponent,
     MessagesComponent,
     TableComponent,
+    ContactsComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,

@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       })
   }
 
-  public executeRecaptcha(): void {
+  executeRecaptcha(): void {
     this.loading = true
     this.reCaptchaSubscription = this.recaptchaV3Service
       .execute('register')
@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       )
   }
 
-  public onSubmit(token: string) {
+  onSubmit(token: string) {
     this.submitted = true
 
     this.authenticationService.login(token).subscribe(
@@ -83,7 +83,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     )
   }
 
-  public openDisclaimerDialog() {
+  openDisclaimerDialog() {
     const dialogConfig = new MatDialogConfig()
 
     dialogConfig.disableClose = true

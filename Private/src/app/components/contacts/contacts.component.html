@@ -1,0 +1,29 @@
+<div class="contacts-container">
+  <app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
+  <div class="mat-elevation-z2">
+    <mat-toolbar>Contacts</mat-toolbar>
+  </div>
+  <div [hidden]="chatUsers.length" class="no-data-found center">
+    No active users
+  </div>
+  <mat-list [hidden]="!chatUsers.length" class="contacts mat-elevation-z1">
+    <mat-list-item
+      class="chat-user-item"
+      *ngFor="let chatUser of chatUsers"
+      (click)="setActiveChat(chatUser)"
+      [ngClass]="{
+        'active-chat-user': activeChat?.username === chatUser.username
+      }"
+    >
+      <div class="chat-user">
+        <mat-icon matListIcon>account_circle</mat-icon>
+        <div class="chat-username">
+          {{ chatUser.username }}
+        </div>
+        <span [hidden]="!chatUser.unreadMessageCount" class="new-msg-icon">{{
+          chatUser.unreadMessageCount
+        }}</span>
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>

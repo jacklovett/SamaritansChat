@@ -28,7 +28,7 @@ export class ChatService {
     return this.authenticationService.getUserDetailsFromJWT()?.username
   }
 
-  public publishMessage = (destination: string, message: ChatMessage) => {
+  publishMessage = (destination: string, message: ChatMessage) => {
     try {
       this.rxStompService.publish({
         destination: `/app/${destination}`,
@@ -39,7 +39,7 @@ export class ChatService {
     }
   }
 
-  public connect() {
+  connect() {
     const message: ChatMessage = <ChatMessage>{
       sender: this.currentUsername,
       type: 'JOIN',
@@ -52,7 +52,7 @@ export class ChatService {
     }
   }
 
-  public disconnect() {
+  disconnect() {
     const message: ChatMessage = <ChatMessage>{
       sender: this.currentUsername,
       type: 'LEAVE',
@@ -62,26 +62,29 @@ export class ChatService {
     this.clearLocalStorage()
   }
 
-  public fetchChatMessages(username: string) {
+  fetchChatMessages(username: string) {
     return this.http.get<ChatMessage[]>(
       `${this.apiUrl}/chat/messages/${username}`,
     )
   }
 
-  public fetchChatUsers() {
+  fetchChatUsers() {
     return this.http.get<string[]>(
       `${this.apiUrl}/chat/users/${this.currentUsername}`,
     )
   }
 
-  public updateUnreadMessages(username: string) {
+  updateUnreadMessages(username: string) {
     this.http
       .put(`${this.apiUrl}/chat/updateUnreadMessages`, username)
-      .subscribe((error) => {
-        console.log(
-          `Unable to update unread messages for user: ${username} - ${error}`,
-        )
-      })
+      .subscribe(
+        () => {},
+        (error) => {
+          console.log(
+            `Unable to update unread messages for user: ${username} - ${error}`,
+          )
+        },
+      )
   }
 
   clearLocalStorage() {

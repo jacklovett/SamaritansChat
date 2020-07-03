@@ -28,11 +28,11 @@ export class NotificationService {
     private authenticationService: AuthenticationService,
   ) {}
 
-  public get currentUser() {
+  get currentUser() {
     return this.authenticationService.getUserDetailsFromJWT()
   }
 
-  public isReloadRequired(): Observable<boolean> {
+  isReloadRequired(): Observable<boolean> {
     return this.isReloadRequiredSubject.asObservable()
   }
 
@@ -67,7 +67,7 @@ export class NotificationService {
     }
   }
 
-  public startConversation(conversationRequest: ConversationRequest) {
+  startConversation(conversationRequest: ConversationRequest) {
     conversationRequest.samaritansUser = this.currentUser.username
     return this.http.post<ApiResponse>(
       `${this.apiUrl}/chat/startConversation`,

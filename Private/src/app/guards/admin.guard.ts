@@ -29,7 +29,7 @@ export class AdminGuard implements CanActivate {
     return false
   }
 
-  public isAdmin() {
+  isAdmin() {
     return this.authenticationService.getUserDetailsFromJWT()?.admin
   }
 }

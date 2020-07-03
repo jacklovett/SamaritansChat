@@ -14,7 +14,7 @@ import { ValidationService } from 'src/app/services/validation.service'
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup
-  loading = false
+  isLoading = false
   submitted = false
   returnUrl: string
 
@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
       return
     }
 
-    this.loading = true
+    this.isLoading = true
 
     this.authenticationService
       .login(this.controls.username.value, this.controls.password.value)
@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
         },
         (error) => {
           this.alertService.error(error)
-          this.loading = false
+          this.isLoading = false
         },
       )
   }

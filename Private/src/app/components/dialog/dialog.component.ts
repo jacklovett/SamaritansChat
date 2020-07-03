@@ -1,11 +1,11 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject } from '@angular/core'
+import { MAT_DIALOG_DATA } from '@angular/material/dialog'
 
 export interface DialogProps {
-  title: string;
-  content: string;
-  successLabel: string;
-  cancelLabel: string;
+  title: string
+  content: string
+  successLabel: string
+  cancelLabel: string
 }
 
 @Component({
@@ -14,9 +14,9 @@ export interface DialogProps {
   styleUrls: ['./dialog.component.scss'],
 })
 export class DialogComponent {
-  props: DialogProps;
-  SUBMIT_VALUE = 'CONFIRMED';
+  props: DialogProps
+  SUBMIT_VALUE = 'CONFIRMED'
   constructor(@Inject(MAT_DIALOG_DATA) public data: DialogProps) {
-    this.props = data;
+    this.props = data
   }
 }
