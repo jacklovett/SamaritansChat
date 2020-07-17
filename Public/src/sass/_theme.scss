@@ -5,15 +5,15 @@
 $app-background: mat-palette($mat-green, 200, 500);
 
 $app-primary: mat-palette($mat-teal, 700);
-$app-accent:  mat-palette($mat-amber, 500, A200);
-$app-warn:    mat-palette($mat-deep-orange);
+$app-accent: mat-palette($mat-amber, 500, A200);
+$app-warn: mat-palette($mat-deep-orange);
 
 $app-theme: mat-light-theme($app-primary, $app-accent, $app-warn);
 
 @include angular-material-theme($app-theme);
 
 // Export theme colors
-$white: #FFFFFF;
+$white: #ffffff;
 $background-color: darken($white, 5%);
 $nav-background: darken(mat-color($app-primary), 10%);
 
