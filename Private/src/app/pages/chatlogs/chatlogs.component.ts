@@ -11,7 +11,6 @@ import { Subscription } from 'rxjs'
 @Component({
   selector: 'app-chatlogs',
   templateUrl: './chatlogs.component.html',
-  styleUrls: ['./chatlogs.component.scss'],
 })
 export class ChatLogsComponent implements OnInit, OnDestroy {
   isLoading = false
