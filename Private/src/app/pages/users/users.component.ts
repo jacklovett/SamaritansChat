@@ -13,7 +13,6 @@ import { ColumnDetails } from 'src/app/components/table/columnDetails'
 @Component({
   selector: 'app-users',
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss'],
 })
 export class UsersComponent implements OnInit, OnDestroy {
   isLoading = false
