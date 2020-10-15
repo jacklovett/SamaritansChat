@@ -1,0 +1,7 @@
+frontend: Private/**/* || Public/**/*
+
+backend: CoreModule/**/*
+
+public: Public/**/*
+
+private: Private/**/*
