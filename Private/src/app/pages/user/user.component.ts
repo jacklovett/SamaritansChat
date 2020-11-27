@@ -177,12 +177,13 @@ export class UserComponent implements OnInit, OnDestroy {
       (user) => {
         this.user = user
         this.populateForm(this.user)
+        this.isLoading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.isLoading = false
       },
     )
-    this.isLoading = false
   }
 
   private edit() {

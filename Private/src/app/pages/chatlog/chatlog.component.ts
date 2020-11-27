@@ -81,12 +81,13 @@ export class ChatLogComponent implements OnDestroy {
       .subscribe(
         (messages) => {
           this.chatMessages = messages
+          this.isLoading = false
         },
         (error) => {
           this.alertService.error(error)
+          this.isLoading = false
         },
       )
-    this.isLoading = false
   }
 
   onSubmit() {
@@ -109,12 +110,13 @@ export class ChatLogComponent implements OnDestroy {
           })
           this.router.navigate(['chatlogs'])
         }
+        this.isLoading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.isLoading = false
       },
     )
-    this.isLoading = false
   }
 
   toggleConversation() {

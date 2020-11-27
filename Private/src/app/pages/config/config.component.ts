@@ -98,12 +98,13 @@ export class ConfigComponent implements OnInit, OnDestroy {
         this.chatConfig = config
         this.populateForm(this.chatConfig)
         this.toggleTimeRestrictions()
+        this.isLoading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.isLoading = false
       },
     )
-    this.isLoading = false
   }
 
   onSubmit() {
@@ -124,13 +125,13 @@ export class ConfigComponent implements OnInit, OnDestroy {
     this.configService.update(config).subscribe(
       (response) => {
         this.alertService.handleResponse(response)
+        this.isLoading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.isLoading = false
       },
     )
-
-    this.isLoading = false
   }
 
   toggleTimeRestrictions() {
