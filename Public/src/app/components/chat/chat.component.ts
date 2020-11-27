@@ -115,12 +115,13 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.chatService.fetchChatMessages(this.username).subscribe(
       (messages) => {
         this.chatMessages = messages
+        this.loading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.loading = false
       },
     )
-    this.loading = false
   }
 
   private handleMessage = (message: ChatMessage) => {
