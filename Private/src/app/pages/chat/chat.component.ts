@@ -90,12 +90,13 @@ export class ChatComponent implements OnInit, OnDestroy {
       .subscribe(
         (messages) => {
           this.chatMessages = messages
+          this.isLoading = false
         },
         (error) => {
           this.alertService.error(error)
+          this.isLoading = false
         },
       )
-    this.isLoading = false
   }
 
   private loadConversation(username: string) {

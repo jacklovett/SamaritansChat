@@ -72,12 +72,13 @@ export class ChatLogsComponent implements OnInit, OnDestroy {
     this.chatLogsSubscription = this.chatLogService.get().subscribe(
       (logs) => {
         this.chatLogs = logs
+        this.isLoading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.isLoading = false
       },
     )
-    this.isLoading = false
   }
 
   goToTranscript = (id: number) => this.router.navigate(['transcript', id])

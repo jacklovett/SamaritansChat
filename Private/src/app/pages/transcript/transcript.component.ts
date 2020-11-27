@@ -15,6 +15,8 @@ import { Rating, ratings } from 'src/app/models/chat.log'
   styleUrls: ['./transcript.component.scss'],
 })
 export class TranscriptComponent implements OnInit, OnDestroy {
+  isLoading = false
+
   transcriptId: number
   transcript: Transcript
 
@@ -27,8 +29,6 @@ export class TranscriptComponent implements OnInit, OnDestroy {
 
   transcriptSubscription: Subscription
   transcriptIdSubscription: Subscription
-
-  isLoading = false
 
   constructor(
     private route: ActivatedRoute,
@@ -53,12 +53,13 @@ export class TranscriptComponent implements OnInit, OnDestroy {
         (transcript) => {
           this.transcript = transcript
           this.populateComponent(transcript)
+          this.isLoading = false
         },
         (error) => {
           this.alertService.error(error)
+          this.isLoading = false
         },
       )
-    this.isLoading = false
   }
 
   populateComponent(transcript: Transcript) {

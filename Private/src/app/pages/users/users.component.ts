@@ -16,7 +16,6 @@ import { ColumnDetails } from 'src/app/components/table/columnDetails'
 })
 export class UsersComponent implements OnInit, OnDestroy {
   isLoading = false
-
   users: ListUser[] = []
 
   columnDetails: ColumnDetails[] = [
@@ -127,18 +126,17 @@ export class UsersComponent implements OnInit, OnDestroy {
           contactNumber: user.contactNumber,
           lastActive: user.lastActive,
         }))
+        this.isLoading = false
       },
       (error) => {
         this.alertService.error(error)
+        this.isLoading = false
       },
     )
-    this.isLoading = false
   }
 
   private deleteUser(userId: number) {
-    this.isLoading = true
     this.userService.delete(userId)
-    this.isLoading = false
   }
 
   ngOnDestroy() {
