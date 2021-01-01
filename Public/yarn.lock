@@ -5942,10 +5942,10 @@ next-tick@~1.0.0:
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.0.0.tgz#ca86d1fe8828169b0120208e3dc8424b9db8342c"
   integrity sha1-yobR/ogoFpsBICCOPchCS524NCw=
 
-ng-recaptcha@6.0.2:
-  version "6.0.2"
-  resolved "https://registry.yarnpkg.com/ng-recaptcha/-/ng-recaptcha-6.0.2.tgz#03beb2bf906fc42aff2df41ae84ae220e20d48fd"
-  integrity sha512-m5nxRTugID+N7/3pMbpAXuwid5Q64DZobkTZyA+Zci5h6ynU+MH58aSmbZoG0J07108/F8Oy2RQDklcxw1u32A==
+ng-recaptcha@6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/ng-recaptcha/-/ng-recaptcha-6.1.0.tgz#035eda6974191dd44a406a00d42addc135d7c6d0"
+  integrity sha512-qAIHKqvqxKzDy9gcVgJuCp7C/i0EuXLjXPcLL/sLo5wp9QbKLnc4+mhqbJ3K3DIWlQjtp91a7of+iSaSftERUQ==
   dependencies:
     tslib "^1.9.0 || ^2.0.0"
   optionalDependencies:
