@@ -1222,26 +1222,26 @@
     semver "7.3.2"
     semver-intersect "1.4.0"
 
-"@stomp/ng2-stompjs@7.2.0":
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/@stomp/ng2-stompjs/-/ng2-stompjs-7.2.0.tgz#2107b7e3d416dc0c69cce2d39f45e1f17261d7fb"
-  integrity sha512-sQO1a7stOIRlj1DO8W2Gix7bUYiw8eU1OzKBLVN+hOTjjYQt93H3ph9ifHvRQlBLMPR/RZnQ3LgUxJVcrhwodQ==
+"@stomp/ng2-stompjs@8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@stomp/ng2-stompjs/-/ng2-stompjs-8.0.0.tgz#7404aa699fb9fcf089f50633136a743b31b5cea9"
+  integrity sha512-1TTwdK7aUaRLfewG2FOqd3ZeIyIchKwOBzJytvUckjrBbpdeAXLXY0mCBFczoY16fSsxiAnZfJffFicStD+Dug==
   dependencies:
-    "@stomp/rx-stomp" "^0.3.0 >=0.3.0"
+    "@stomp/rx-stomp" "^1.0.0 >=1.0.1"
     tslib "^1.9.0"
 
-"@stomp/rx-stomp@^0.3.0 >=0.3.0":
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/@stomp/rx-stomp/-/rx-stomp-0.3.5.tgz#3739f44f3f098ddfaf4f46d1f3b6541e3a1d4224"
-  integrity sha512-oEaMkq2IejzVKFg8EtSTe0xnyhPVWJxuQmnuTQStC3EAPcJgH9eQziJc0BR9tUvm6m962v4LPvyJKlzxOJhFWg==
+"@stomp/rx-stomp@^1.0.0 >=1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stomp/rx-stomp/-/rx-stomp-1.0.1.tgz#0ed57a371ae9f16cb16f9c202e06e7d8f5d1fff4"
+  integrity sha512-USW5VW41jCbWxcwCsJ67j+ZCkmQv3L9PUXOoaNRF3Rh9bgmJ6V7ShE+Q5UiZ4VAngKsaFlHhiImak/RisisfWg==
   dependencies:
-    "@stomp/stompjs" "^5.1.0 >=5.4.2"
+    "@stomp/stompjs" "^6.0.0"
     angular2-uuid "^1.1.1"
 
-"@stomp/stompjs@^5.1.0 >=5.4.2":
-  version "5.4.4"
-  resolved "https://registry.yarnpkg.com/@stomp/stompjs/-/stompjs-5.4.4.tgz#f51d2edf9a00fac645dde3a494738d96ca17e5aa"
-  integrity sha512-RIzQ7MLRSJLUpTHcje1ZclnHH982amJSKC9bDxGO0wyu5OF9ROuuiLf7TxKxo1zUu7lGEYNedg9SEi87uMWDqg==
+"@stomp/stompjs@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@stomp/stompjs/-/stompjs-6.0.0.tgz#707f54032984bf74a1956abf1e5421d7b5bb8e19"
+  integrity sha512-mMTltM/I9MkoOQip89jh/8P53IC50I4T87/chSxJDX4aNInRSpKxSZ/f7umjWPvYfrqcRTpFmKa7Z4cp2iojng==
 
 "@types/glob@^7.1.1":
   version "7.1.3"
