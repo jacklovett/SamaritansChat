@@ -34,7 +34,7 @@
     "@angular/cli": "10.2.3",
     "@angular/compiler-cli": "10.2.4",
     "@angular/language-service": "10.2.4",
-    "@types/jasmine": "3.6.4",
+    "@types/jasmine": "3.6.9",
     "@types/jasminewd2": "2.0.8",
     "@types/node": "12.19.15",
     "@types/stompjs": "2.3.4",
