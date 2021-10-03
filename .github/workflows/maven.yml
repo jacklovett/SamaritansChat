@@ -7,9 +7,6 @@ on:
   pull_request:
     branches: [ master ]
 
-
-working_directory: ~/SamaritansChat/CoreModule
-
 jobs:
   build:
     name: Build
