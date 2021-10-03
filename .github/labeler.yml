@@ -3,3 +3,5 @@ backend: CoreModule/**/*
 public: Public/**/*
 
 private: Private/**/*
+
+CI/CD: .github/workflows/**/*
