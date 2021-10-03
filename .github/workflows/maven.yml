@@ -12,6 +12,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
+    working_directory: ~/SamaritansChat/CoreModule
+
     services:
       postgres:
         image: postgres
@@ -45,6 +47,8 @@ jobs:
   test:
     name: JUnit Tests
     runs-on: ubuntu-latest
+
+    working_directory: ~/SamaritansChat/CoreModule
 
     services:
       postgres:
