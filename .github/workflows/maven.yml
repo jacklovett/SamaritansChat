@@ -25,9 +25,9 @@ jobs:
           - 3306:3306
 
     steps:
-    working-directory: ./CoreModule
     - uses: actions/checkout@v2
     - name: Set up JDK 14
+    working-directory: ./CoreModule
       uses: actions/setup-java@v1
       with:
         java-version: 14
