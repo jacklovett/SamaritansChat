@@ -8,7 +8,6 @@ on:
     branches: [ master ]
 
 jobs:
-  working-directory: ./CoreModule
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -26,6 +25,7 @@ jobs:
           - 3306:3306
 
     steps:
+    working-directory: ./CoreModule
     - uses: actions/checkout@v2
     - name: Set up JDK 14
       uses: actions/setup-java@v1
