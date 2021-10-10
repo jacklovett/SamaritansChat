@@ -1,8 +1,13 @@
 package com.samaritans.samaritanscoremodule.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -15,13 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
@@ -36,8 +38,8 @@ import com.samaritans.samaritanscoremodule.responses.NotificationResponse;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.NotificationTypeEnum;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NotificationServiceTest {
+@ExtendWith(MockitoExtension.class)
+class NotificationServiceTest {
 
 	private static final Long ID = 1l;
 	private static final String TOPIC_ENDPOINT = "/topic/notifications.";
@@ -58,8 +60,8 @@ public class NotificationServiceTest {
 	@InjectMocks
 	private NotificationService notificationService;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		boUser = new BoUser();
 		boUser.setId(ID);
@@ -81,7 +83,7 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	public void testFindNotifications() {
+	void testFindNotifications() {
 
 		when(notificationDao.findNotificationByUserId(ID)).thenReturn(notificationResponses);
 
@@ -93,7 +95,7 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	public void testFindNotificationsWhenEmpty() {
+	void testFindNotificationsWhenEmpty() {
 
 		final List<NotificationResponse> response = notificationService.findNotifications(ID);
 
@@ -102,7 +104,7 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	public void testAddNotification() {
+	void testAddNotification() {
 
 		when(boUserDao.findUserByUsernameOrEmail(AppConstants.SAMARITANS_USERNAME)).thenReturn(Optional.of(boUser));
 
@@ -125,20 +127,19 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	public void testAddNotificationWhenRecipientNotSpecified() {
+	void testAddNotificationWhenRecipientNotSpecified() {
 
 		notification = new Notification(NotificationTypeEnum.NEW_USER_CONNECTED, USERNAME);
 
 		notificationService.addNotification(NotificationTypeEnum.NEW_USER_CONNECTED, null, USERNAME);
 
-		verify(simpMessagingTemplate, never()).convertAndSend(Mockito.anyString(),
-				Mockito.any(NotificationResponse.class));
+		verify(simpMessagingTemplate, never()).convertAndSend(Mockito.anyString(), Mockito.any(NotificationResponse.class));
 		verify(notificationDao, never()).save(Mockito.any(Notification.class));
 
 	}
 
 	@Test
-	public void testAddNotificationWhenUserNotFound() {
+	void testAddNotificationWhenUserNotFound() {
 
 		when(boUserDao.findUserByUsernameOrEmail(AppConstants.SAMARITANS_USERNAME)).thenReturn(Optional.empty());
 
@@ -147,13 +148,12 @@ public class NotificationServiceTest {
 		notificationService.addNotification(NotificationTypeEnum.USER_DISCONNECTED, AppConstants.SAMARITANS_USERNAME,
 				USERNAME);
 
-		verify(simpMessagingTemplate, never()).convertAndSend(Mockito.anyString(),
-				Mockito.any(NotificationResponse.class));
+		verify(simpMessagingTemplate, never()).convertAndSend(Mockito.anyString(), Mockito.any(NotificationResponse.class));
 		verify(notificationDao, never()).save(Mockito.any(Notification.class));
 	}
 
 	@Test
-	public void testUpdateNotification() {
+	void testUpdateNotification() {
 
 		when(notificationDao.findById(ID)).thenReturn(notification);
 
@@ -163,21 +163,20 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	public void testUpdateNotificationWhenNotificationNotFound() {
+	void testUpdateNotificationWhenNotificationNotFound() {
 		notificationService.updateNotification(notificationRequest);
 		verify(notificationDao, never()).save(Mockito.any(Notification.class));
 	}
 
 	@Test
-	public void testDeleteNotification() {
+	void testDeleteNotification() {
 		final ApiResponse response = notificationService.deleteNotification(ID);
 		assertEquals(new ApiResponse(true, "Notification deleted"), response);
 	}
 
 	@Test
-	public void testDeleteNotificationFails() {
-		doThrow(new SamaritansException("Unable to delete notification")).when(notificationDao)
-				.deleteNotificationById(ID);
+	void testDeleteNotificationFails() {
+		doThrow(new SamaritansException("Unable to delete notification")).when(notificationDao).deleteNotificationById(ID);
 		final ApiResponse response = notificationService.deleteNotification(ID);
 		assertEquals(new ApiResponse(false, "Unable to delete notfication"), response);
 	}

@@ -1,17 +1,19 @@
 package com.samaritans.samaritanscoremodule.service;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.samaritans.samaritanscoremodule.dao.BoUserDao;
@@ -25,8 +27,8 @@ import com.samaritans.samaritanscoremodule.requests.UserRequest;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
 import com.samaritans.samaritanscoremodule.utils.RoleEnum;
 
-@RunWith(MockitoJUnitRunner.class)
-public class BOUserServiceTest {
+@ExtendWith(MockitoExtension.class)
+class BOUserServiceTest {
 
 	private static final Long ID = 1L;
 	private static final String USERNAME = "username";
@@ -53,8 +55,8 @@ public class BOUserServiceTest {
 	@InjectMocks
 	private BoUserService boUserService;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		userRequest = new UserRequest();
 		userRequest.setFirstName(FIRST_NAME);
@@ -86,7 +88,7 @@ public class BOUserServiceTest {
 	}
 
 	@Test
-	public void testRegisterUser() {
+	void testRegisterUser() {
 
 		when(passwordEncoder.encode(SECRET)).thenReturn(ENCODED_SECRET);
 		when(roleDao.findRoleById(RoleEnum.USER.getId())).thenReturn(userRole);
@@ -98,7 +100,7 @@ public class BOUserServiceTest {
 	}
 
 	@Test
-	public void testUpdateUser() {
+	void testUpdateUser() {
 
 		userRequest.setId(ID);
 		userRequest.setAdmin(false);
@@ -113,7 +115,7 @@ public class BOUserServiceTest {
 	}
 
 	@Test
-	public void testUpdatePassword() {
+	void testUpdatePassword() {
 
 		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 		when(passwordEncoder.encode(SECRET)).thenReturn(ENCODED_SECRET);
@@ -125,14 +127,15 @@ public class BOUserServiceTest {
 
 	}
 
-	@Test(expected = ResourceNotFoundException.class)
-	public void testUpdatePasswordWhenUserNotFound() {
+	@Test
+	void testUpdatePasswordWhenUserNotFound() {
 		when(boUserDao.findUserById(ID)).thenReturn(null);
-		boUserService.updatePassword(userDetailsRequest);
+
+		assertThrows(ResourceNotFoundException.class, () -> boUserService.updatePassword(userDetailsRequest));
 	}
 
 	@Test
-	public void checkCurrentPassword() {
+	void checkCurrentPassword() {
 
 		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 		when(passwordEncoder.matches(SECRET, ENCODED_SECRET)).thenReturn(true);
@@ -143,7 +146,7 @@ public class BOUserServiceTest {
 	}
 
 	@Test
-	public void checkCurrentPasswordWhenWrong() {
+	void checkCurrentPasswordWhenWrong() {
 
 		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 		when(passwordEncoder.matches(SECRET, ENCODED_SECRET)).thenReturn(false);
@@ -154,7 +157,7 @@ public class BOUserServiceTest {
 	}
 
 	@Test
-	public void checkCurrentPasswordWhenUserNotFound() {
+	void checkCurrentPasswordWhenUserNotFound() {
 
 		when(boUserDao.findUserById(ID)).thenReturn(null);
 

@@ -1,25 +1,29 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +47,8 @@ import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
 import com.samaritans.samaritanscoremodule.utils.MessageType;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ChatControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ChatControllerTest {
 
 	private static final String USERNAME = "jlove09876";
 	private static final String MESSAGE_CONTENT = "I'm a little teapot!";
@@ -62,8 +66,8 @@ public class ChatControllerTest {
 	@InjectMocks
 	private ChatController chatController;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		gson = new GsonBuilder().serializeNulls().create();
 
@@ -85,7 +89,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testSendMessage() {
+	void testSendMessage() {
 
 		message.setSender(AppConstants.SAMARITANS_USERNAME);
 		message.setRecipient(USERNAME);
@@ -101,32 +105,35 @@ public class ChatControllerTest {
 		verify(chatService, times(1)).sendMessage(message);
 	}
 
-	@Test(expected = SamaritansException.class)
-	public void testSendMessageHandlesException() {
+	@Test
+	void testSendMessageHandlesException() {
 
 		doThrow(new MessagingException("Error")).when(chatService).sendMessage(message);
 
 		chatController.sendMessage(message);
+
+		assertThrows(SamaritansException.class, () -> chatController.sendMessage(message));
 	}
 
-	@Test(expected = SamaritansException.class)
-	public void testDisconnectHandlesException() {
+	@Test
+	void testDisconnectHandlesException() {
 
 		doThrow(new MessagingException("Error")).when(chatService).disconnect(message);
 
 		chatController.disconnect(message);
+
+		assertThrows(SamaritansException.class, () -> chatController.disconnect(message));
 	}
 
 	@Test
-	public void testGetChatUsers() throws Exception {
+	void testGetChatUsers() throws Exception {
 
 		String chatUsersJson = gson.toJson(chatUsers);
 
 		when(chatService.getChatUsers(AppConstants.SAMARITANS_USERNAME)).thenReturn(chatUsersJson);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders
-				.get("/api/chat/users/" + AppConstants.SAMARITANS_USERNAME).accept(MediaType.APPLICATION_JSON)
-				.contentType(MediaType.APPLICATION_JSON);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/users/" + AppConstants.SAMARITANS_USERNAME)
+				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
@@ -139,7 +146,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testGetChatUsersWhenEmpty() throws Exception {
+	void testGetChatUsersWhenEmpty() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/users/" + USERNAME)
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON);
@@ -154,7 +161,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testAddActiveUser() {
+	void testAddActiveUser() {
 
 		message.setSender(USERNAME);
 		message.setType(MessageType.JOIN);
@@ -167,7 +174,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testAddActiveUserWhenMessageIsNotAJoinMessage() {
+	void testAddActiveUserWhenMessageIsNotAJoinMessage() {
 
 		message.setSender(USERNAME);
 		message.setType(MessageType.CHAT);
@@ -180,7 +187,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testUpdateUnreadMessages() throws Exception {
+	void testUpdateUnreadMessages() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/chat/updateUnreadMessages")
 				.accept(MediaType.APPLICATION_JSON).content(USERNAME).contentType(MediaType.APPLICATION_JSON);
@@ -194,10 +201,9 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testIsChatAvailable() throws Exception {
+	void testIsChatAvailable() throws Exception {
 
-		ChatAvailabilityResponse chatAvailabilityResponse = new ChatAvailabilityResponse(
-				ChatAvailabilityEnum.AVAILABLE);
+		ChatAvailabilityResponse chatAvailabilityResponse = new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE);
 
 		when(chatService.isChatAvailable()).thenReturn(chatAvailabilityResponse);
 
@@ -214,7 +220,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testGetMessages() throws Exception {
+	void testGetMessages() throws Exception {
 
 		when(chatService.getMessagesByUsername(USERNAME)).thenReturn(conversation);
 
@@ -231,7 +237,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testGetMessagesWhenNoMessages() throws Exception {
+	void testGetMessagesWhenNoMessages() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/chat/messages/" + USERNAME)
 				.accept(MediaType.APPLICATION_JSON).content(USERNAME).contentType(MediaType.APPLICATION_JSON);
@@ -246,7 +252,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testStartConversation() throws Exception {
+	void testStartConversation() throws Exception {
 
 		ApiResponse expectedResponse = new ApiResponse(true, USERNAME + " added to contacts");
 
@@ -265,7 +271,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testIsVolunteerActive() throws Exception {
+	void testIsVolunteerActive() throws Exception {
 
 		ApiResponse expectedResponse = new ApiResponse(true, "Volunteer is active");
 
@@ -283,7 +289,7 @@ public class ChatControllerTest {
 	}
 
 	@Test
-	public void testIsVolunteerActiveBadRequest() throws Exception {
+	void testIsVolunteerActiveBadRequest() throws Exception {
 
 		ApiResponse expectedResponse = new ApiResponse(false,
 				"No username provided. Unable to check if volunteer is active");

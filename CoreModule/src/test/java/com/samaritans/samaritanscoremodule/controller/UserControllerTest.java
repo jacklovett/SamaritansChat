@@ -1,20 +1,23 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import static org.mockito.Mockito.when;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +46,9 @@ import com.google.gson.GsonBuilder;
  * @author jackl
  *
  */
-@RunWith(MockitoJUnitRunner.class)
-public class UserControllerTest {
+
+@ExtendWith(MockitoExtension.class)
+class UserControllerTest {
 
 	private static final Long ID = 1L;
 	private static final String USERNAME = "username";
@@ -80,8 +84,8 @@ public class UserControllerTest {
 	@InjectMocks
 	private UserController userController;
 
-	@Before
-	public void setUp() throws Exception {
+	@BeforeEach
+	void setUp() throws Exception {
 
 		gson = new GsonBuilder().serializeNulls().create();
 
@@ -122,12 +126,11 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testGetUsers() throws Exception {
+	void testGetUsers() throws Exception {
 
 		when(boUserDao.findAllUsers()).thenReturn(users);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/")
-				.contentType(MediaType.APPLICATION_JSON);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/").contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
@@ -139,14 +142,13 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testGetUsersReturnsNoUsers() throws Exception {
+	void testGetUsersReturnsNoUsers() throws Exception {
 
 		users.clear();
 
 		when(boUserDao.findAllUsers()).thenReturn(users);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/")
-				.contentType(MediaType.APPLICATION_JSON);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.get("/api/users/").contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
@@ -159,7 +161,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testGetUserById() throws Exception {
+	void testGetUserById() throws Exception {
 
 		when(boUserDao.findUserById(ID)).thenReturn(boUser);
 
@@ -176,7 +178,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testGeUserByIdNotFound() throws Exception {
+	void testGeUserByIdNotFound() throws Exception {
 
 		when(boUserDao.findUserById(ID)).thenReturn(null);
 
@@ -192,7 +194,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testRegisterUser() throws Exception {
+	void testRegisterUser() throws Exception {
 
 		String json = gson.toJson(registerRequest);
 
@@ -210,7 +212,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testRegisterUserWhenUsernameAlreadyExists() throws Exception {
+	void testRegisterUserWhenUsernameAlreadyExists() throws Exception {
 
 		when(boUserDao.existsByUsername(registerRequest.getUsername())).thenReturn(true);
 
@@ -230,7 +232,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testRegisterUserWhenEmailAlreadyExists() throws Exception {
+	void testRegisterUserWhenEmailAlreadyExists() throws Exception {
 
 		when(boUserDao.existsByEmail(registerRequest.getEmail())).thenReturn(true);
 
@@ -245,12 +247,11 @@ public class UserControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		assertEquals(gson.toJson(new ApiResponse(false, "Email Address already in use!")),
-				response.getContentAsString());
+		assertEquals(gson.toJson(new ApiResponse(false, "Email Address already in use!")), response.getContentAsString());
 	}
 
 	@Test
-	public void testUpdateUser() throws Exception {
+	void testUpdateUser() throws Exception {
 
 		String json = gson.toJson(userRequest);
 
@@ -267,7 +268,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testDeleteUser() throws Exception {
+	void testDeleteUser() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/users/delete/" + ID);
 
@@ -281,7 +282,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testUpdatePassword() throws Exception {
+	void testUpdatePassword() throws Exception {
 
 		userDetailsRequest.setValue(SECRET);
 
@@ -296,12 +297,11 @@ public class UserControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		assertEquals(gson.toJson(new ApiResponse(true, "Password changed successfully!")),
-				response.getContentAsString());
+		assertEquals(gson.toJson(new ApiResponse(true, "Password changed successfully!")), response.getContentAsString());
 	}
 
 	@Test
-	public void testUpdatePasswordWhenNoUserId() throws Exception {
+	void testUpdatePasswordWhenNoUserId() throws Exception {
 
 		String json = gson.toJson(new UserDetailsRequest());
 
@@ -320,7 +320,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testUpdatePasswordWhenNoPassword() throws Exception {
+	void testUpdatePasswordWhenNoPassword() throws Exception {
 
 		userDetailsRequest.setValue(null);
 
@@ -341,7 +341,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckCurrentPassword() throws Exception {
+	void testCheckCurrentPassword() throws Exception {
 
 		userDetailsRequest.setValue(SECRET);
 
@@ -364,7 +364,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckIsUsernameAvailableWhenAlreadyExists() throws Exception {
+	void testCheckIsUsernameAvailableWhenAlreadyExists() throws Exception {
 
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
 
@@ -381,7 +381,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckIsUsernameAvailableWhenUserIdIsNull() {
+	void testCheckIsUsernameAvailableWhenUserIdIsNull() {
 
 		userDetailsRequest.setUserId(null);
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
@@ -397,7 +397,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckIsUsernameAvailableWhenTheSameAsUsers() {
+	void testCheckIsUsernameAvailableWhenTheSameAsUsers() {
 
 		userDetailsRequest.setValue(USERNAME);
 		when(boUserDao.findUserById(ID)).thenReturn(boUser);
@@ -411,7 +411,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckIsEmailAvailableWhenAlreadyExists() throws Exception {
+	void testCheckIsEmailAvailableWhenAlreadyExists() throws Exception {
 
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
 
@@ -428,7 +428,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckIsEmailAvailableWhenUserIdIsNull() {
+	void testCheckIsEmailAvailableWhenUserIdIsNull() {
 
 		userDetailsRequest.setUserId(null);
 		userDetailsRequest.setValue(NEW_USERNAME_EMAIL);
@@ -444,7 +444,7 @@ public class UserControllerTest {
 	}
 
 	@Test
-	public void testCheckIsEmailAvailableWhenTheSameAsUsers() {
+	void testCheckIsEmailAvailableWhenTheSameAsUsers() {
 
 		userDetailsRequest.setValue(EMAIL);
 

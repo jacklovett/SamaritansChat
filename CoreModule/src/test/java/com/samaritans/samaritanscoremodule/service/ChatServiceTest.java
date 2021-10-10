@@ -1,9 +1,14 @@
 package com.samaritans.samaritanscoremodule.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -18,13 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import com.google.gson.Gson;
@@ -45,8 +47,8 @@ import com.samaritans.samaritanscoremodule.utils.ChatAvailabilityEnum;
 import com.samaritans.samaritanscoremodule.utils.MessageType;
 import com.samaritans.samaritanscoremodule.utils.NotificationTypeEnum;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ChatServiceTest {
+@ExtendWith(MockitoExtension.class)
+class ChatServiceTest {
 
 	private static final Long ID = 1L;
 	private static final String TOPIC = "/topic/";
@@ -86,8 +88,8 @@ public class ChatServiceTest {
 	@InjectMocks
 	private ChatService chatService;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		gson = new Gson();
 
@@ -128,7 +130,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testSendMessageAsChatUser() {
+	void testSendMessageAsChatUser() {
 
 		message.setRecipient(AppConstants.SAMARITANS_USERNAME);
 
@@ -147,7 +149,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testSendMessageAsSamaritansUser() {
+	void testSendMessageAsSamaritansUser() {
 
 		chatService.setConversations(conversations);
 
@@ -166,18 +168,20 @@ public class ChatServiceTest {
 		verify(simpMessagingTemplate, times(1)).convertAndSend(TOPIC + USERNAME, responseMessage);
 	}
 
-	@Test(expected = SamaritansException.class)
-	public void testSendMessageWhenNoConversationFound() {
+	@Test
+	void testSendMessageWhenNoConversationFound() {
 
 		chatService.setConversations(new HashMap<>());
 		chatService.sendMessage(message);
 
 		verify(chatDao, never()).save(Mockito.any(Message.class));
 		verify(simpMessagingTemplate, never()).convertAndSend(Mockito.anyString(), Mockito.any(Message.class));
+
+		assertThrows(SamaritansException.class, () -> chatService.sendMessage(message));
 	}
 
 	@Test
-	public void testDisconnectSamaritansUser() {
+	void testDisconnectSamaritansUser() {
 
 		activeSamaritansUsers.add(SAMARITANS_USER);
 		chatService.setActiveSamaritansUsers(activeSamaritansUsers);
@@ -207,7 +211,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testDisconnectChatUser() {
+	void testDisconnectChatUser() {
 
 		chatUser.setUsername(USERNAME);
 
@@ -235,7 +239,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testDisconnectWhenConversationNotFoundAndDeleteUser() {
+	void testDisconnectWhenConversationNotFoundAndDeleteUser() {
 
 		chatUser.setUsername(USERNAME);
 
@@ -262,7 +266,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testDisconnectWhenConversationNotFoundWhenMessagesExist() {
+	void testDisconnectWhenConversationNotFoundWhenMessagesExist() {
 
 		chatUser.setUsername(USERNAME);
 
@@ -293,8 +297,8 @@ public class ChatServiceTest {
 
 	}
 
-	@Test(expected = SamaritansException.class)
-	public void testDisconnectIncorrectMessageType() {
+	@Test
+	void testDisconnectIncorrectMessageType() {
 
 		message.setSender(USERNAME);
 		message.setRecipient(AppConstants.SAMARITANS_USERNAME);
@@ -302,10 +306,12 @@ public class ChatServiceTest {
 
 		chatService.disconnect(message);
 
+		assertThrows(SamaritansException.class, () -> chatService.disconnect(message));
+
 	}
 
 	@Test
-	public void testAddActiveUserWhenSamaritansUserAndChatIsAvailable() {
+	void testAddActiveUserWhenSamaritansUserAndChatIsAvailable() {
 
 		when(userService.getUserByUsername(SAMARITANS_USER)).thenReturn(boUser);
 		when(chatConfigDao.findConfig()).thenReturn(config);
@@ -328,7 +334,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testAddActiveUserWhenSamaritansUserAndChatIsUnAvailable() {
+	void testAddActiveUserWhenSamaritansUserAndChatIsUnAvailable() {
 
 		when(userService.getUserByUsername(SAMARITANS_USER)).thenReturn(boUser);
 
@@ -349,7 +355,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testAddActiveUserWhenSamaritansUserAlreadyConnected() {
+	void testAddActiveUserWhenSamaritansUserAlreadyConnected() {
 
 		activeSamaritansUsers.add(SAMARITANS_USER);
 
@@ -370,7 +376,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testAddActiveUserWhenChatUser() {
+	void testAddActiveUserWhenChatUser() {
 
 		chatUser.setUsername(USERNAME);
 
@@ -396,7 +402,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testAddActiveUserWhenChatUserAlreadyConnected() {
+	void testAddActiveUserWhenChatUserAlreadyConnected() {
 
 		activeUsers.add(USERNAME);
 
@@ -416,7 +422,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testGetChatUsers() {
+	void testGetChatUsers() {
 
 		conversations.put(USERNAME_2, SAMARITANS_USER);
 		chatService.setConversations(conversations);
@@ -432,7 +438,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testGetChatUsersWhenEmpty() {
+	void testGetChatUsersWhenEmpty() {
 
 		conversations = new HashMap<>();
 		chatService.setConversations(conversations);
@@ -444,7 +450,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testIsChatAvailableFailsWhenNoVolunteers() {
+	void testIsChatAvailableFailsWhenNoVolunteers() {
 
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
@@ -459,7 +465,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testIsChatAvailableSuccess() {
+	void testIsChatAvailableSuccess() {
 
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
@@ -474,7 +480,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testIsChatAvailableWhenTimeUnavailable() {
+	void testIsChatAvailableWhenTimeUnavailable() {
 
 		config.setAvailableFrom(0);
 		config.setAvailableUntil(0);
@@ -492,7 +498,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testGetMessagesByUsername() {
+	void testGetMessagesByUsername() {
 
 		when(chatDao.findChatMessagesByUsername(USERNAME)).thenReturn(chatMessages);
 
@@ -506,7 +512,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testGetMessagesByUsernameWhenNoMessages() {
+	void testGetMessagesByUsernameWhenNoMessages() {
 
 		final List<Message> response = chatService.getMessagesByUsername(USERNAME);
 
@@ -516,7 +522,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testUpdateUnreadMessages() {
+	void testUpdateUnreadMessages() {
 
 		when(chatDao.updateSeenMessagesByUsername(USERNAME)).thenReturn(1);
 
@@ -526,7 +532,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testStartConversation() {
+	void testStartConversation() {
 
 		message.setType(MessageType.JOIN);
 
@@ -550,13 +556,14 @@ public class ChatServiceTest {
 
 	}
 
-	@Test(expected = SamaritansException.class)
-	public void testStartConversationWhenSamaritansUserNotConnected() {
+	@Test
+	void testStartConversationWhenSamaritansUserNotConnected() {
 		chatService.startConversation(conversationRequest);
+		assertThrows(SamaritansException.class, () -> chatService.startConversation(conversationRequest));
 	}
 
 	@Test
-	public void testStartConversationWhenChatUserNotActive() {
+	void testStartConversationWhenChatUserNotActive() {
 
 		activeSamaritansUsers.add(SAMARITANS_USER);
 		chatService.setActiveSamaritansUsers(activeSamaritansUsers);
@@ -567,7 +574,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testStartConversationWhenConversationInProgress() {
+	void testStartConversationWhenConversationInProgress() {
 
 		activeUsers.add(USERNAME);
 		chatService.setActiveUsers(activeUsers);
@@ -584,7 +591,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testIsVolunteerAvailable() {
+	void testIsVolunteerAvailable() {
 
 		chatService.setConversations(conversations);
 		activeSamaritansUsers.add(SAMARITANS_USER);
@@ -596,7 +603,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testIsVolunteerAvailableWhenNoConversation() {
+	void testIsVolunteerAvailableWhenNoConversation() {
 
 		final ApiResponse response = chatService.isVolunteerActive(USERNAME);
 
@@ -604,7 +611,7 @@ public class ChatServiceTest {
 	}
 
 	@Test
-	public void testIsVolunteerAvailableWhenNotActive() {
+	void testIsVolunteerAvailableWhenNotActive() {
 
 		chatService.setConversations(conversations);
 
