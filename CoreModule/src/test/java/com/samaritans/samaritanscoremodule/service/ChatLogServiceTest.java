@@ -1,7 +1,11 @@
 package com.samaritans.samaritanscoremodule.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
@@ -9,14 +13,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.samaritans.samaritanscoremodule.dao.ChatDao;
 import com.samaritans.samaritanscoremodule.dao.ChatLogDao;
@@ -30,8 +31,8 @@ import com.samaritans.samaritanscoremodule.responses.TranscriptResponse;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.google.gson.Gson;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ChatLogServiceTest {
+@ExtendWith(MockitoExtension.class)
+class ChatLogServiceTest {
 
 	private static final Long ID = 1l;
 	private static final String USERNAME = "jlove0987";
@@ -61,8 +62,8 @@ public class ChatLogServiceTest {
 	@InjectMocks
 	private ChatLogService chatLogService;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		gson = new Gson();
 
@@ -109,7 +110,7 @@ public class ChatLogServiceTest {
 	}
 
 	@Test
-	public void testSaveChatLog() {
+	void testSaveChatLog() {
 
 		when(chatDao.findChatMessagesByUsername(USERNAME)).thenReturn(conversation);
 
@@ -124,7 +125,7 @@ public class ChatLogServiceTest {
 	}
 
 	@Test
-	public void testSaveChatLogWhenNoMessages() {
+	void testSaveChatLogWhenNoMessages() {
 
 		conversation.clear();
 
@@ -141,7 +142,7 @@ public class ChatLogServiceTest {
 	}
 
 	@Test
-	public void testFindChatLogs() {
+	void testFindChatLogs() {
 
 		when(chatLogDao.findAll()).thenReturn(chatLogResponses);
 
@@ -152,7 +153,7 @@ public class ChatLogServiceTest {
 	}
 
 	@Test
-	public void testFindTranscriptById() {
+	void testFindTranscriptById() {
 
 		when(transcriptDao.findById(ID)).thenReturn(transcriptResponse);
 

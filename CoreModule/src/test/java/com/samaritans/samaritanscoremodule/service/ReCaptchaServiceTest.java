@@ -1,17 +1,20 @@
 package com.samaritans.samaritanscoremodule.service;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 
@@ -20,8 +23,8 @@ import com.samaritans.samaritanscoremodule.exception.ReCaptchaUnavailableExcepti
 import com.samaritans.samaritanscoremodule.responses.ReCaptchaResponse;
 import com.samaritans.samaritanscoremodule.security.ReCaptchaSettings;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ReCaptchaServiceTest {
+@ExtendWith(MockitoExtension.class)
+class ReCaptchaServiceTest {
 
 	private static final String CLIENT_IP = "127.0.0.1";
 	private static final String TOKEN = "token";
@@ -38,8 +41,8 @@ public class ReCaptchaServiceTest {
 	@InjectMocks
 	private ReCaptchaService reCaptchaService;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		reCaptchaResponse = new ReCaptchaResponse();
 		reCaptchaResponse.setSuccess(true);
@@ -49,36 +52,43 @@ public class ReCaptchaServiceTest {
 		when(request.getHeader("X-Forwarded-For")).thenReturn(CLIENT_IP);
 	}
 
-	@Test(expected = InvalidReCaptchaException.class)
-	public void testVerifyResponseWhenSanityCheckFails() throws Exception {
+	@Test
+	void testVerifyResponseWhenSanityCheckFails() throws Exception {
 		reCaptchaService.verifyResponse("");
+
+		assertThrows(InvalidReCaptchaException.class, () -> reCaptchaService.verifyResponse(""));
 	}
 
 	@Test
-	public void testVerifyResponseSuccess() {
+	void testVerifyResponseSuccess() {
 		when(restTemplate.getForObject(Mockito.any(), Mockito.any())).thenReturn(reCaptchaResponse);
 		reCaptchaService.verifyResponse(TOKEN);
 	}
 
-	@Test(expected = InvalidReCaptchaException.class)
-	public void testVerifyResponseSuccessFalse() throws Exception {
+	@Test
+	void testVerifyResponseSuccessFalse() throws Exception {
 		reCaptchaResponse.setSuccess(false);
 		when(restTemplate.getForObject(Mockito.any(), Mockito.any())).thenReturn(reCaptchaResponse);
 		reCaptchaService.verifyResponse(TOKEN);
+
+		assertThrows(InvalidReCaptchaException.class, () -> reCaptchaService.verifyResponse(TOKEN));
 	}
 
-	@Test(expected = InvalidReCaptchaException.class)
-	public void testVerifyResponseWhenScoreBelowThreshold() throws Exception {
+	@Test
+	void testVerifyResponseWhenScoreBelowThreshold() throws Exception {
 		when(reCaptchaSettings.getThreshold()).thenReturn(0.8);
 		when(restTemplate.getForObject(Mockito.any(), Mockito.any())).thenReturn(reCaptchaResponse);
 		reCaptchaService.verifyResponse(TOKEN);
+
+		assertThrows(InvalidReCaptchaException.class, () -> reCaptchaService.verifyResponse(TOKEN));
 	}
 
-	@Test(expected = ReCaptchaUnavailableException.class)
-	public void testVerifyResponseWhenRestCallFails() throws Exception {
-		doThrow(new RestClientException("Rest call failed!")).when(restTemplate).getForObject(Mockito.any(),
-				Mockito.any());
+	@Test
+	void testVerifyResponseWhenRestCallFails() throws Exception {
+		doThrow(new RestClientException("Rest call failed!")).when(restTemplate).getForObject(Mockito.any(), Mockito.any());
 		reCaptchaService.verifyResponse(TOKEN);
+
+		assertThrows(ReCaptchaUnavailableException.class, () -> reCaptchaService.verifyResponse(TOKEN));
 	}
 
 }

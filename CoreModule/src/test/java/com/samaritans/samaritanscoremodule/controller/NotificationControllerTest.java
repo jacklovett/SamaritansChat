@@ -1,18 +1,21 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.mockito.Mockito.when;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -28,8 +31,8 @@ import com.samaritans.samaritanscoremodule.service.NotificationService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@RunWith(MockitoJUnitRunner.class)
-public class NotificationControllerTest {
+@ExtendWith(MockitoExtension.class)
+class NotificationControllerTest {
 
 	private static final Long ID = 1l;
 
@@ -44,8 +47,8 @@ public class NotificationControllerTest {
 	@InjectMocks
 	private NotificationController notificationController;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		gson = new GsonBuilder().serializeNulls().create();
 
@@ -60,7 +63,7 @@ public class NotificationControllerTest {
 	}
 
 	@Test
-	public void testGetNotifications() throws Exception {
+	void testGetNotifications() throws Exception {
 
 		when(notificationService.findNotifications(ID)).thenReturn(notificationResponses);
 
@@ -77,7 +80,7 @@ public class NotificationControllerTest {
 	}
 
 	@Test
-	public void testGetNotificationsWhenEmpty() throws Exception {
+	void testGetNotificationsWhenEmpty() throws Exception {
 
 		notificationResponses.clear();
 
@@ -97,7 +100,7 @@ public class NotificationControllerTest {
 	}
 
 	@Test
-	public void testDeleteNotification() throws Exception {
+	void testDeleteNotification() throws Exception {
 
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/notifications/delete/" + ID);
 

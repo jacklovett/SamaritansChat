@@ -1,19 +1,22 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +41,8 @@ import com.samaritans.samaritanscoremodule.service.ReCaptchaService;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
 import com.google.gson.Gson;
 
-@RunWith(MockitoJUnitRunner.class)
-public class AuthControllerTest {
+@ExtendWith(MockitoExtension.class)
+class AuthControllerTest {
 
 	private static final String USERNAME = "username";
 	private static final String SECRET = "secret";
@@ -70,8 +73,8 @@ public class AuthControllerTest {
 	@InjectMocks
 	private AuthController authController;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		this.mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
 
@@ -97,7 +100,7 @@ public class AuthControllerTest {
 	}
 
 	@Test
-	public void testAuthenticateUser() throws Exception {
+	void testAuthenticateUser() throws Exception {
 
 		when(authenticationService.authenticate(loginRequest))
 				.thenReturn(ResponseEntity.of(Optional.ofNullable(jwtResponse)));
@@ -112,7 +115,7 @@ public class AuthControllerTest {
 	}
 
 	@Test
-	public void testAuthenticateUserThrowsException() throws Exception {
+	void testAuthenticateUserThrowsException() throws Exception {
 
 		doThrow(new SamaritansException("Unable to authenticate user")).when(authenticationService)
 				.authenticate(loginRequest);
@@ -123,11 +126,10 @@ public class AuthControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), response.getStatus());
-
 	}
 
 	@Test
-	public void testChatLogin() throws Exception {
+	void testChatLogin() throws Exception {
 
 		when(chatUserService.buildChatUserRequest()).thenReturn(registerRequest);
 		when(authenticationService.authenticate(Mockito.any(LoginRequest.class)))
@@ -142,7 +144,7 @@ public class AuthControllerTest {
 	}
 
 	@Test
-	public void testChatLoginWhenReCaptchaFails() throws Exception {
+	void testChatLoginWhenReCaptchaFails() throws Exception {
 
 		doThrow(new InvalidReCaptchaException("Unable to validate response")).when(reCaptchaService)
 				.verifyResponse(RECAPTCHA_TOKEN);
@@ -156,7 +158,7 @@ public class AuthControllerTest {
 	}
 
 	@Test
-	public void testChatLoginUnableToRegisterUser() throws Exception {
+	void testChatLoginUnableToRegisterUser() throws Exception {
 
 		when(chatUserService.buildChatUserRequest()).thenReturn(registerRequest);
 

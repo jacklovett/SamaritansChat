@@ -1,16 +1,19 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -27,8 +30,8 @@ import com.samaritans.samaritanscoremodule.model.ChatConfig;
 import com.samaritans.samaritanscoremodule.requests.ChatConfigRequest;
 import com.samaritans.samaritanscoremodule.responses.ApiResponse;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ChatConfigControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ChatConfigControllerTest {
 
 	private static final int ID = 1;
 	private static final int AVAILABLE_FROM = 0;
@@ -46,8 +49,8 @@ public class ChatConfigControllerTest {
 	@InjectMocks
 	private ChatConfigController chatConfigController;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		gson = new Gson();
 
@@ -63,7 +66,7 @@ public class ChatConfigControllerTest {
 	}
 
 	@Test
-	public void testGetChatConfig() throws Exception {
+	void testGetChatConfig() throws Exception {
 
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
@@ -80,7 +83,7 @@ public class ChatConfigControllerTest {
 	}
 
 	@Test
-	public void testGetChatNotFound() throws Exception {
+	void testGetChatNotFound() throws Exception {
 
 		doThrow(new ResourceNotFoundException("No chat config found")).when(chatConfigDao).findConfig();
 
@@ -96,7 +99,7 @@ public class ChatConfigControllerTest {
 	}
 
 	@Test
-	public void testUpdateConfig() throws Exception {
+	void testUpdateConfig() throws Exception {
 
 		when(chatConfigDao.findConfig()).thenReturn(config);
 
@@ -111,12 +114,11 @@ public class ChatConfigControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK.value(), response.getStatus());
-		assertEquals(gson.toJson(new ApiResponse(true, "Settings updated successfully")),
-				response.getContentAsString());
+		assertEquals(gson.toJson(new ApiResponse(true, "Settings updated successfully")), response.getContentAsString());
 	}
 
 	@Test
-	public void testUpdateConfigWhenNotFound() throws Exception {
+	void testUpdateConfigWhenNotFound() throws Exception {
 
 		doThrow(new ResourceNotFoundException("No chat config found")).when(chatConfigDao).findConfig();
 
@@ -131,8 +133,7 @@ public class ChatConfigControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus());
-		assertEquals(gson.toJson(new ApiResponse(false, "Unable to update chat settings")),
-				response.getContentAsString());
+		assertEquals(gson.toJson(new ApiResponse(false, "Unable to update chat settings")), response.getContentAsString());
 	}
 
 }

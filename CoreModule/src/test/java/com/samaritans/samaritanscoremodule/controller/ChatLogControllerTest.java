@@ -1,19 +1,22 @@
 package com.samaritans.samaritanscoremodule.controller;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.mockito.Mockito.when;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -32,11 +35,12 @@ import com.samaritans.samaritanscoremodule.responses.ChatLogResponse;
 import com.samaritans.samaritanscoremodule.responses.TranscriptResponse;
 import com.samaritans.samaritanscoremodule.service.ChatLogService;
 import com.samaritans.samaritanscoremodule.utils.AppConstants;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ChatLogControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ChatLogControllerTest {
 
 	private static final Long ID = 1l;
 	private static final String TRANSCRIPT_NOTES = "notes";
@@ -62,8 +66,8 @@ public class ChatLogControllerTest {
 	@InjectMocks
 	private ChatLogController chatLogController;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 
 		gson = new GsonBuilder().serializeNulls().create();
 
@@ -111,7 +115,7 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testGetChatLogs() throws Exception {
+	void testGetChatLogs() throws Exception {
 
 		when(chatLogService.findChatLogs()).thenReturn(chatLogResponses);
 
@@ -128,7 +132,7 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testGetGetChatLogsWhenEmpty() throws Exception {
+	void testGetGetChatLogsWhenEmpty() throws Exception {
 
 		chatLogResponses.clear();
 
@@ -148,7 +152,7 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testGetTranscriptById() throws Exception {
+	void testGetTranscriptById() throws Exception {
 
 		when(chatLogService.findTranscriptById(ID)).thenReturn(transcriptResponse);
 
@@ -165,7 +169,7 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testGetTranscriptByIdWhenTranscriptNotFound() throws Exception {
+	void testGetTranscriptByIdWhenTranscriptNotFound() throws Exception {
 
 		when(chatLogService.findTranscriptById(ID)).thenReturn(null);
 
@@ -182,14 +186,14 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testSave() throws Exception {
+	void testSave() throws Exception {
 
 		String json = gson.toJson(chatLogRequest);
 
 		when(chatLogService.saveChatLog(chatLogRequest)).thenReturn(ID);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/chatlogs/save")
-				.accept(MediaType.APPLICATION_JSON).content(json).contentType(MediaType.APPLICATION_JSON);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/chatlogs/save").accept(MediaType.APPLICATION_JSON)
+				.content(json).contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
@@ -202,12 +206,12 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testSaveBadRequest() throws Exception {
+	void testSaveBadRequest() throws Exception {
 
 		String json = gson.toJson(chatLogRequest);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/chatlogs/save")
-				.accept(MediaType.APPLICATION_JSON).content(json).contentType(MediaType.APPLICATION_JSON);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/chatlogs/save").accept(MediaType.APPLICATION_JSON)
+				.content(json).contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
@@ -219,14 +223,14 @@ public class ChatLogControllerTest {
 	}
 
 	@Test
-	public void testSaveWhenChatLogAlreadyExists() throws Exception {
+	void testSaveWhenChatLogAlreadyExists() throws Exception {
 
 		String json = gson.toJson(chatLogRequest);
 
 		when(chatLogService.chatLogExistsByUsername(USERNAME)).thenReturn(true);
 
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/chatlogs/save")
-				.accept(MediaType.APPLICATION_JSON).content(json).contentType(MediaType.APPLICATION_JSON);
+		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/api/chatlogs/save").accept(MediaType.APPLICATION_JSON)
+				.content(json).contentType(MediaType.APPLICATION_JSON);
 
 		MvcResult result = mockMvc.perform(requestBuilder).andReturn();
 
@@ -234,8 +238,7 @@ public class ChatLogControllerTest {
 
 		assertNotNull(response);
 		assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
-		assertEquals(gson.toJson(new ApiResponse(false, "Chat log has already been saved")),
-				response.getContentAsString());
+		assertEquals(gson.toJson(new ApiResponse(false, "Chat log has already been saved")), response.getContentAsString());
 
 	}
 }

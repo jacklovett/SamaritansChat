@@ -1,26 +1,27 @@
 package com.samaritans.samaritanscoremodule.service;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.samaritans.samaritanscoremodule.dao.ChatUserDao;
 import com.samaritans.samaritanscoremodule.model.ChatUser;
 import com.samaritans.samaritanscoremodule.requests.RegisterRequest;
 
-@RunWith(MockitoJUnitRunner.class)
-public class ChatUserServiceTest {
+@ExtendWith(MockitoExtension.class)
+class ChatUserServiceTest {
 
 	private static final String USERNAME = "username";
 	private static final String SECRET = "secret";
@@ -34,15 +35,15 @@ public class ChatUserServiceTest {
 	@InjectMocks
 	private ChatUserService chatUserService;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		registerRequest = new RegisterRequest();
 		registerRequest.setUsername(USERNAME);
 		registerRequest.setPassword(SECRET);
 	}
 
 	@Test
-	public void testRegisterUser() {
+	void testRegisterUser() {
 
 		when(passwordEncoder.encode(SECRET)).thenReturn(SECRET);
 		chatUserService.registerUser(registerRequest);
@@ -51,7 +52,7 @@ public class ChatUserServiceTest {
 	}
 
 	@Test
-	public void testBuildChatUserRequest() {
+	void testBuildChatUserRequest() {
 
 		RegisterRequest registerRequest = chatUserService.buildChatUserRequest();
 
