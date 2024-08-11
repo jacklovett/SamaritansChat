@@ -1,12 +1,17 @@
+@import './../../../sass/theme';
+
+.login-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 32px;
+  color: $nav-background;
+}
+
 .login-panel {
-  margin: 0;
-  padding: 32px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-  max-width: 500px;
+  padding: 16px;
+  max-width: 540px;
   width: 100%;
 }
 

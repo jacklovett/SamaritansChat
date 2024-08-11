@@ -1,14 +1,14 @@
 <app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
 <mat-card class="container-margin" [hidden]="isLoading">
-  <div class="toolbar">
-    <mat-toolbar>Users</mat-toolbar>
+  <mat-toolbar
+    >Users
     <mat-icon
       matTooltip="Add User"
       class="material-icons material-icons-btn toolbar-icon"
       (click)="addUser()"
       >add_circle</mat-icon
-    >
-  </div>
+    ></mat-toolbar
+  >
   <app-table
     *ngIf="users.length"
     [data]="users"

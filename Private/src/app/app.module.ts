@@ -44,8 +44,9 @@ import {
   RxStompService,
   rxStompServiceFactory,
 } from '@stomp/ng2-stompjs'
-import { rxStompConfig } from './rx-stomp.config';
+import { rxStompConfig } from './rx-stomp.config'
 import { LoadingComponent } from './components/loading/loading.component'
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 
 export const customTooltipDefaults: MatTooltipDefaultOptions = {
   showDelay: 1000,
@@ -85,7 +86,6 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
     HttpClientModule,
     ReactiveFormsModule,
   ],
-  entryComponents: [DialogComponent, PasswordComponent],
   providers: [
     DatePipe,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
@@ -100,6 +100,7 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
       useFactory: rxStompServiceFactory,
       deps: [InjectableRxStompConfig],
     },
+    provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent],
 })

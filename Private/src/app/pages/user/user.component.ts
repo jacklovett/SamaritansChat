@@ -131,7 +131,8 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   private buildRegisterForm() {
-    const checkUsernameEmailRequest: UserDetailsRequest = new UserDetailsRequest()
+    const checkUsernameEmailRequest: UserDetailsRequest =
+      new UserDetailsRequest()
 
     this.userForm = this.formBuilder.group({
       firstName: ['', Validators.required],

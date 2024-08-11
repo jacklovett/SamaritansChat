@@ -1,5 +1,18 @@
 @import './../../../sass/theme';
 
+.login-title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 64px;
+  color: $primary;
+}
+
+.tag-line {
+  padding-top: 16px;
+}
+
 .login-panel {
   width: 100%;
   display: flex;
@@ -14,11 +27,24 @@
 }
 
 .logo {
-  max-width: 300px;
-  max-height: 300px;
+  max-width: 320px;
+  max-height: 320px;
 }
 
 .login-content {
-  margin: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  max-width: 560px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.disclaimer {
+  position: absolute;
+  bottom: 64px;
+  padding: 0 32px;
+  max-width: 560px;
   text-align: center;
 }

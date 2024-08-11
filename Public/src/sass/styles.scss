@@ -1,8 +1,12 @@
+@use '@angular/material' as mat;
 /* You can add global styles to this file, and also import other style files */
 @import './mixins';
 @import './variables';
 @import './materialFonts';
 @import './theme';
+
+// Apply the Angular Material theme globally
+@include mat.all-component-themes($app-theme);
 
 html,
 body {
@@ -80,4 +84,8 @@ button.mat-raised-button.primary-btn:hover {
 
 .faded-text {
   opacity: 0.5;
+}
+
+.hide-recaptcha .grecaptcha-badge {
+  visibility: hidden;
 }

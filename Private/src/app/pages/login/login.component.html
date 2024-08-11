@@ -1,5 +1,9 @@
 <app-loading [isCenter]="true" [isLoading]="isLoading"></app-loading>
-<mat-card class="login-panel" [hidden]="isLoading">
+<div class="login-title">
+  <h2>Samaritans</h2>
+  <h4>Back Office</h4>
+</div>
+<mat-card class="login-panel container-margin" [hidden]="isLoading">
   <mat-toolbar>Login</mat-toolbar>
   <form
     [formGroup]="loginForm"

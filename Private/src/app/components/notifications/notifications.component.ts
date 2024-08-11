@@ -44,9 +44,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     this.notificationsSubscription = this.rxStompService
       .watch(`/topic/notifications.${this.currentUsername}`)
-      .subscribe((message: Message) => {
-        this.onNotificationRecieved(message)
-      })
+      .subscribe((message: Message) => this.onNotificationRecieved(message))
   }
 
   get currentUsername() {
@@ -90,6 +88,18 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     ++this.notificationCount
   }
 
+  private async getNotifications() {
+    try {
+      this.notifications = await this.notificationService.get().toPromise()
+      const unreadNotifications = this.notifications.filter(
+        (notification) => !notification.read,
+      )
+      this.notificationCount = unreadNotifications.length
+    } catch (error) {
+      this.alertService.error(error)
+    }
+  }
+
   private async startConversation(notification: Notification) {
     const conversationRequest: ConversationRequest = <ConversationRequest>{
       chatUser: notification.username,
@@ -103,18 +113,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       notification.processed = true
       this.notificationService.update(notification)
       this.router.navigate(['chat'])
-    } catch (error) {
-      this.alertService.error(error)
-    }
-  }
-
-  private async getNotifications() {
-    try {
-      this.notifications = await this.notificationService.get().toPromise()
-      const unreadNotifications = this.notifications.filter(
-        (notification) => !notification.read,
-      )
-      this.notificationCount = unreadNotifications.length
     } catch (error) {
       this.alertService.error(error)
     }
