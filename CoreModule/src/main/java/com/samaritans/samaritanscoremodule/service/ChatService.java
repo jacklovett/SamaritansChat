@@ -124,6 +124,8 @@ public class ChatService {
 			throw new SamaritansException("Unable to connect to chat: No user found");
 		}
 
+		// Ensure the user is not already active
+		boolean isAlreadyActive = activeUsers.contains(username) || activeSamaritansUsers.contains(username);
 		if (isAlreadyActive) {
 			logger.info("User {} already active", username);
 			return;
@@ -308,6 +310,7 @@ public class ChatService {
 
 	private void addActiveSamaritansUser(final String username, final Message message) {
 		this.activeSamaritansUsers.add(username);
+		logger.info("Samaritans user {} added. Active Samaritans Users: {}", username, activeSamaritansUsers.toString());
 
 		convertAndSend("availability", new ChatAvailabilityResponse(ChatAvailabilityEnum.AVAILABLE));
 

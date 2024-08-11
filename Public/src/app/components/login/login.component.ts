@@ -59,7 +59,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.reCaptchaSubscription = this.recaptchaV3Service
       .execute('register')
       .subscribe(
-        (token) => {
         (token) => this.onSubmit(token),
         (error) => {
           this.alertService.error(error)

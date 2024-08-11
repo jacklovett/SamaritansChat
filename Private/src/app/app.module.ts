@@ -100,6 +100,7 @@ export const customTooltipDefaults: MatTooltipDefaultOptions = {
       useFactory: rxStompServiceFactory,
       deps: [InjectableRxStompConfig],
     },
+    provideAnimationsAsync(),
   ],
   bootstrap: [AppComponent],
 })
