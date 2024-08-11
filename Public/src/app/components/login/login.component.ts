@@ -60,8 +60,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       .execute('register')
       .subscribe(
         (token) => {
-          this.onSubmit(token)
-        },
+        (token) => this.onSubmit(token),
         (error) => {
           this.alertService.error(error)
           this.loading = false
@@ -73,9 +72,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.submitted = true
 
     this.authenticationService.login(token).subscribe(
-      () => {
-        this.router.navigate([this.returnUrl])
-      },
+      () => this.router.navigate([this.returnUrl]),
       (error) => {
         this.alertService.error(error)
         this.loading = false
@@ -85,15 +82,13 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   openDisclaimerDialog() {
     const dialogConfig = new MatDialogConfig()
-
     dialogConfig.disableClose = true
     dialogConfig.autoFocus = false
     dialogConfig.data = {
       title: 'Disclaimer',
       content:
-        'You are about to be put in contact with one of our trained representatives. ' +
-        'You are completely anonymous, and no information you disclose will be stored. ' +
-        'However, by continuing you agree that if you decide to provide us with your details, ' +
+        'You are about to be connected with one of our trained representatives. ' +
+        'You are completely anonymous. However, by continuing you agree that if you decide to provide us with your details, ' +
         'we have a duty of care and will take the necessary steps to prevent any harm to you.',
       successLabel: 'I agree, continue',
       cancelLabel: 'Go Back',

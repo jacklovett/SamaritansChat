@@ -4,18 +4,11 @@
 
 .search-container {
   display: flex;
-  font-size: 14px;
 }
 
 .search {
   margin-left: auto;
-  width: 200px;
-}
-
-.search-icon {
-  position: relative;
-  bottom: -2px;
-  margin-right: 3px;
+  width: 320px;
 }
 
 @media (max-width: 430px) {
@@ -30,11 +23,11 @@ table {
 
 th.mat-header-cell,
 td.mat-cell {
-  padding: 0 14px !important;
+  padding: 0 16px !important;
 }
 
 td.mat-cell {
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .center-cell {

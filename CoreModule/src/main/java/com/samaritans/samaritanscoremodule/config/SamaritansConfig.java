@@ -23,47 +23,47 @@ import com.samaritans.samaritanscoremodule.dao.TranscriptDao;
 public class SamaritansConfig {
 
 	@Bean
-	public RestTemplate getRestTemplate() {
+	RestTemplate getRestTemplate() {
 		return new RestTemplate();
 	}
 
 	@Bean
-	public ChatUserDao chatUserDao() {
+	ChatUserDao chatUserDao() {
 		return new ChatUserDao();
 	}
 
 	@Bean
-	public BoUserDao boUserDao() {
+	BoUserDao boUserDao() {
 		return new BoUserDao();
 	}
 
 	@Bean
-	public ChatLogDao chatLogDao() {
+	ChatLogDao chatLogDao() {
 		return new ChatLogDao();
 	}
 
 	@Bean
-	public RoleDao roleDao() {
+	RoleDao roleDao() {
 		return new RoleDao();
 	}
 
 	@Bean
-	public ChatDao chatDao() {
+	ChatDao chatDao() {
 		return new ChatDao();
 	}
 
 	@Bean
-	public ChatConfigDao chatConfigDao() {
+	ChatConfigDao chatConfigDao() {
 		return new ChatConfigDao();
 	}
 
 	@Bean
-	public NotificationDao notificationDao() {
+	NotificationDao notificationDao() {
 		return new NotificationDao();
 	}
 
 	@Bean
-	public TranscriptDao transcriptDao() {
+	TranscriptDao transcriptDao() {
 		return new TranscriptDao();
 	}
 }

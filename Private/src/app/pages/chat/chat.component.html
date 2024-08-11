@@ -16,9 +16,9 @@
         >
       </div>
     </div>
-    <div class="toolbar chat-toolbar primary mat-elevation-z2">
-      <mat-toolbar>{{ activeChat?.username }}</mat-toolbar>
-    </div>
+    <mat-toolbar class="chat-toolbar primary mat-elevation-z2">{{
+      activeChat?.username
+    }}</mat-toolbar>
     <app-messages
       class="chat-window"
       [username]="currentUsername"

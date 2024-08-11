@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
-import { Router } from '@angular/router'
+import { NavigationEnd, Router } from '@angular/router'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
+import { filter } from 'rxjs/operators'
 
 import { AuthenticationService } from './services/authentication.service'
 import { DialogComponent } from './components/dialog/dialog.component'
@@ -21,6 +22,16 @@ export class AppComponent {
     public dialog: MatDialog,
   ) {}
 
+  ngOnInit() {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) =>
+        event.urlAfterRedirects === '/chat'
+          ? document.body.classList.add('hide-recaptcha')
+          : document.body.classList.remove('hide-recaptcha'),
+      )
+  }
+
   leaveChatDialog() {
     const dialogConfig = new MatDialogConfig()
 
@@ -35,7 +46,7 @@ export class AppComponent {
     }
 
     dialogConfig.position = {
-      top: '36px',
+      top: '32px',
     }
 
     const dialogRef = this.dialog.open(DialogComponent, dialogConfig)

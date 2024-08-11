@@ -1,11 +1,7 @@
 <mat-card class="container-margin">
-  <div class="toolbar">
-    <mat-toolbar>Chat Settings</mat-toolbar>
-  </div>
+  <mat-toolbar>Chat Settings</mat-toolbar>
   <form [formGroup]="configForm" (ngSubmit)="onSubmit()" class="content">
-    <p>
-      Choose what time the chat service will be available to the public
-    </p>
+    <p>Choose what time the chat service will be available to the public</p>
     <mat-checkbox
       class="checkbox-container"
       formControlName="isTimeRestricted"

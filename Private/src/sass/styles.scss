@@ -1,9 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
-// @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@use '@angular/material' as mat;
+
 @import './mixins';
 @import './variables';
 @import './materialFonts';
 @import './theme';
+
+// Apply the Angular Material theme globally
+@include mat.all-component-themes($app-theme);
 
 html,
 body {
@@ -12,6 +15,8 @@ body {
   width: 100%;
   height: 100%;
   overflow: auto;
+
+  --mat-toolbar-title-text-size: 24px;
 }
 
 body {
@@ -24,8 +29,8 @@ span {
   font-size: 14px;
 }
 
-.mat-card {
-  font-size: 14px;
+.content {
+  padding: 16px;
 }
 
 a {
@@ -66,10 +71,6 @@ a {
   max-width: 800px;
 }
 
-.content {
-  padding: 0 16px;
-}
-
 @media (max-width: 864px) {
   .container-margin {
     margin: 16px;
@@ -106,11 +107,12 @@ a {
 
 mat-toolbar {
   background: none !important;
-}
+  justify-content: space-between;
 
-.toolbar {
-  display: flex;
-  align-items: center;
+  .mat-icon {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 .toolbar-icon {

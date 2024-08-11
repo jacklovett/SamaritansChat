@@ -1,10 +1,13 @@
 <div class="login-panel">
-  <!-- Add charity logo here -->
-  <!-- <img
-    alt="Samaritans"
-    class="logo"
-    src="../../../assets/img/samaritans_logo-min.png"
-  /> -->
+  <div class="login-content login-title">
+    <h2>Samaritans</h2>
+    <h5>Live Chat Helpline</h5>
+    <p>
+      Chat anonymously with trained volunteers who are ready to listen if you're
+      having a rough day.
+    </p>
+    <p class="tag-line">No judgement. No pressure. Completely confidential.</p>
+  </div>
   <div class="login-content">
     <div class="faded-text" [hidden]="chatAvailabilityResponse?.available">
       {{ chatAvailabilityResponse?.message }}
@@ -26,5 +29,14 @@
         class="form-spinner"
       ></mat-spinner>
     </div>
+  </div>
+  <div
+    class="disclaimer faded-text"
+    [hidden]="chatAvailabilityResponse?.available"
+  >
+    <p>
+      If you seek urgent assistance then contact your therapist or local medical
+      services.
+    </p>
   </div>
 </div>
